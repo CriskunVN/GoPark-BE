@@ -8,11 +8,14 @@ import APIFeatures from '../utils/apiFeatures.js';
 
 export const createOne = (Model) =>
   catchAsync(async (req, res, next) => {
-    const existingUser = await Model.findOne({ email: req.body.email });
-    if (existingUser) {
-      return next(new AppError('User with this email already exists', 409));
+    // Kiểm tra xem mô hình có phải là User không, nếu có thì kiểm tra email đã tồn tại chưa
+    if (Model === 'User') {
+      const existingUser = await Model.findOne({ email: req.body.email });
+      if (existingUser) {
+        return next(new AppError('User with this email already exists', 409));
+      }
     }
-
+    // Tạo một tài liệu mới từ mô hình với dữ liệu từ yêu cầu
     const doc = await Model.create(req.body);
     res.status(201).json({
       status: 'success',
@@ -49,7 +52,7 @@ export const updateOne = (Model) =>
     res.status(200).json({
       status: 'success',
       data: {
-        data: data,
+        data: doc,
       },
     });
   });
@@ -63,6 +66,25 @@ export const deleteOne = (Model) =>
     res.status(204).json({
       status: 'success',
       data: null,
+    });
+  });
+
+// Xóa mềm: cập nhật isActive = false
+export const softDeleteOne = (Model) =>
+  catchAsync(async (req, res, next) => {
+    const doc = await Model.findByIdAndUpdate(
+      req.params.id,
+      { isActive: false },
+      { new: true, runValidators: true }
+    );
+    if (!doc) {
+      return next(new AppError('No document found with that ID', 404));
+    }
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data: doc,
+      },
     });
   });
 

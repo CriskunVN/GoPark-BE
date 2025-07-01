@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import AppError from './utils/appError.js';
 import userRouter from './routes/user.route.js';
+import parkinglotRouter from './routes/parkinglot.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -28,6 +29,7 @@ app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 
 // 3. ROUTES
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/parkinglots', parkinglotRouter);
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
