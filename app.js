@@ -5,6 +5,7 @@ import cors from 'cors';
 import AppError from './utils/appError.js';
 import userRouter from './routes/user.route.js';
 import parkinglotRouter from './routes/parkinglot.route.js';
+import parkingSlotRouter from './routes/parkingSlot.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -28,9 +29,9 @@ app.use(express.json()); // Parse JSON request body
 app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 
 // 3. ROUTES
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/parkinglots', parkinglotRouter);
-
+app.use(`/api/v1/users`, userRouter);
+app.use(`/api/v1/parkinglots`, parkinglotRouter);
+app.use(`/api/v1/parkingSlots`, parkingSlotRouter);
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;

@@ -4,46 +4,48 @@ import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
-const userSchema = new mongoose.Schema({
-  userName: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email'],
-  },
-  password: { type: String, required: true, minlength: 8, select: false },
-  passwordConfirm: {
-    type: String,
-    required: [true, 'A user must have a passwordConfirm'],
-    validate: {
-      // This only works on CREATE and SAVE!!!
-      validator: function (el) {
-        return el === this.password;
-      },
-      message: 'Password are not the same!',
+const userSchema = new mongoose.Schema(
+  {
+    userName: {
+      type: String,
+      required: true,
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email'],
+    },
+    password: { type: String, required: true, minlength: 8, select: false },
+    passwordConfirm: {
+      type: String,
+      required: [true, 'A user must have a passwordConfirm'],
+      validate: {
+        // This only works on CREATE and SAVE!!!
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: 'Password are not the same!',
+      },
+    },
+
+    role: {
+      type: String,
+      enum: ['user', 'admin', 'parking_owner'],
+      default: 'user',
+    },
+    // profilePicture: { type: String, default: '' }, // hình đại diện người dùng
+    phoneNumber: { type: String, default: '' },
+    isActive: { type: Boolean, default: true, select: false },
+    passwordChangeAt: { type: Date, default: Date.now },
+    // the password reset token of the user
+    passwordResetToken: { type: String, select: false },
+    // the password reset expires date of the user
+    passwordResetExpires: { type: Date, select: false },
   },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-  role: {
-    type: String,
-    enum: ['user', 'admin', 'parking_owner'],
-    default: 'user',
-  },
-  // profilePicture: { type: String, default: '' }, // hình đại diện người dùng
-  phoneNumber: { type: String, default: '' },
-  isActive: { type: Boolean, default: true, select: false },
-  passwordChangeAt: { type: Date, default: Date.now },
-  // the password reset token of the user
-  passwordResetToken: { type: String, select: false },
-  // the password reset expires date of the user
-  passwordResetExpires: { type: Date, select: false },
-});
+  { timestamps: true } // sinh thêm trường updatedAt và createdAt
+);
 
 // Middleware để hash mật khẩu trước khi lưu vào cơ sở dữ liệu
 userSchema.pre('save', async function (next) {
