@@ -1,6 +1,14 @@
 import nodemailer from 'nodemailer';
 import catchAsync from './catchAsync.js';
-
+import fs from 'fs';
+import path from 'path';
+const templatePath = path.join(
+  process.cwd(),
+  'utils',
+  'template',
+  'email-template.html'
+);
+const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
 // This function sends an email using nodemailer
 // It takes an option object with email, subject, and message properties
 const sendEmail = catchAsync(async (option) => {
@@ -13,13 +21,19 @@ const sendEmail = catchAsync(async (option) => {
     },
   });
 
+  // Thay thế biến trong template
+  const html = htmlTemplate
+    .replace('{{userName}}', option.user)
+    .replace('{{resetURL}}', option.resetURL);
+
   // 2) Define the email options
   const mailOptions = {
     from: 'GoPark <goparkservice@gmail.io> ',
     to: option.email,
     subject: option.subject,
     text: option.message,
-    // html: '<h1>HTML version</h1>',
+    // Nếu option.html có giá trị thì gửi html, nếu không thì undefined
+    html,
   };
   // 3) Send the email
   await transporter.sendMail(mailOptions);

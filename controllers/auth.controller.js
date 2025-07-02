@@ -138,9 +138,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3. Gửi reset token qua email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
+  const resetURL = `${req.protocol}://localhost:3000/account/reset/password?token=${resetToken}`;
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.
                     If you didn't forget your password, please ignore this email!`;
@@ -150,6 +148,8 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
       email: user.email,
       subject: 'Your password reset token (valid for 10 min)',
       message,
+      user: user.userName,
+      resetURL, // truyền resetURL vào đây nếu cần
     });
 
     res.status(200).json({
