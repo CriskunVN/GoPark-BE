@@ -45,6 +45,7 @@ export const createParkingLotWithSlots = catchAsync(async (req, res, next) => {
       slotsToCreate.push({
         parkingLot: newLot._id,
         slotNumber: `${zone}${i}`,
+        zone: zone,
         status: 'Trống',
         expiresAt: null,
       });
@@ -54,7 +55,8 @@ export const createParkingLotWithSlots = catchAsync(async (req, res, next) => {
   const createdSlots = await ParkingSlot.insertMany(slotsToCreate);
 
   res.status(201).json({
-    message: `${newLot.name} đã được tạo với ${createdSlots.length} slot.`,
+    status: 'success',
+    messsage: 'Tạo bãi thành công',
     data: {
       parkingLot: newLot,
       slots: createdSlots,

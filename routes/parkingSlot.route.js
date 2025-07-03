@@ -7,4 +7,6 @@ router
   .get(ParkingSlot.getAllParkingSlots)
   .post(ParkingSlot.createParkingSlot);
 
+router.route('/:id').delete(ParkingSlot.deleteParkingSlot);
+
 export default router;

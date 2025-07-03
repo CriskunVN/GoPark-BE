@@ -3,7 +3,6 @@ import AppError from '../utils/appError.js';
 import APIFeatures from '../utils/apiFeatures.js';
 import ParkingLot from '../models/parkinglot.model.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
-
 // Hàm này sẽ trả về một hàm bất đồng bộ (async function) để xử lý các yêu cầu CRUD cho mô hình cụ thể
 // Ví dụ: createOne(User) sẽ trả về một hàm để tạo người dùng mới, tạo ra một hàm để lấy người dùng theo ID, v.v.
 // Tác dụng của hàm này là để giảm thiểu mã lặp lại trong các controller
@@ -20,34 +19,6 @@ export const createOne = (Model) =>
     // Tạo một tài liệu mới từ mô hình với dữ liệu từ yêu cầu
     const doc = await Model.create(req.body);
 
-    // Nếu là tạo thêm slot thì update count zone tương ứng trong ParkingLot
-    if (Model.modelName === 'ParkingSlot') {
-      const { parkingLot, slotNumber } = req.body;
-      // slotNumber dạng "A6" => zone = "A", number = 6
-      const match = /^([A-Za-z]+)(\d+)$/.exec(slotNumber);
-      if (match) {
-        const zoneName = match[1];
-        const slotNum = parseInt(match[2], 10);
-        // Tìm ParkingLot
-        const lot = await ParkingLot.findById(parkingLot);
-        if (lot) {
-          const zones = lot.zones || [];
-          const zoneIdx = zones.findIndex((z) => z.zone === zoneName);
-          if (zoneIdx !== -1) {
-            // Nếu đã có zone, cập nhật count nếu cần
-            if (zones[zoneIdx].count < slotNum) {
-              zones[zoneIdx].count = slotNum;
-              await ParkingLot.findByIdAndUpdate(parkingLot, { zones });
-            }
-          } else {
-            // Nếu chưa có zone, thêm mới
-            zones.push({ zone: zoneName, count: slotNum });
-            await ParkingLot.findByIdAndUpdate(parkingLot, { zones });
-          }
-        }
-      }
-    }
-
     res.status(201).json({
       status: 'success',
       data: {
@@ -59,11 +30,15 @@ export const createOne = (Model) =>
 export const getOne = (Model) =>
   catchAsync(async (req, res, next) => {
     let doc = '';
+
     if (Model.modelName !== 'ParkingLot') {
       doc = await Model.findById(req.params.id);
     } else {
-      // tương tự như sub-query để lấy các thông tin của bãi xe và số lượng trống không cần phải tham chiếu
+      // Dùng aggregate để lấy bãi đỗ, tổng số slot, slot còn trống và danh sách slot
       doc = await ParkingLot.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(req.params.id) },
+        },
         {
           $lookup: {
             from: 'parkingslots',
@@ -75,7 +50,7 @@ export const getOne = (Model) =>
         {
           $addFields: {
             totalSlots: { $size: '$slots' },
-            emptySlots: {
+            availableSlots: {
               $size: {
                 $filter: {
                   input: '$slots',
@@ -88,15 +63,21 @@ export const getOne = (Model) =>
         },
         {
           $project: {
-            slots: 0, // ẩn danh sách slot
+            name: 1,
+            location: 1,
+            zones: 1,
+            slots: 1,
+            totalSlots: 1,
+            availableSlots: 1,
           },
         },
-      ]);
+      ]); // Vì aggregate trả về mảng
     }
 
     if (!doc) {
-      return next(new AppError('No document found with that ID', 404));
+      return next(new AppError('Không tìm thấy bãi đỗ xe với ID này', 404));
     }
+
     res.status(200).json({
       status: 'success',
       data: {

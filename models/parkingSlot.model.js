@@ -23,6 +23,10 @@ const parkingSlotSchema = new mongoose.Schema(
     //   },
 
     // thời gian hết hạn của slot cũng như của booking
+    zone: {
+      type: String,
+      required: true,
+    },
     expiresAt: {
       type: Date,
       default: null,
