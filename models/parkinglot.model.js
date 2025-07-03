@@ -25,6 +25,10 @@ const parkingLotSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    address: {
+      type: String,
+      required: true, // Địa chỉ chi tiết, có thể chứa tên thành phố
+    },
     zones: [
       {
         zone: { type: String, required: true }, // A, B, C

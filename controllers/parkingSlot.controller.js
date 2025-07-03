@@ -19,6 +19,8 @@ export const createParkingSlot = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get one slot
+export const getParkingSlot = () => {};
 // Xóa 1 slot
 export const deleteParkingSlot = catchAsync(async (req, res, next) => {
   await ParkingSlotService.deleteSlotAndSyncZone(req.params.id);
@@ -27,3 +29,6 @@ export const deleteParkingSlot = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+// Update 1 slot
+export const updateParkingSlot = () => {};

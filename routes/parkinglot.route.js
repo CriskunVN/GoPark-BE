@@ -4,7 +4,7 @@ import * as authController from '../controllers/auth.controller.js';
 import parkingSlotRoute from './parkingSlot.route.js';
 const router = express.Router();
 
-router.use('/:slotID', parkingSlotRoute);
+// router.use('/:slotID', parkingSlotRoute);
 
 // Sử dụng cho tất cả các route
 router.use(

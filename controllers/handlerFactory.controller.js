@@ -3,6 +3,7 @@ import AppError from '../utils/appError.js';
 import APIFeatures from '../utils/apiFeatures.js';
 import ParkingLot from '../models/parkinglot.model.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
+import mongoose from 'mongoose';
 // Hàm này sẽ trả về một hàm bất đồng bộ (async function) để xử lý các yêu cầu CRUD cho mô hình cụ thể
 // Ví dụ: createOne(User) sẽ trả về một hàm để tạo người dùng mới, tạo ra một hàm để lấy người dùng theo ID, v.v.
 // Tác dụng của hàm này là để giảm thiểu mã lặp lại trong các controller
@@ -30,15 +31,12 @@ export const createOne = (Model) =>
 export const getOne = (Model) =>
   catchAsync(async (req, res, next) => {
     let doc = '';
-
     if (Model.modelName !== 'ParkingLot') {
       doc = await Model.findById(req.params.id);
     } else {
-      // Dùng aggregate để lấy bãi đỗ, tổng số slot, slot còn trống và danh sách slot
+      // tương tự như sub-query để lấy các thông tin của bãi xe và số lượng trống không cần phải tham chiếu
       doc = await ParkingLot.aggregate([
-        {
-          $match: { _id: new mongoose.Types.ObjectId(req.params.id) },
-        },
+        { $match: { _id: new mongoose.Types.ObjectId(req.params.id) } },
         {
           $lookup: {
             from: 'parkingslots',
@@ -50,7 +48,7 @@ export const getOne = (Model) =>
         {
           $addFields: {
             totalSlots: { $size: '$slots' },
-            availableSlots: {
+            emptySlots: {
               $size: {
                 $filter: {
                   input: '$slots',
@@ -61,23 +59,17 @@ export const getOne = (Model) =>
             },
           },
         },
-        {
-          $project: {
-            name: 1,
-            location: 1,
-            zones: 1,
-            slots: 1,
-            totalSlots: 1,
-            availableSlots: 1,
-          },
-        },
-      ]); // Vì aggregate trả về mảng
+        // {
+        //   $project: {
+        //     slots: 0, // ẩn danh sách slot
+        //   },
+        // },
+      ]);
     }
 
     if (!doc) {
-      return next(new AppError('Không tìm thấy bãi đỗ xe với ID này', 404));
+      return next(new AppError('No document found with that ID', 404));
     }
-
     res.status(200).json({
       status: 'success',
       data: {
