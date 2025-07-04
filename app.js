@@ -31,7 +31,7 @@ app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 // 3. ROUTES
 app.use(`/api/v1/users`, userRouter);
 app.use(`/api/v1/parkinglots`, parkinglotRouter);
-app.use(`/api/v1/parkingSlots`, parkingSlotRouter);
+app.use(`/api/v1/parking-slots`, parkingSlotRouter);
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;

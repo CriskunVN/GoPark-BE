@@ -1,9 +1,8 @@
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
 import APIFeatures from '../utils/apiFeatures.js';
-import ParkingLot from '../models/parkinglot.model.js';
+import * as ParkingLotService from '../services/parkinglot.service.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
-import mongoose from 'mongoose';
 // Hàm này sẽ trả về một hàm bất đồng bộ (async function) để xử lý các yêu cầu CRUD cho mô hình cụ thể
 // Ví dụ: createOne(User) sẽ trả về một hàm để tạo người dùng mới, tạo ra một hàm để lấy người dùng theo ID, v.v.
 // Tác dụng của hàm này là để giảm thiểu mã lặp lại trong các controller
@@ -35,36 +34,7 @@ export const getOne = (Model) =>
       doc = await Model.findById(req.params.id);
     } else {
       // tương tự như sub-query để lấy các thông tin của bãi xe và số lượng trống không cần phải tham chiếu
-      doc = await ParkingLot.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(req.params.id) } },
-        {
-          $lookup: {
-            from: 'parkingslots',
-            localField: '_id',
-            foreignField: 'parkingLot',
-            as: 'slots',
-          },
-        },
-        {
-          $addFields: {
-            totalSlots: { $size: '$slots' },
-            emptySlots: {
-              $size: {
-                $filter: {
-                  input: '$slots',
-                  as: 'slot',
-                  cond: { $eq: ['$$slot.status', 'Trống'] },
-                },
-              },
-            },
-          },
-        },
-        // {
-        //   $project: {
-        //     slots: 0, // ẩn danh sách slot
-        //   },
-        // },
-      ]);
+      doc = await ParkingLotService.getParkingLotWithPineline();
     }
 
     if (!doc) {
@@ -72,9 +42,7 @@ export const getOne = (Model) =>
     }
     res.status(200).json({
       status: 'success',
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });
 

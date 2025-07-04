@@ -16,7 +16,7 @@ router.use(
 router
   .route('/')
   .get(parkingLotController.getAllParkingLots)
-  .post(parkingLotController.createParkingLotWithSlots);
+  .post(parkingLotController.createParkingLot);
 
 // Route để lấy, cập nhật hoặc xóa bãi đỗ xe theo ID
 router

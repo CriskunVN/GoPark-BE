@@ -4,7 +4,7 @@ import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
 
 // thêm slot và đồng bộ trong parkingLot
-export const prepareParkingSlotData = catchAsync(async (data) => {
+export const prepareParkingSlotData = async (data) => {
   const { parkingLot, zone } = data;
 
   if (!parkingLot || !zone) {
@@ -46,10 +46,10 @@ export const prepareParkingSlotData = catchAsync(async (data) => {
   await ParkingLot.findByIdAndUpdate(parkingLot, { zones });
 
   return data;
-});
+};
 
 // Xóa slot cuối và đồng bộ ParkingLot
-export const deleteSlotAndSyncZone = catchAsync(async (slotId) => {
+export const deleteSlotAndSyncZone = async (slotId) => {
   const slot = await ParkingSlot.findById(slotId);
   if (!slot) throw new AppError('Slot không tồn tại', 404);
 
@@ -79,4 +79,4 @@ export const deleteSlotAndSyncZone = catchAsync(async (slotId) => {
       await ParkingLot.findByIdAndUpdate(parkingLot, { zones });
     }
   }
-});
+};
