@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "server": "nodemon server.js",
-    "dev": "concurrently \"npm run server\""
+    "dev": "concurrently \"npm run server\"",
+    "debug": "ndb server.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.0",
     "morgan": "^1.10.0",
+    "ndb": "^1.1.5",
     "node-cron": "^4.2.0",
     "nodemailer": "^7.0.3",
     "populate": "^5.0.1",
