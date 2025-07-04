@@ -2,6 +2,7 @@ import * as Factory from './handlerFactory.controller.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
 import catchAsync from '../utils/catchAsync.js';
 import * as ParkingSlotService from '../services/parkingSlot.service.js';
+import ParkingLot from '../models/parkinglot.model.js';
 
 // Lấy toàn bộ slot trong Bãi đỗ có thể lọc theo trạng thái "Trống , Đã Đặt , Đặt Trước"
 export const getAllParkingSlots = Factory.getAll(ParkingSlot);
@@ -19,6 +20,9 @@ export const createParkingSlot = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get one slot
+export const getParkingSlot = Factory.getOne(ParkingSlot);
+
 // Xóa 1 slot
 export const deleteParkingSlot = catchAsync(async (req, res, next) => {
   await ParkingSlotService.deleteSlotAndSyncZone(req.params.id);
@@ -27,3 +31,6 @@ export const deleteParkingSlot = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+// Update 1 slot
+export const updateParkingSlot = Factory.updateOne(ParkingSlot);
