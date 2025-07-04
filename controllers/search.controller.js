@@ -8,9 +8,11 @@ export const searchParkingLots = async (req, res) => {
       return res.status(400).json({ message: 'Location is required' });
     }
 
-    // Tìm theo tên gần giống (index text đã được tạo trên trường `name`)
     const lots = await ParkingLot.find({
-      name: { $regex: location, $options: 'i' },
+      $or: [
+        { address: { $regex: location, $options: 'i' } },
+        // { name: { $regex: location, $options: 'i' } }
+      ],
       isActive: true,
     }).populate('parkingOwner', 'userName email');
 
