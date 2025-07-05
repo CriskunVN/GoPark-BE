@@ -13,8 +13,8 @@ const parkingSlotSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Trống', 'Đã đặt', 'Đặt trước'],
-      default: 'Trống',
+      enum: ['available', 'booked', 'reserved'],
+      default: 'available',
     },
     //   vehicleType: {
     //     type: String,
@@ -23,9 +23,9 @@ const parkingSlotSchema = new mongoose.Schema(
     //   },
 
     // thời gian hết hạn của slot cũng như của booking
-    expiresAt: {
-      type: Date,
-      default: null,
+    zone: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true } // sinh thêm trường updatedAt và createdAt
