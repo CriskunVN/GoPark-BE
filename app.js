@@ -15,13 +15,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://go-park-fe.vercel.app' // FE đã deploy trên Vercel
+];
 
 // 1. GLOBAL MIDDLEWARE
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
-    origin: 'http://localhost:3000', // FE Next.js URL
-    credentials: true, // Cho phép gửi cookie hoặc Authorization headers
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
   })
 );
 
