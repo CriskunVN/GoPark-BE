@@ -20,9 +20,16 @@ const app = express();
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
-    origin: 'https://go-park-fe.vercel.app', // chỉ cho phép domain của bạn
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true, // nếu cần dùng cookie hoặc authentication
+    origin: [
+      'https://go-park-fe.vercel.app',
+      'http://localhost:3000',
+      'https://gopark-fe-production.up.railway.app',
+      'https://go-park-fe-git-main-yourusername.vercel.app',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
 
