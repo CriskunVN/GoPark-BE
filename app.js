@@ -7,7 +7,7 @@ import userRouter from './routes/user.route.js';
 import parkinglotRouter from './routes/parkinglot.route.js';
 import parkingSlotRouter from './routes/parkingSlot.route.js';
 import searchRoutes from './routes/search.route.js';
-import vehicleRoutes from "./routes/vehicle.route.js";
+import vehicleRoutes from './routes/vehicle.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -16,12 +16,24 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://go-park-fe.vercel.app',
+];
+
 // 1. GLOBAL MIDDLEWARE
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
-    origin: 'http://localhost:3000', // FE Next.js URL
-    credentials: true, // Cho phép gửi cookie hoặc Authorization headers
+    origin: function (origin, callback) {
+      // Cho phép request không có origin (ví dụ Postman) hoặc origin nằm trong danh sách
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Cho phép gửi cookies hoặc Authorization headers
   })
 );
 
@@ -35,7 +47,7 @@ app.use(`/api/v1/users`, userRouter);
 app.use(`/api/v1/parkinglots`, parkinglotRouter);
 app.use('/api/v1/search', searchRoutes);
 app.use(`/api/v1/parking-slots`, parkingSlotRouter);
-app.use("/api/v1/vehicles", vehicleRoutes);
+app.use('/api/v1/vehicles', vehicleRoutes);
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
