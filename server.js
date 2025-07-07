@@ -1,14 +1,13 @@
-// 4. SERVER
-
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-// ...existing code...
+import app from './app.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
 dotenv.config({ path: `${__dirname}/config.env` });
-import app from './app.js';
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -19,19 +18,20 @@ process.on('uncaughtException', (err) => {
   });
 });
 
+// MongoDB connection
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
-); // Replace <PASSWORD> with your actual database password
+);
 
-// Connect to the database using mongoose
 mongoose.connect(DB).then(() => console.log('DB connection successful!'));
 
-const port = process.env.PORT;
+// ✅ Quan trọng: Đặt mặc định port nếu biến môi trường không có
+const port = process.env.PORT || 5000;
 
-// Start the server
+// Start server
 const server = app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`🚀 Server is running on port ${port}`);
 });
 
 // Handle unhandled promise rejections

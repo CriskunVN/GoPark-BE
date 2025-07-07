@@ -4,7 +4,8 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "server": "nodemon server.js",
+    "start": "node server.js",                  
+    "server": "nodemon server.js",               
     "dev": "concurrently \"npm run server\"",
     "debug": "ndb server.js"
   },
