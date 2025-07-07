@@ -16,24 +16,21 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://go-park-fe.vercel.app',
-];
-
 // 1. GLOBAL MIDDLEWARE
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Cho phép request không có origin (ví dụ Postman) hoặc origin nằm trong danh sách
+      const allowedOrigins = [
+        'https://go-park-fe.vercel.app',
+        'http://localhost:3000',
+      ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
-    credentials: true, // Cho phép gửi cookies hoặc Authorization headers
   })
 );
 
