@@ -20,17 +20,9 @@ const app = express();
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        'https://go-park-fe.vercel.app',
-        'http://localhost:3000',
-      ];
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: 'https://go-park-fe.vercel.app', // chỉ cho phép domain của bạn
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true, // nếu cần dùng cookie hoặc authentication
   })
 );
 
