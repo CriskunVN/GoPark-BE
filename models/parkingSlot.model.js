@@ -27,6 +27,12 @@ const parkingSlotSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+     pricePerHour: {
+      type: Number,
+      required: true,
+      default: 0, // Giá tiền mỗi giờ
+    },
+
   },
   { timestamps: true } // sinh thêm trường updatedAt và createdAt
 );
