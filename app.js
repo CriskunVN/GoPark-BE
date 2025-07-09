@@ -3,11 +3,13 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
 import AppError from './utils/appError.js';
+//Route
 import userRouter from './routes/user.route.js';
 import parkinglotRouter from './routes/parkinglot.route.js';
 import parkingSlotRouter from './routes/parkingSlot.route.js';
 import searchRoutes from './routes/search.route.js';
 import vehicleRoutes from './routes/vehicle.route.js';
+import bookingRouter from './routes/booking.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -39,6 +41,7 @@ app.use(`/api/v1/parkinglots`, parkinglotRouter);
 app.use('/api/v1/search', searchRoutes);
 app.use(`/api/v1/parking-slots`, parkingSlotRouter);
 app.use('/api/v1/vehicles', vehicleRoutes);
+app.use('/api/v1/bookings', bookingRouter); 
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {

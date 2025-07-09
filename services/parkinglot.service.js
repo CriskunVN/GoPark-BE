@@ -1,6 +1,7 @@
 import ParkingLot from '../models/parkinglot.model.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
 import AppError from '../utils/appError.js';
+import mongoose from 'mongoose';
 
 export const createParkingLotWithSlots = async (body) => {
   const { name, zones, location } = body;
@@ -53,8 +54,10 @@ export const createParkingLotWithSlots = async (body) => {
   };
 };
 
-export const getParkingLotWithPineline = async () => {
+
+export const getParkingLotByIdWithStats = async (id) => {
   const doc = await ParkingLot.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(id) } },
     {
       $lookup: {
         from: 'parkingslots',
@@ -77,12 +80,7 @@ export const getParkingLotWithPineline = async () => {
         },
       },
     },
-    // {
-    //   $project: {
-    //     slots: 0, // ẩn danh sách slot
-    //   },
-    // },
+    { $project: { slots: 0 } },
   ]);
-
-  return doc;
+  return doc[0] || null;
 };

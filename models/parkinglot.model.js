@@ -52,7 +52,7 @@ const parkingLotSchema = new mongoose.Schema(
     allowedPaymentMethods: {
       type: [String],
       enum: ['prepaid', 'pay-at-parking' ], // Các phương thức thanh toán được hỗ trợ
-      default: ['prepaid'],
+      default: ['prepaid', 'pay-at-parking'], // Mặc định là cả hai phương thức
     },
   },
   { timestamps: true } // sinh thêm trường updatedAt và createdAt

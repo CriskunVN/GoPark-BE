@@ -16,13 +16,6 @@ const parkingSlotSchema = new mongoose.Schema(
       enum: ['available', 'booked', 'reserved'],
       default: 'available',
     },
-    //   vehicleType: {
-    //     type: String,
-    //     enum: ['Xe máy', 'Ô tô', 'Xe đạp'],
-    //     required: true,
-    //   },
-
-    // thời gian hết hạn của slot cũng như của booking
     zone: {
       type: String,
       required: true,
@@ -30,7 +23,7 @@ const parkingSlotSchema = new mongoose.Schema(
      pricePerHour: {
       type: Number,
       required: true,
-      default: 0, // Giá tiền mỗi giờ
+      default: 20000, // Giá tiền mỗi giờ, mặc định là 20.000 VNĐ
     },
 
   },

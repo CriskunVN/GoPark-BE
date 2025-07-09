@@ -1,55 +1,73 @@
 import Booking from '../models/booking.model.js';
 import AppError from '../utils/appError.js';
 import { isPaymentMethodAllowed } from './paymentOption.service.js';
+import mongoose from 'mongoose';
+
+// Tính tổng tiền dựa trên thời gian bắt đầu, kết thúc và giá mỗi giờ
+const funcTotalPrice = (start, end, pricePerHour) => {
+    const diffMs = end - start;
+    if (diffMs <= 0) {
+        throw new AppError('End time must be after start time', 400);
+    }
+    // Tính số giờ, làm tròn lên nếu có lẻ phút
+    const hours = Math.ceil(diffMs / (1000 * 60 * 60));
+    return hours * pricePerHour;
+};
+
+
 
 // Tạo booking mới
 export const createBooking = async (data) => {
     // Kiểm tra xem user con tồn tại không
-  if (!data.userId) {
-    throw new AppError('User ID is required for booking', 400);
+    const user = await mongoose.model('User').findById(data.userId);
+    if (!user) {
+        throw new AppError('User ID is required for booking', 400);
     }
-    // Kiểm tra xem slot có còn trống không
-    if (data.parkingSlotId.status !== 'available') {
+    // Kiểm tra slot
+    if (!data.parkingSlotId) {
+        throw new AppError('Parking slot is required', 400);
+    }
+    const slot = await mongoose.model('ParkingSlot').findById(data.parkingSlotId);
+    if (!slot) {
+        throw new AppError('Parking slot not found', 404);
+    }
+    if (slot.status !== 'available') {
         throw new AppError('Parking slot is not available', 400);
     }
-    // Kiểm tra thời gian bắt đầu và kết thúc
-    if (data.startTime >= data.endTime) {
-        throw new AppError('Start time must be before end time', 400);
+    // Kiểm tra thời gian
+    if (!data.startTime || !data.endTime || data.startTime >= data.endTime) {
+        throw new AppError('Invalid start or end time', 400);
     }
-    
-    // Tính toán giá tiền dựa trên thời gian booking
-    const duration = (data.endTime - data.startTime) / (1000 * 60 * 60); // Tính theo giờ
-    const pricePerHour = data.parkingSlotId.pricePerHour || 0; // Giá theo giờ của slot
-    data.totalPrice = duration * pricePerHour;
-    
-    // Cập nhật trạng thái của slot
-    data.parkingSlotId.status = 'booked';
-    
-    // Tạo booking mới
-    data.status = 'pending'; // Trạng thái ban đầu của booking
 
-    // Kiểm tra phương thức thanh toán khách chọn
+    // Tính tiền theo thời gian start và end
+    const totalPrice = funcTotalPrice(data.startTime , data.endTime , slot.pricePerHour);
+
+    // Cập nhật trạng thái slot
+    await mongoose.model('ParkingSlot').findByIdAndUpdate(data.parkingSlotId, { status: 'booked' });
+    
+    // Phương thức thanh toán
     const paymentMethod = data.paymentMethod || 'pay-at-parking';
-    await isPaymentMethodAllowed(data.parkingSlotId, paymentMethod);
-    data.paymentMethod = paymentMethod;
-    if (paymentMethod === 'prepaid') {
-        data.paymentStatus = 'paid';
-    } else {
-        data.paymentStatus = 'unpaid';
+    const isAllowed = await isPaymentMethodAllowed(data.parkingSlotId, paymentMethod);
+    if (!isAllowed) {
+        throw new AppError('Payment method not allowed for this parking lot', 400);
     }
-
-  // Tạo booking mới
-  data.bookingDate = new Date(); // Ngày tạo booking, mặc định là ngày hiện
-  data.vehicleNumber = data.vehicleNumber || ''; // Số xe của người dùng, có thể để trống nếu không có
-
-  const booking = await Booking.create(data);
-  return booking;
+    
+    // Tạo booking
+    const booking = await Booking.create({
+        userId: data.userId,
+        parkingSlotId: data.parkingSlotId,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        totalPrice,
+        paymentMethod,
+        paymentStatus: paymentMethod === 'prepaid' ? 'paid' : 'unpaid',
+        status: 'pending',
+        bookingDate: new Date(),
+        vehicleNumber: data.vehicleNumber || ''
+    });
+    return booking;
 };
 
-// Lấy danh sách booking (có thể filter theo user, slot, status...)
-export const getBookings = async (filter = {}, options = {}) => {
-  return Booking.find(filter, null, options).populate('userId parkingSlotId');
-};
 
 // Lấy chi tiết một booking
 export const getBookingById = async (id) => {

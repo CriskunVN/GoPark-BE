@@ -7,25 +7,17 @@ const bookingSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    parkingSlotId: { 
+    parkingSlotId: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ParkingSlot',
         required: true
-    },
-    startTime: {
-        type: Date,
-        required: true
-    },
-    endTime: {
-        type: Date,
-        required: true
-    },
+    }],
     status: {
         type: String,
         enum: ['pending', 'confirmed', 'cancelled' , 'completed'],
         default: 'pending'
     },
-    totalPrice: {
+    price: {
         type: Number,
         default: 0, // Giá tiền tổng cộng cho booking
     },
@@ -43,10 +35,7 @@ const bookingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now // Ngày tạo booking, mặc định là ngày hiện tại
     },
-    vehicleNumber: {
-        type: String,
-        required: true // Số xe của người dùng
-    },
+    
 
 
 
