@@ -17,9 +17,19 @@ const bookingSchema = new mongoose.Schema({
         enum: ['pending', 'confirmed', 'cancelled' , 'completed'],
         default: 'pending'
     },
-    price: {
-        type: Number,
-        default: 0, // Giá tiền tổng cộng cho booking
+    startTime: {
+        type: Date,
+        required: true, // Thời gian bắt đầu booking là bắt buộc
+        default: Date.now() // Mặc định là thời gian hiện tại nếu không được cung cấp
+    },
+    endTime: {
+        type: Date,
+
+    },
+    vehicleNumber: {
+        type: String,
+        required: true, // Số xe là bắt buộc
+        trim: true // Loại bỏ khoảng trắng thừa
     },
     paymentStatus: {
         type: String,
@@ -35,7 +45,11 @@ const bookingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now // Ngày tạo booking, mặc định là ngày hiện tại
     },
-    
+    bookingType:{
+        type: String,
+        enum: ['date', 'hour'], // Loại booking, có thể là theo ngày hoặc theo giờ
+        default: 'hour' // Mặc định là booking theo ngày
+    },
 
 
 

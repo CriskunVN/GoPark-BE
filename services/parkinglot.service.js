@@ -80,7 +80,7 @@ export const getParkingLotByIdWithStats = async (id) => {
         },
       },
     },
-    { $project: { slots: 0 } },
+    // { $project: { slots: 0 } },
   ]);
   return doc[0] || null;
 };

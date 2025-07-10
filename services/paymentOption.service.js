@@ -11,7 +11,6 @@ export const isPaymentMethodAllowed = async (parkingSlotId, paymentMethod) => {
   if (!slot) throw new AppError('Parking slot not found', 404);
   // Lấy allowedPaymentMethods từ parkingLot
   const lot = slot.parkingLot;
-  console.log("SLot : ",slot , "Lot: ", lot);
   if (!lot.allowedPaymentMethods.includes(paymentMethod)) {
     throw new AppError('Payment method not allowed for this parking lot', 400);
   }
