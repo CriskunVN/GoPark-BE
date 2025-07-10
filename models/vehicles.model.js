@@ -15,6 +15,10 @@ const vehicleSchema = new mongoose.Schema({
     required: true,
     ref: "User", // Optional: nếu bạn có model User và muốn populate
   },
+  imageVehicle :{
+    type: String,
+    default: '',
+  }
 }, {
   timestamps: true, // Optional: tự động thêm createdAt & updatedAt
 });
