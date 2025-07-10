@@ -22,7 +22,7 @@ const app = express();
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
-    origin: ['https://go-park-fe.vercel.app'],
+    origin: ['http://localhost:3000', 'https://go-park-fe.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
     preflightContinue: false,
