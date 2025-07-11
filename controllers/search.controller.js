@@ -21,3 +21,30 @@ export const searchParkingLots = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const searchParkingNearMe = async (req, res) => {
+  try {
+    const { lat, lng, radius } = req.params;
+    if (!lat || !lng || !radius) {
+      return res
+        .status(400)
+        .json({ message: 'Latitude, longitude and radius are required' });
+    }
+
+    const lots = await ParkingLot.find({
+      location: {
+        $geoWithin: {
+          $centerSphere: [
+            [parseFloat(lng), parseFloat(lat)],
+            parseFloat(radius) / 6378.1,
+          ],
+        },
+      },
+      isActive: true,
+    });
+
+    res.status(200).json({ results: lots.length, data: lots });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

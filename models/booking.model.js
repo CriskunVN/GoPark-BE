@@ -19,12 +19,12 @@ const bookingSchema = new mongoose.Schema({
     },
     startTime: {
         type: Date,
-        required: true, // Thời gian bắt đầu booking là bắt buộc
-        default: Date.now() // Mặc định là thời gian hiện tại nếu không được cung cấp
+        default: Date.now(), // Mặc định là thời gian hiện tại nếu không được cung cấp
+        required: true // Ngày bắt đầu là bắt buộc
     },
     endTime: {
         type: Date,
-
+        required: true // Ngày kết thúc là bắt buộc
     },
     vehicleNumber: {
         type: String,
