@@ -5,16 +5,26 @@ import {
   createVehicle,
   updateVehicle,
   deleteVehicle,
+  getMyVehicles,
+  getVehiclesByUser,       // ✅ mới
+  createVehicleForUser     // ✅ mới
 } from '../controllers/vehicle.controller.js';
 import * as authController from '../controllers/auth.controller.js';
 
 const router = express.Router();
 
-// Dùng để bảo vệ tất cả các route bên dưới
-router.use(authController.protect, authController.restrictTo('admin', 'user'));
+// Public routes for Admin via FE (no token needed)
+router.get('/by-user/:userId', getVehiclesByUser);
+router.post('/for-user/:userId', createVehicleForUser);
 
+// Public routes
 router.get('/', getAllVehicles);
 router.get('/:id', getVehicleById);
+
+// Protected routes
+router.use(authController.protect);
+
+router.get('/my-vehicles', getMyVehicles);
 router.post('/', createVehicle);
 router.put('/:id', updateVehicle);
 router.delete('/:id', deleteVehicle);
