@@ -1,6 +1,7 @@
 import Ticket from '../models/ticket.models.js';
 import * as bookingService from '../services/booking.service.js';
 import catchAsync from '../utils/catchAsync.js';
+import * as ticketService from '../services/ticket.service.js';
 
 // Hàm tạo một vé mới
 export const createTicket = catchAsync(async (bookingData) => {
@@ -33,18 +34,10 @@ export const getTicketsByUserId = catchAsync(async (userId) => {
 });
 
 // Checkin ticket
-export const checkinTicket = catchAsync(async (ticketId) => {
-  const ticket = await Ticket.findById(ticketId);
-  if (!ticket) throw new AppError('Ticket not found', 404);
-  if (ticket.status !== 'pending')
-    throw new AppError('Ticket has already been checked in', 400);
-
-  ticket.status = 'active'; // hoặc 'checked-in'
-  ticket.checkInTime = new Date(); // nếu có trường này
-  await ticket.save();
-
-  await bookingService.checkInBooking(ticket.bookingId); // Cập nhật trạng thái booking nếu cần
-
+export const checkinTicket = catchAsync(async (req, res, next) => {
+  const { ticketId } = req.params;
+  const ticket = await ticketService.checkInTicket(ticketId);
+  console.log('Ticket checked in:', ticket);
   res.status(200).json({
     status: 'success',
     data: {
@@ -54,22 +47,10 @@ export const checkinTicket = catchAsync(async (ticketId) => {
 });
 
 // Checkout ticket
-export const checkoutTicket = catchAsync(async (ticketId) => {
-  const ticket = await Ticket.findById(ticketId);
-  if (!ticket) throw new AppError('Ticket not found', 404);
-  if (ticket.status !== 'active') {
-    if (ticket.status !== 'pending') {
-      throw new AppError('Ticket has already been checked out', 400);
-    }
-    throw new AppError('Ticket is not active', 400);
-  }
-  // Cập nhật trạng thái vé và thời gian checkout
-  ticket.checkoutTime = new Date(); // nếu có trường này
-  ticket.status = 'used'; // hoặc 'checked-out'
-  ticket.checkoutTime = new Date(); // nếu có trường này
-  await ticket.save();
-
-  await bookingService.checkOutBooking(ticket.bookingId); // Cập nhật trạng thái booking nếu cần
+export const checkoutTicket = catchAsync(async (req, res, next) => {
+  const { ticketId } = req.params;
+  const ticket = await ticketService.checkOutTicket(ticketId);
+  console.log('Ticket checked out:', ticket);
   res.status(200).json({
     status: 'success',
     data: {

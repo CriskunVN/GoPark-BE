@@ -13,7 +13,7 @@ export const createBookingForGuest = catchAsync(async (req, res, next) => {
     userId: booking.userId,
     parkingSlotId: booking.parkingSlotId,
     vehicleNumber: booking.vehicleNumber,
-    ticketType: booking.bookingType === 'hour' ? 'hourly' : 'daily',
+    ticketType: 'guest', // Loại vé cho khách vãng lai
     startTime: booking.startTime,
     expiryDate: booking.endTime,
     paymentStatus: booking.paymentStatus,
@@ -38,7 +38,7 @@ export const createBookingByHour = catchAsync(async (req, res, next) => {
       userId: bookingData.userId,
       parkingSlotId: bookingData.parkingSlotId,
       vehicleNumber: bookingData.vehicleNumber,
-      ticketType: bookingData.bookingType === 'hour' ? 'hourly' : 'daily',
+      ticketType: bookingData.bookingType,
       startTime: bookingData.startTime,
       expiryDate: bookingData.endTime,
       paymentStatus: bookingData.paymentStatus,
@@ -63,7 +63,7 @@ export const createBookingByDate = catchAsync(async (req, res, next) => {
       userId: bookingData.userId,
       parkingSlotId: bookingData.parkingSlotId,
       vehicleNumber: bookingData.vehicleNumber,
-      ticketType: bookingData.bookingType === 'hour' ? 'hourly' : 'daily',
+      ticketType: bookingData.bookingType,
       expiryDate: bookingData.endTime,
       paymentStatus: bookingData.paymentStatus,
     });
@@ -105,14 +105,19 @@ export const cancelBooking = catchAsync(async (req, res, next) => {
 });
 
 // checkin booking
-export const checkinBooking = catchAsync(async (req, res, next) => {
-  const booking = await bookingService.checkInBooking(req.params.id);
-  return booking;
+export const checkinBooking = catchAsync(async (bookingId) => {
+  const booking = await bookingService.getBookingById(bookingId);
+  if (booking.paymentStatus !== 'paid') {
+    throw new AppError('Payment required before check-in', 400);
+  }
+  const updateBooking = await bookingService.checkInBooking(bookingId);
+
+  return updateBooking;
 });
 
 // checkout booking
-export const checkoutBooking = catchAsync(async (req, res, next) => {
-  const booking = await bookingService.checkOutBooking(req.params.id);
+export const checkoutBooking = catchAsync(async (bookingId) => {
+  const booking = await bookingService.checkOutBooking(bookingId);
   return booking;
 });
 

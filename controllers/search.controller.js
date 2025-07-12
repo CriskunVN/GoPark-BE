@@ -1,8 +1,9 @@
 import ParkingLot from '../models/parkinglot.model.js';
+import removeVietnameseTones from '../utils/removeVietNameseTones.js';
 
 export const searchParkingLots = async (req, res) => {
   try {
-    const { location } = req.query;
+    let { location } = req.query;
 
     if (!location || location.trim() === '') {
       return res.status(400).json({ message: 'Location is required' });

@@ -94,7 +94,6 @@ export const createBookingForGuest = async (data) => {
     paymentStatus: 'unpaid',
     status: 'pending',
     vehicleNumber: data.vehicleNumber || '',
-    bookingType: data.bookingType || 'hour',
   });
 
   return booking;

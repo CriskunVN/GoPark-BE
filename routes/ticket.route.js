@@ -6,10 +6,10 @@ const router = express.Router();
 // ...existing code...
 
 // Checkin ticket (POST /tickets/:id/checkin)
-router.route('/:id/checkin').post(ticketController.checkinTicket);
+router.route('/:ticketId/checkin').post(ticketController.checkinTicket);
 
 // Checkout ticket (POST /tickets/:id/checkout)
-router.route('/:id/checkout').post(ticketController.checkoutTicket);
+router.route('/:ticketId/checkout').post(ticketController.checkoutTicket);
 
 // ...existing code...
 export default router;
