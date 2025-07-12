@@ -1,28 +1,10 @@
 import express from 'express';
-import {
-  getAllVehicles,
-  getVehicleById,
-  createVehicle,
-  updateVehicle,
-  deleteVehicle,
-  getMyVehicles,
-  getVehiclesByUser,       // ✅ mới
-  createVehicleForUser     // ✅ mới
-} from '../controllers/vehicle.controller.js';
+import { getMyVehicles, createVehicle, updateVehicle, deleteVehicle } from '../controllers/vehicle.controller.js';
 import * as authController from '../controllers/auth.controller.js';
 
 const router = express.Router();
 
-// Public routes for Admin via FE (no token needed)
-router.get('/by-user/:userId', getVehiclesByUser);
-router.post('/for-user/:userId', createVehicleForUser);
-
-// Public routes
-router.get('/', getAllVehicles);
-router.get('/:id', getVehicleById);
-
-// Protected routes
-router.use(authController.protect);
+router.use(authController.protect); // Áp dụng middleware bảo vệ cho tất cả route
 
 router.get('/my-vehicles', getMyVehicles);
 router.post('/', createVehicle);
