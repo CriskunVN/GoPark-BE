@@ -58,7 +58,7 @@ const parkingLotSchema = new mongoose.Schema(
   { timestamps: true } // sinh thêm trường updatedAt và createdAt
 );
 
-parkingLotSchema.index({ localtion: '2dsphere' }); // Tạo chỉ mục 2dsphere cho trường localtion để hỗ trợ truy vấn không gian
+parkingLotSchema.index({ location: '2dsphere' }); // Tạo chỉ mục 2dsphere cho trường localtion để hỗ trợ truy vấn không gian
 parkingLotSchema.index({ name: 'text' }); // Tạo chỉ mục văn bản cho trường name để hỗ trợ tìm kiếm
 
 const ParkingLot = mongoose.model('ParkingLot', parkingLotSchema);

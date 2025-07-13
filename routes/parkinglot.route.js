@@ -2,40 +2,70 @@ import express from 'express';
 import * as parkingLotController from '../controllers/parkinglot.controller.js';
 import * as authController from '../controllers/auth.controller.js';
 import parkingSlotRoute from './parkingSlot.route.js';
+
 const router = express.Router();
 
-// router.use('/:slotID', parkingSlotRoute);
+// ========================
+// Nested Route cho Slots
+// ========================
+router.use('/:parkingLotId/slots', parkingSlotRoute);
 
-// Sử dụng cho tất cả các route
-router.use(
-  authController.protect,
-  authController.restrictTo('admin', 'parking_owner')
+// ========================
+// Bảo vệ tất cả các route bên dưới
+// ========================
+router.use(authController.protect);
+
+// ========================
+// Route cho Parking Owner
+// ========================
+router.get(
+  '/my-parkinglots',
+  authController.restrictTo('owner'),
+  parkingLotController.getMyParkingLots
 );
 
-// Route để lấy tất cả bãi đỗ xe hoặc tạo bãi đỗ xe mới
-router
-  .route('/')
-  .get(parkingLotController.getAllParkingLots)
-  .post(parkingLotController.createParkingLot);
+router.post(
+  '/',
+  authController.restrictTo('owner'),
+  parkingLotController.createParkingLot
+);
 
-// Route để lấy, cập nhật hoặc xóa bãi đỗ xe theo ID
 router
   .route('/:id')
-  .get(parkingLotController.getParkingLot)
-  .patch(parkingLotController.updateParkingLot)
+  .get(
+    authController.restrictTo('owner'),
+    parkingLotController.getParkingLotById
+  )
+  .patch(
+    authController.restrictTo('owner'),
+    parkingLotController.updateParkingLot
+  )
   .delete(
-    authController.restrictTo('admin'), // only admin
+    authController.restrictTo('owner'),
     parkingLotController.deleteParkingLot
   );
 
-router
-  .route('/:id/soft-delete')
-  .patch(parkingLotController.softDeleteParkingLot);
+// ========================
+// Xóa mềm
+// ========================
+router.patch(
+  '/:id/soft-delete',
+  authController.restrictTo('owner'),
+  parkingLotController.softDeleteParkingLot
+);
 
-// // Route để tìm kiếm bãi đỗ xe theo tên
-// router.route('/search').get(parkingLotController.searchParkingLots);
-
-// // Route để lấy bãi đỗ xe gần vị trí hiện tại
-// router.route('/nearby').get(parkingLotController.getNearbyParkingLots);
+// ========================
+// Admin quyền toàn bộ (nếu cần dùng riêng)
+// ========================
+router.get(
+  '/',
+  authController.restrictTo('admin'),
+  parkingLotController.getAllParkingLots || ((req, res) => {
+    res.status(501).json({
+      status: 'error',
+      message: 'Chức năng chưa được hỗ trợ',
+    });
+  })
+);
 
 export default router;
