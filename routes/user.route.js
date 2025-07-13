@@ -3,8 +3,8 @@ import express from 'express';
 import {
   signup,
   login,
-  protect, // protect dùng để bảo vệ các route yêu cầu người dùng đã đăng nhập
-  restrictTo, // restrictTo dùng để giới hạn quyền truy cập vào các route chỉ cho một số vai trò nhất định
+  protect,
+  restrictTo,
   forgotPassword,
   resetPassword,
   updatePassword,
@@ -14,24 +14,29 @@ import * as userController from '../controllers/user.controller.js';
 
 const router = express.Router();
 
-router.post('/signup', signup); // Đăng ký người dùng mới
-router.post('/login', login); // Đăng nhập người dùng
-router.post('/forgotPassword', forgotPassword); // Quên mật khẩu, gửi email reset mật khẩu
-router.patch('/resetPassword/:token', resetPassword); // Reset mật khẩu bằng token
+router.post('/signup', signup);
+router.post('/login', login);
+router.post('/forgotPassword', forgotPassword);
+router.patch('/resetPassword/:token', resetPassword);
 
-// authentication Middleware (chỉ cho phép người dùng đã đăng nhập)
-router.use(protect); // Bảo vệ các route bên dưới, yêu cầu người dùng đã đăng nhập
+// ✅ Middleware: bảo vệ các route dưới
+router.use(protect);
 
+// ✅ Route: Lấy thông tin người dùng hiện tại
+router.get('/me', userController.getCurrentUser);
+
+// ✅ Route: Cập nhật mật khẩu người dùng hiện tại
 router.patch('/updateMyPassword', updatePassword);
 
-// Chỉ dành cho role 'admin'
+// ✅ Chỉ admin mới được truy cập các route dưới
 router.use(restrictTo('admin'));
 
-router.route('/').get(userController.getAllUsers); // Lấy tất cả người dùng
+router.route('/').get(userController.getAllUsers);
+
 router
   .route('/:id')
-  .get(userController.getUser) // Lấy người dùng theo ID
-  .patch(userController.updateUser) // Cập nhật người dùng theo ID
-  .delete(userController.deleteUser); // Xóa người dùng theo ID
+  .get(userController.getUser)
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
 
 export default router;
