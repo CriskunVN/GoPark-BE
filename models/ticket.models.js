@@ -24,7 +24,7 @@ const ticketSchema = new mongoose.Schema(
     },
     ticketType: {
       type: String,
-      enum: ['hours', 'date', 'guest'], // Loại vé, có thể là theo giờ hoặc theo ngày
+      enum: ['hours', 'date', 'guest', 'month'], // Loại vé, có thể là theo giờ hoặc theo ngày
       default: 'guest', // Mặc định là vé theo giờ
     },
     status: {

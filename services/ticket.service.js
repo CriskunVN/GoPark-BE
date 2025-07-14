@@ -14,7 +14,8 @@ export const checkInTicket = async (ticketId) => {
 
   ticket.status = 'active'; // hoặc 'checked-in'
   ticket.checkInTime = new Date(); // nếu có trường này
-  // lưu vào db lịch sử  => làm sau
+  // lưu vào db lịch sử  checkin => làm sau
+
   await ticket.save();
   await bookingService.checkInBooking(ticket.bookingId); // Cập nhật trạng thái booking nếu cần
 
@@ -25,7 +26,7 @@ export const checkOutTicket = async (ticketId) => {
   const ticket = await Ticket.findById(ticketId);
   if (!ticket) throw new AppError('Ticket not found', 404);
 
-  // Kiểm tra trạng thái vé khách vãng lai
+  // Kiểm tra checkout vé khách vãng lai
   if (ticket.ticketType === 'guest') {
     if (ticket.status !== 'active') {
       if (ticket.status !== 'pending') {
@@ -36,12 +37,14 @@ export const checkOutTicket = async (ticketId) => {
     // Cập nhật trạng thái vé khách vãng lai
     ticket.status = 'used'; // hoặc 'checked-out'
     // Cập nhật trạng thái booking cho khách vàng lai vì khách
-    await bookingService.checkOutBooking(ticket.bookingId);
-    return ticket;
+    await bookingService.checkOutBookingForGuest(ticket.bookingId);
   }
+
   // Cập nhật trạng thái vé và thời gian checkout
   ticket.checkoutTime = new Date(); // nếu có trường này
   await ticket.save();
+
+  // lưu vào db lịch sử checkout => làm sau
 
   return ticket;
 };

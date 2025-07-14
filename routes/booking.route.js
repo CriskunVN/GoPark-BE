@@ -12,11 +12,8 @@ router
   .patch(BookingController.updateBooking)
   .delete(BookingController.deleteBooking);
 
-// Route để tạo booking theo giờ
-router.route('/bookingHour').post(BookingController.createBookingByHour);
-
-// Route để tạo booking theo ngày
-router.route('/bookingDate').post(BookingController.createBookingByDate);
+// Route tạo một booking online cho khách hàng
+router.route('/bookingOnline').post(BookingController.createBookingOnline);
 
 // Route để tạo một booking cho khách vãng lai
 router.route('/bookingGuest').post(BookingController.createBookingForGuest);
@@ -24,4 +21,9 @@ router.route('/bookingGuest').post(BookingController.createBookingForGuest);
 // Route để hủy một booking
 router.route('/:id/cancel').patch(BookingController.cancelBooking);
 
+// Route để thanh toán tại bãi
+router.route('/:id/payAtParking').patch(BookingController.payAtParking);
+
+// Route Sau khi thanh toán thành công , cập nhật paymentStatus và tạo vé
+router.post('/:id/pay', BookingController.paymentCallback);
 export default router;

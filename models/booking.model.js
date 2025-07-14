@@ -7,13 +7,11 @@ const bookingSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    parkingSlotId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ParkingSlot',
-        required: true,
-      },
-    ],
+    parkingSlotId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ParkingSlot',
+      required: true,
+    },
     status: {
       type: String,
       enum: ['pending', 'confirmed', 'cancelled', 'completed'],
@@ -49,8 +47,17 @@ const bookingSchema = new mongoose.Schema(
     },
     bookingType: {
       type: String,
-      enum: ['date', 'hours', 'guest'], // Loại booking, có thể là theo ngày hoặc theo giờ
+      enum: ['date', 'hours', 'month', 'guest'], // Loại booking, có thể là theo ngày hoặc theo giờ
       default: 'guest', // Mặc định là booking theo ngày
+    },
+    discount: {
+      type: Number,
+      default: 0, // phần trăm giảm giá hoặc số tiền giảm
+    },
+    totalPrice: {
+      type: Number,
+      required: true, // Tổng giá là bắt buộc
+      default: 0, // Mặc định là 0 nếu không có giá trị
     },
   },
   { timestamps: true }

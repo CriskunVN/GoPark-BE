@@ -1,6 +1,6 @@
 import ParkingLot from '../models/parkinglot.model.js';
-import removeVietnameseTones from '../utils/removeVietNameseTones.js';
 
+// [GET] /api/v1/search/city?location=Đà Nẵng
 export const searchParkingLots = async (req, res) => {
   try {
     let { location } = req.query;
@@ -10,15 +10,13 @@ export const searchParkingLots = async (req, res) => {
     }
 
     const lots = await ParkingLot.find({
-      $or: [
-        { address: { $regex: location, $options: 'i' } },
-        // { name: { $regex: location, $options: 'i' } }
-      ],
+      address: { $regex: location, $options: 'i' },
       isActive: true,
     }).populate('parkingOwner', 'userName email');
 
     res.status(200).json({ results: lots.length, data: lots });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -46,6 +44,7 @@ export const searchParkingNearMe = async (req, res) => {
 
     res.status(200).json({ results: lots.length, data: lots });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };

@@ -65,12 +65,37 @@ const isSlotBooked = async (slotId, newStartTime, newEndTime) => {
   });
 };
 
+// Tính tiền và áp dụng giảm giá cho booking
+const calculateTotalPrice = (data, slot) => {
+  let price = 0;
+  let discountPercent = 0;
+  const startTime = new Date(data.startTime);
+  const endTime = new Date(data.endTime);
+
+  if (data.bookingType === 'hours' || data.bookingType === 'guest') {
+    const hours = Math.ceil((endTime - startTime) / (1000 * 60 * 60));
+    price = slot.pricePerHour * hours;
+  } else if (data.bookingType === 'date') {
+    const days = Math.ceil((endTime - startTime) / (1000 * 60 * 60 * 24));
+    price = slot.pricePerHour * days;
+  } else if (data.bookingType === 'month') {
+    price = slot.pricePerHour * 30;
+    discountPercent = 10; // Giảm 10% cho tháng
+  } else if (data.bookingType === 'year') {
+    price = slot.pricePerHour * 365;
+    discountPercent = 20; // Giảm 20% cho năm
+  }
+  // Áp dụng giảm giá
+  price = price * (1 - discountPercent / 100);
+  return { price, discountPercent };
+};
+
 // Tạo booking cho khách vãng lai
 export const createBookingForGuest = async (data) => {
+  const startTime = new Date(); // Thời gian bắt đầu là hiện tại
+  const endTime = new Date(startTime.getTime() + 24 * 60 * 60 * 1000); // Thời gian kết thúc là 24 giờ sau
   // Validate input
   await validateBookingGuestInput(data);
-  const startTime = new Date();
-  const endTime = new Date(startTime.getTime() + 24 * 60 * 60 * 1000); // Sau 24 tiếng
   // Kiểm tra trùng lịch
   const booked = await isSlotBooked(data.parkingSlotId, startTime, endTime);
   if (booked)
@@ -88,19 +113,21 @@ export const createBookingForGuest = async (data) => {
   const booking = await Booking.create({
     userId: data.userId,
     parkingSlotId: data.parkingSlotId,
-    startTime: startTime,
+    startTime: startTime, // Thời gian bắt đầu là hiện tại
     endTime: endTime,
     paymentMethod,
     paymentStatus: 'unpaid',
     status: 'pending',
     vehicleNumber: data.vehicleNumber || '',
+    bookingType: 'guest', // Loại booking cho khách vãng lai
+    discount: 0, // Không có giảm giá cho khách vãng lai
+    totalPrice: 0, // Không có giá cho khách vãng lai
   });
 
   return booking;
 };
 
-// Booking theo giờ
-export const createBookingByHour = async (data) => {
+export const createBooking = async (data) => {
   // Validate input
   const { startTime, endTime, slot } = await validateBookingInput(data);
 
@@ -118,51 +145,30 @@ export const createBookingByHour = async (data) => {
   if (!isAllowed)
     throw new AppError('Payment method not allowed for this parking lot', 400);
 
-  // Tạo booking
-  const booking = await Booking.create({
-    userId: data.userId,
-    parkingSlotId: data.parkingSlotId,
-    startTime: startTime,
-    endTime: endTime,
-    paymentMethod,
-    paymentStatus: paymentMethod === 'prepaid' ? 'paid' : 'unpaid',
-    status: 'pending',
-    vehicleNumber: data.vehicleNumber || '',
-    bookingType: 'hour',
-  });
-  return booking;
-};
+  // Nếu là prepaid mà chưa thanh toán thì không tạo booking
+  if (paymentMethod === 'prepaid' && data.paymentStatus !== 'paid') {
+    throw new AppError(
+      'Booking can only be created after payment is completed',
+      400
+    );
+  }
 
-// Booking theo ngày
-export const createBookingByDate = async (data) => {
-  // Validate input
-  const { startTime, endTime, slot } = await validateBookingInput(data);
-
-  // Kiểm tra trùng lịch
-  const booked = await isSlotBooked(data.parkingSlotId, startTime, endTime);
-  if (booked)
-    throw new AppError('Slot has already been booked for this time range', 400);
-
-  // Kiểm tra phương thức thanh toán
-  const paymentMethod = data.paymentMethod || 'pay-at-parking';
-  const isAllowed = await isPaymentMethodAllowed(
-    data.parkingSlotId,
-    paymentMethod
-  );
-  if (!isAllowed)
-    throw new AppError('Payment method not allowed for this parking lot', 400);
+  // Tính toán giá cho booking tháng và năm
+  const { price, discountPercent } = calculateTotalPrice(data, slot);
 
   // Tạo booking
   const booking = await Booking.create({
     userId: data.userId,
     parkingSlotId: data.parkingSlotId,
-    startTime: startTime,
-    endTime: endTime,
+    startTime,
+    endTime,
     paymentMethod,
-    paymentStatus: paymentMethod === 'prepaid' ? 'paid' : 'unpaid',
+    paymentStatus: paymentMethod === 'prepaid' ? 'paid' : 'unpaid', // sau khi thanh toán rồi update lại
     status: 'pending',
     vehicleNumber: data.vehicleNumber || '',
-    bookingType: 'date',
+    bookingType: data.bookingType, // 'hours', 'date', hoặc 'month'
+    discount: discountPercent, // Lưu phần trăm giảm giá
+    totalPrice: price, // Lưu tổng giá sau giảm
   });
   return booking;
 };
@@ -193,12 +199,33 @@ export const checkOutBooking = async (id) => {
 
 // Check out cho booking khách vãng lai
 export const checkOutBookingForGuest = async (id) => {
-  return Booking.findByIdAndUpdate(
-    id,
+  const booking = await Booking.findById(id);
+  if (!booking) throw new AppError('Booking not found', 404);
+
+  const endTime = new Date();
+  const slot = await mongoose
+    .model('ParkingSlot')
+    .findById(booking.parkingSlotId);
+
+  const { price } = calculateTotalPrice(
     {
-      status: 'completed',
-      endTime: new Date(), // cập nhật endTime khi check-out
+      bookingType: 'guest',
+      startTime: booking.startTime,
+      endTime: endTime,
     },
-    { new: true }
+    slot
   );
+
+  // Cập nhật trạng thái booking
+  booking.status = 'completed';
+  booking.endTime = endTime;
+  booking.totalPrice = price;
+  await booking.save();
+
+  // Cập nhật trạng thái slot
+  await mongoose
+    .model('ParkingSlot')
+    .findByIdAndUpdate(booking.parkingSlotId, { status: 'available' });
+
+  return booking;
 };

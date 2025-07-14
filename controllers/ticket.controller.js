@@ -50,7 +50,6 @@ export const checkinTicket = catchAsync(async (req, res, next) => {
 export const checkoutTicket = catchAsync(async (req, res, next) => {
   const { ticketId } = req.params;
   const ticket = await ticketService.checkOutTicket(ticketId);
-  console.log('Ticket checked out:', ticket);
   res.status(200).json({
     status: 'success',
     data: {
