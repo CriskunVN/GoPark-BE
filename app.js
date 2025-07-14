@@ -12,6 +12,7 @@ import searchRoutes from './routes/search.route.js';
 import vehicleRoutes from './routes/vehicle.route.js';
 import bookingRouter from './routes/booking.route.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
+import ticketRouter from './routes/ticket.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -32,7 +33,6 @@ app.use(
   })
 );
 
-
 app.use(helmet()); // Bảo mật HTTP headers
 app.use(morgan('dev')); // Ghi log các request
 app.use(express.json()); // Parse JSON request body
@@ -46,7 +46,8 @@ app.use('/api/v1/search', searchRoutes);
 app.use(`/api/v1/parking-slots`, parkingSlotRouter);
 app.use('/api/v1/vehicles', vehicleRoutes);
 app.use('/api/v1/bookings', bookingRouter);
-app.use("/api/chatbot", chatbotRoutes); 
+app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/v1/tickets', ticketRouter);
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
