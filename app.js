@@ -11,6 +11,7 @@ import parkingSlotRouter from './routes/parkingSlot.route.js';
 import searchRoutes from './routes/search.route.js';
 import vehicleRoutes from './routes/vehicle.route.js';
 import bookingRouter from './routes/booking.route.js';
+import chatbotRoutes from './routes/chatbot.routes.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -44,7 +45,8 @@ app.use(`/api/v1/parkinglots`, parkinglotRouter);
 app.use('/api/v1/search', searchRoutes);
 app.use(`/api/v1/parking-slots`, parkingSlotRouter);
 app.use('/api/v1/vehicles', vehicleRoutes);
-app.use('/api/v1/bookings', bookingRouter); 
+app.use('/api/v1/bookings', bookingRouter);
+app.use("/api/chatbot", chatbotRoutes); 
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
