@@ -22,7 +22,7 @@ const updateSlotStatusToBooked = async () => {
   const now = new Date();
   // Tìm các booking có startTime <= hiện tại và status là 'pending'
   const bookings = await Booking.find({
-    status: 'pending',
+    status: { $in: ['pending', 'confirmed'] },
     startTime: { $lte: now },
   });
 

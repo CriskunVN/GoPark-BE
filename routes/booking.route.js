@@ -24,6 +24,4 @@ router.route('/:id/cancel').patch(BookingController.cancelBooking);
 // Route để thanh toán tại bãi
 router.route('/:id/payAtParking').patch(BookingController.payAtParking);
 
-// Route Sau khi thanh toán thành công , cập nhật paymentStatus và tạo vé
-router.post('/:id/pay', BookingController.paymentCallback);
 export default router;

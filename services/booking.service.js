@@ -1,6 +1,8 @@
 import Booking from '../models/booking.model.js';
 import AppError from '../utils/appError.js';
 import Ticket from '../models/ticket.models.js';
+import * as InvoiceService from './invoice.service.js';
+
 import { isPaymentMethodAllowed } from './paymentOption.service.js';
 import mongoose from 'mongoose';
 
@@ -145,14 +147,6 @@ export const createBooking = async (data) => {
   if (!isAllowed)
     throw new AppError('Payment method not allowed for this parking lot', 400);
 
-  // Nếu là prepaid mà chưa thanh toán thì không tạo booking
-  if (paymentMethod === 'prepaid' && data.paymentStatus !== 'paid') {
-    throw new AppError(
-      'Booking can only be created after payment is completed',
-      400
-    );
-  }
-
   // Tính toán giá cho booking tháng và năm
   const { price, discountPercent } = calculateTotalPrice(data, slot);
 
@@ -163,7 +157,6 @@ export const createBooking = async (data) => {
     startTime,
     endTime,
     paymentMethod,
-    paymentStatus: paymentMethod === 'prepaid' ? 'paid' : 'unpaid', // sau khi thanh toán rồi update lại
     status: 'pending',
     vehicleNumber: data.vehicleNumber || '',
     bookingType: data.bookingType, // 'hours', 'date', hoặc 'month'
@@ -171,6 +164,39 @@ export const createBooking = async (data) => {
     totalPrice: price, // Lưu tổng giá sau giảm
   });
   return booking;
+};
+
+export const handleBookingAfterCreate = async (bookingData) => {
+  // Nếu khách thanh toán tại bãi, sinh ticket luôn
+  if (bookingData.paymentMethod === 'pay-at-parking') {
+    const ticket = await createTicket({
+      bookingId: bookingData._id,
+      userId: bookingData.userId,
+      parkingSlotId: bookingData.parkingSlotId,
+      vehicleNumber: bookingData.vehicleNumber,
+      ticketType: bookingData.bookingType,
+      startTime: bookingData.startTime,
+      expiryDate: bookingData.endTime,
+      paymentStatus: bookingData.paymentStatus,
+    });
+    return { ticket };
+  }
+
+  // Tạo hóa đơn nếu khách thanh toán trước (prepaid)
+  if (bookingData.paymentMethod === 'prepaid') {
+    const invoiceNumber =
+      'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    const invoice = await InvoiceService.createInvoice({
+      userId: bookingData.userId,
+      invoiceNumber: invoiceNumber,
+      bookingId: bookingData._id,
+      amount: bookingData.totalPrice,
+      status: 'unpaid',
+      transactionId: `TXN-${Date.now()}`,
+    });
+    return { invoice };
+  }
+  return {};
 };
 
 // Lấy chi tiết một booking
