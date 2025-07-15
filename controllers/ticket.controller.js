@@ -5,8 +5,14 @@ import * as ticketService from '../services/ticket.service.js';
 
 // Hàm tạo một vé mới
 export const createTicket = catchAsync(async (bookingData) => {
-  const ticket = await Ticket.create(bookingData);
-  return ticket;
+  const ticket = await ticketService.createTicket(req.body);
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      ticket,
+    },
+  });
 });
 
 // Hàm lấy tất cả vé
@@ -37,7 +43,7 @@ export const getTicketsByUserId = catchAsync(async (userId) => {
 export const checkinTicket = catchAsync(async (req, res, next) => {
   const { ticketId } = req.params;
   const ticket = await ticketService.checkInTicket(ticketId);
-  console.log('Ticket checked in:', ticket);
+  // console.log('Ticket checked in:', ticket);
   res.status(200).json({
     status: 'success',
     data: {
