@@ -48,3 +48,8 @@ export const checkOutTicket = async (ticketId) => {
 
   return ticket;
 };
+
+export const createTicket = async (ticketData) => {
+  const ticket = await Ticket.create(ticketData);
+  return ticket;
+};

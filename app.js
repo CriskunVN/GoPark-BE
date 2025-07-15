@@ -13,6 +13,8 @@ import vehicleRoutes from './routes/vehicle.route.js';
 import bookingRouter from './routes/booking.route.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
 import ticketRouter from './routes/ticket.route.js';
+// Route for VNPay
+import vnpayRouter from './routes/vnpay.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -48,6 +50,7 @@ app.use('/api/v1/vehicles', vehicleRoutes);
 app.use('/api/v1/bookings', bookingRouter);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/v1/tickets', ticketRouter);
+app.use('/api/v1/vnpay', vnpayRouter);
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
