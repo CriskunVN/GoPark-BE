@@ -30,6 +30,8 @@ export const createParkingLotWithSlots = async (body) => {
   // Tạo bãi đỗ xe mới
   const newLot = await ParkingLot.create(body);
 
+  console.log('✅ Created parking lot:', newLot);
+
   // Tạo các slot dựa trên zones
   let slotsToCreate = [];
 
@@ -49,11 +51,9 @@ export const createParkingLotWithSlots = async (body) => {
   const createdSlots = await ParkingSlot.insertMany(slotsToCreate);
 
   return {
-    parkingLot: newLot,
-    slots: createdSlots,
+    newLot,
   };
 };
-
 
 export const getParkingLotByIdWithStats = async (id) => {
   const doc = await ParkingLot.aggregate([
