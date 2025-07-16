@@ -5,6 +5,7 @@ import * as InvoiceService from './invoice.service.js';
 
 import { isPaymentMethodAllowed } from './paymentOption.service.js';
 import mongoose from 'mongoose';
+import ParkingSlot from '../models/parkingSlot.model.js';
 
 // Hàm validate dùng chung cho booking
 const validateBookingInput = async (data) => {
@@ -147,6 +148,10 @@ export const createBooking = async (data) => {
   if (!isAllowed)
     throw new AppError('Payment method not allowed for this parking lot', 400);
 
+  await ParkingSlot.findByIdAndUpdate(data.parkingSlotId, {
+    status: 'reserved',
+  });
+
   // Tính toán giá cho booking tháng và năm
   const { price, discountPercent } = calculateTotalPrice(data, slot);
 
@@ -163,6 +168,7 @@ export const createBooking = async (data) => {
     discount: discountPercent, // Lưu phần trăm giảm giá
     totalPrice: price, // Lưu tổng giá sau giảm
   });
+
   return booking;
 };
 

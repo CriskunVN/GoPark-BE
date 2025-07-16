@@ -1,12 +1,13 @@
 import ParkingLot from '../models/parkinglot.model.js';
 import ParkingSlot from '../models/parkingSlot.model.js'; // Thêm import này
 import catchAsync from '../utils/catchAsync.js';
+import * as parkinglotService from '../services/parkinglot.service.js';
 import AppError from '../utils/appError.js';
 
 // [GET] Lấy tất cả bãi đỗ thuộc về chủ bãi hiện tại
 export const getMyParkingLots = catchAsync(async (req, res, next) => {
-  console.log("📤 [GET] /api/v1/parkinglots/my-parkinglots");
-  console.log("👉 req.user.id:", req.user?.id);
+  console.log('📤 [GET] /api/v1/parkinglots/my-parkinglots');
+  console.log('👉 req.user.id:', req.user?.id);
 
   const parkingLots = await ParkingLot.find({ parkingOwner: req.user.id });
 
@@ -19,49 +20,33 @@ export const getMyParkingLots = catchAsync(async (req, res, next) => {
 
 // [POST] Tạo bãi đỗ mới
 export const createParkingLot = catchAsync(async (req, res, next) => {
-  console.log("📥 [POST] /api/v1/parkinglots");
-  console.log("👉 req.body:", JSON.stringify(req.body, null, 2));
-  console.log("👉 req.user.id:", req.user?.id);
+  const defaultLocation = {
+    type: 'Point',
+    coordinates: [105.854444, 21.028511], // Hà Nội
+  };
 
-  try {
-    const defaultLocation = {
-      type: 'Point',
-      coordinates: [105.854444, 21.028511], // Hà Nội
-    };
+  const location =
+    req.body.location?.coordinates?.length === 2 &&
+    typeof req.body.location.coordinates[0] === 'number' &&
+    typeof req.body.location.coordinates[1] === 'number'
+      ? req.body.location
+      : defaultLocation;
 
-    const location =
-      req.body.location?.coordinates?.length === 2 &&
-      typeof req.body.location.coordinates[0] === "number" &&
-      typeof req.body.location.coordinates[1] === "number"
-        ? req.body.location
-        : defaultLocation;
+  const parkingLot = await parkinglotService.createParkingLotWithSlots({
+    ...req.body,
+    parkingOwner: req.user.id,
+    location,
+  });
 
-    const newParkingLot = await ParkingLot.create({
-      ...req.body,
-      parkingOwner: req.user.id,
-      location,
-    });
-
-    console.log("✅ Created parking lot:", newParkingLot);
-
-    res.status(201).json({
-      status: 'success',
-      message: 'Tạo bãi đỗ xe thành công',
-      data: newParkingLot,
-    });
-  } catch (error) {
-    console.error("❌ Error while creating parking lot:", error);
-    return next(new AppError("Lỗi khi tạo bãi đỗ xe", 500));
-  }
+  res.status(201).json({
+    status: 'success',
+    message: 'Tạo bãi đỗ xe thành công',
+    data: parkingLot,
+  });
 });
 
 // [GET] Lấy bãi đỗ theo ID
 export const getParkingLotById = catchAsync(async (req, res, next) => {
-  console.log("📥 [GET] /api/v1/parkinglots/:id or /:id/public");
-  console.log("👉 req.params.id:", req.params.id);
-  console.log("👉 req.user.id:", req.user?.id);
-  console.log("👉 isPublic:", req.path.includes('/public'));
-
   const query = req.path.includes('/public')
     ? { _id: req.params.id }
     : { _id: req.params.id, parkingOwner: req.user.id };
@@ -69,7 +54,6 @@ export const getParkingLotById = catchAsync(async (req, res, next) => {
   const lot = await ParkingLot.findOne(query);
 
   if (!lot) {
-    console.warn("⚠️ Không tìm thấy bãi đỗ xe");
     return next(new AppError('Không tìm thấy bãi đỗ xe', 404));
   }
 
@@ -81,11 +65,6 @@ export const getParkingLotById = catchAsync(async (req, res, next) => {
 
 // [PATCH] Cập nhật bãi đỗ
 export const updateParkingLot = catchAsync(async (req, res, next) => {
-  console.log("🔧 [PATCH] /api/v1/parkinglots/:id");
-  console.log("👉 req.params.id:", req.params.id);
-  console.log("👉 req.user.id:", req.user?.id);
-  console.log("👉 req.body:", JSON.stringify(req.body, null, 2));
-
   try {
     const updatedLot = await ParkingLot.findOneAndUpdate(
       { _id: req.params.id, parkingOwner: req.user.id },
@@ -97,11 +76,10 @@ export const updateParkingLot = catchAsync(async (req, res, next) => {
     );
 
     if (!updatedLot) {
-      console.warn("⚠️ Không tìm thấy bãi đỗ để cập nhật");
       return next(new AppError('Không tìm thấy bãi đỗ xe của bạn', 404));
     }
 
-    console.log("✅ Updated:", updatedLot);
+    console.log('✅ Updated:', updatedLot);
 
     res.status(200).json({
       status: 'success',
@@ -109,28 +87,23 @@ export const updateParkingLot = catchAsync(async (req, res, next) => {
       data: updatedLot,
     });
   } catch (error) {
-    console.error("❌ Lỗi khi cập nhật bãi đỗ:", error);
-    return next(new AppError("Lỗi khi cập nhật bãi đỗ", 500));
+    return next(new AppError('Lỗi khi cập nhật bãi đỗ', 500));
   }
 });
 
 // [DELETE] Xóa vĩnh viễn
 export const deleteParkingLot = catchAsync(async (req, res, next) => {
-  console.log("🗑️ [DELETE] /api/v1/parkinglots/:id");
-  console.log("👉 req.params.id:", req.params.id);
-  console.log("👉 req.user.id:", req.user?.id);
-
   const deletedLot = await ParkingLot.findOneAndDelete({
     _id: req.params.id,
     parkingOwner: req.user.id,
   });
 
   if (!deletedLot) {
-    console.warn("⚠️ Không tìm thấy bãi đỗ để xóa");
     return next(new AppError('Không tìm thấy bãi đỗ xe của bạn', 404));
   }
 
-  console.log("✅ Deleted:", deletedLot);
+  // Xóa tất cả slot thuộc về bãi đỗ vừa xóa
+  await ParkingSlot.deleteMany({ parkingLot: req.params.id });
 
   res.status(204).json({
     status: 'success',
@@ -141,39 +114,27 @@ export const deleteParkingLot = catchAsync(async (req, res, next) => {
 
 // [PATCH] Xóa mềm (isActive = false)
 export const softDeleteParkingLot = catchAsync(async (req, res, next) => {
-  console.log("🗑️ [PATCH] /api/v1/parkinglots/:id/soft-delete");
-  console.log("👉 req.params.id:", req.params.id);
-  console.log("👉 req.user.id:", req.user?.id);
+  const updatedLot = await ParkingLot.findOneAndUpdate(
+    { _id: req.params.id, parkingOwner: req.user.id },
+    { isActive: false },
+    { new: true }
+  );
 
-  try {
-    const updatedLot = await ParkingLot.findOneAndUpdate(
-      { _id: req.params.id, parkingOwner: req.user.id },
-      { isActive: false },
-      { new: true }
-    );
-
-    if (!updatedLot) {
-      console.warn("⚠️ Không tìm thấy bãi đỗ để xoá mềm");
-      return next(new AppError('Không tìm thấy bãi đỗ xe của bạn', 404));
-    }
-
-    console.log("✅ Soft deleted:", updatedLot);
-
-    res.status(200).json({
-      status: 'success',
-      message: 'Đã xóa mềm bãi đỗ',
-      data: updatedLot,
-    });
-  } catch (error) {
-    console.error("❌ Lỗi khi xóa mềm bãi đỗ:", error);
-    return next(new AppError("Lỗi khi xóa mềm bãi đỗ", 500));
+  if (!updatedLot) {
+    return next(new AppError('Không tìm thấy bãi đỗ xe của bạn', 404));
   }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Đã xóa mềm bãi đỗ',
+    data: updatedLot,
+  });
 });
 
 // [GET] Lấy tất cả bãi đỗ theo thành phố (công khai)
 export const getParkingLotsByCity = catchAsync(async (req, res, next) => {
-  console.log("📤 [GET] /api/v1/parkinglots/city/:city");
-  console.log("👉 req.params.city:", req.params.city);
+  console.log('📤 [GET] /api/v1/parkinglots/city/:city');
+  console.log('👉 req.params.city:', req.params.city);
 
   const parkingLots = await ParkingLot.find({
     address: { $regex: req.params.city, $options: 'i' },
@@ -189,8 +150,8 @@ export const getParkingLotsByCity = catchAsync(async (req, res, next) => {
 
 // [GET] Lấy tất cả vị trí đỗ theo bãi đỗ (công khai)
 export const getAllParkingSlotsByLotId = catchAsync(async (req, res, next) => {
-  console.log("📤 [GET] /api/v1/parkinglots/:parkingLotId/slots");
-  console.log("👉 req.params.parkingLotId:", req.params.parkingLotId);
+  console.log('📤 [GET] /api/v1/parkinglots/:parkingLotId/slots');
+  console.log('👉 req.params.parkingLotId:', req.params.parkingLotId);
 
   const parkingLot = await ParkingLot.findById(req.params.parkingLotId);
   if (!parkingLot) {
@@ -208,12 +169,26 @@ export const getAllParkingSlotsByLotId = catchAsync(async (req, res, next) => {
 
 // [GET] Lấy tất cả bãi đỗ (chỉ dành cho admin)
 export const getAllParkingLots = catchAsync(async (req, res, next) => {
-  console.log("📤 [GET] /api/v1/parkinglots");
+  console.log('📤 [GET] /api/v1/parkinglots');
   const parkingLots = await ParkingLot.find();
 
   res.status(200).json({
     status: 'success',
     results: parkingLots.length,
     data: parkingLots,
+  });
+});
+
+// [GET] Lấy bãi đỗ theo ID với thống kê (công khai)
+export const getOneParkingLot = catchAsync(async (req, res) => {
+  const parkingLot = await parkinglotService.getParkingLotByIdWithStats(
+    req.params.id
+  );
+  if (!parkingLot) {
+    return res.status(404).json({ status: 'fail', message: 'Not found' });
+  }
+  res.status(200).json({
+    status: 'success',
+    data: { parkingLot },
   });
 });
