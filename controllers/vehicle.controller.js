@@ -26,14 +26,12 @@ export const createVehicle = async (req, res) => {
     res.status(201).json(newVehicle);
   } catch (err) {
     if (err.code === 11000) {
-      // ⚠️ Duplicate key error
       return res.status(400).json({
         error: "A vehicle with this license plate already exists.",
         field: "licensePlate",
       });
     }
 
-    console.error("❌ Error creating vehicle:", err);
     res.status(400).json({ error: "Failed to create vehicle." });
   }
 };
@@ -44,7 +42,6 @@ export const updateVehicle = async (req, res) => {
     const { id } = req.params;
     const { licensePlate, capacity, imageVehicle } = req.body;
 
-    // Tìm xe theo ID và kiểm tra quyền sở hữu
     const vehicle = await Vehicle.findOne({ _id: id, userId: req.user.id });
 
     if (!vehicle) {
@@ -53,7 +50,6 @@ export const updateVehicle = async (req, res) => {
       });
     }
 
-    // Cập nhật thông tin xe
     vehicle.licensePlate = licensePlate || vehicle.licensePlate;
     vehicle.capacity = capacity || vehicle.capacity;
     vehicle.imageVehicle = imageVehicle !== undefined ? imageVehicle : vehicle.imageVehicle;
@@ -68,7 +64,6 @@ export const updateVehicle = async (req, res) => {
       });
     }
 
-    console.error("❌ Error updating vehicle:", err);
     res.status(400).json({ error: "Failed to update vehicle." });
   }
 };
@@ -78,7 +73,6 @@ export const deleteVehicle = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Tìm và xóa xe theo ID và kiểm tra quyền sở hữu
     const vehicle = await Vehicle.findOneAndDelete({ _id: id, userId: req.user.id });
 
     if (!vehicle) {
@@ -89,7 +83,49 @@ export const deleteVehicle = async (req, res) => {
 
     res.status(200).json({ status: "success", message: "Vehicle deleted successfully." });
   } catch (err) {
-    console.error("❌ Error deleting vehicle:", err);
     res.status(400).json({ error: "Failed to delete vehicle." });
+  }
+};
+
+// [GET] /api/v1/vehicles/by-user/:userId
+export const getVehiclesByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const vehicles = await Vehicle.find({ userId });
+
+    if (!vehicles) {
+      return res.status(404).json({ error: "No vehicles found for this user." });
+    }
+
+    res.status(200).json(vehicles);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch vehicles." });
+  }
+};
+
+// [POST] /api/v1/vehicles/for-user/:userId
+export const addVehicleForUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { licensePlate, capacity, imageVehicle } = req.body;
+
+    const newVehicle = new Vehicle({
+      licensePlate,
+      capacity,
+      imageVehicle: imageVehicle || "",
+      userId,
+    });
+
+    await newVehicle.save();
+    res.status(201).json({ status: "success", data: newVehicle });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        error: "A vehicle with this license plate already exists.",
+        field: "licensePlate",
+      });
+    }
+
+    res.status(400).json({ error: "Failed to create vehicle." });
   }
 };
