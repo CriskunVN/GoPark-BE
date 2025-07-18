@@ -30,20 +30,25 @@ export const createBookingForGuest = catchAsync(async (req, res, next) => {
   });
 });
 
-// Tạo booking cho khách đã đăng ký
 export const createBookingOnline = catchAsync(async (req, res, next) => {
-  const bookingData = await bookingService.createBooking(req.body);
+  try {
+    console.log("🚀 Dữ liệu nhận từ FE:", req.body);
+    const bookingData = await bookingService.createBooking(req.body);
+    const bookingResult = await bookingService.handleBookingAfterCreate(bookingData);
 
-  // xử lý sau khi tạo booking
-  const bookingResult = await bookingService.handleBookingAfterCreate(
-    bookingData
-  );
-
-  res.status(201).json({
-    status: 'success',
-    data: { booking: bookingData, ...bookingResult },
-  });
+    res.status(201).json({
+      status: 'success',
+      data: { booking: bookingData, ...bookingResult },
+    });
+  } catch (err) {
+    console.error("❌ Lỗi khi tạo booking:", err);
+    res.status(400).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
 });
+
 
 // Lấy tất cả bookings
 export const getAllBookings = Factory.getAll(Booking);
