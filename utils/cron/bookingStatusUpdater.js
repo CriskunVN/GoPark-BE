@@ -3,7 +3,7 @@ import Booking from '../../models/booking.model.js';
 import ParkingSlot from '../../models/parkingSlot.model.js';
 
 // CRON
-cron.schedule('* * * * *', async () => {
+cron.schedule('*/2 * * * *', async () => {
   try {
     console.log('[CRON] Running booking status update...');
     const result = await updateSlotStatusToBooked();

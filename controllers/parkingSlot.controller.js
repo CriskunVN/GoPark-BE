@@ -2,7 +2,6 @@ import * as Factory from './handlerFactory.controller.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
 import catchAsync from '../utils/catchAsync.js';
 import * as ParkingSlotService from '../services/parkingSlot.service.js';
-import ParkingLot from '../models/parkinglot.model.js';
 
 // Lấy toàn bộ slot trong Bãi đỗ có thể lọc theo trạng thái "Trống , Đã Đặt , Đặt Trước"
 export const getAllParkingSlots = Factory.getAll(ParkingSlot);
@@ -36,18 +35,23 @@ export const deleteParkingSlot = catchAsync(async (req, res, next) => {
 export const updateParkingSlot = Factory.updateOne(ParkingSlot);
 
 // lấy các slot theo ngày
-export const getSlotsByDate = catchAsync(async (req, res, next) => {
+export const getSlotsAvailableByDate = catchAsync(async (req, res, next) => {
+  const { startTime, endTime } = req.query;
   const { parkingLotId } = req.params;
-  const { date } = req.query;
 
-  const result = await ParkingSlotService.getAvailableSlotsByDate(
-    parkingLotId,
-    date
+  if (!startTime || !endTime) {
+    return res.status(400).json({ message: 'Missing date query' });
+  }
+
+  const availableSlots = await ParkingSlotService.getSlotsAvailable(
+    startTime,
+    endTime,
+    parkingLotId
   );
 
   res.status(200).json({
     status: 'success',
-    results: result.length,
-    data: result,
+    results: availableSlots.length,
+    data: availableSlots,
   });
 });
