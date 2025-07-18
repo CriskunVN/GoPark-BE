@@ -4,7 +4,7 @@ import ParkingSlot from '../../models/parkingSlot.model.js';
 import Ticket from '../../models/ticket.models.js';
 
 // Chạy mỗi 2 phút
-cron.schedule('* * * * *', async () => {
+cron.schedule('*/2 * * * *', async () => {
   const now = new Date();
 
   // Tìm các booking đã hết hạn (endTime < hiện tại) và chưa cancelled

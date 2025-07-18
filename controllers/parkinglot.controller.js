@@ -192,3 +192,23 @@ export const getOneParkingLot = catchAsync(async (req, res) => {
     data: { parkingLot },
   });
 });
+
+// [GET] Lấy danh sách user đã booking trong bãi đỗ (Chủ bãi xe có thể xem)
+export const getUserBookingInParkingLot = catchAsync(async (req, res, next) => {
+  const parkingLotId = req.params.id;
+  const users = await parkinglotService.getUserBookingInParkingLot(
+    parkingLotId
+  );
+
+  if (!users || users.length === 0) {
+    return next(
+      new AppError('Không tìm thấy user nào booking trong bãi đỗ này', 404)
+    );
+  }
+
+  res.status(200).json({
+    status: 'success',
+    results: users.length,
+    data: users,
+  });
+});

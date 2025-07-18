@@ -12,7 +12,10 @@ router.get('/:id/public', parkingLotController.getParkingLotById);
 router.get('/city/:city', parkingLotController.getParkingLotsByCity);
 
 // ➕ Thêm route công khai mới cho FE gọi danh sách slots
-router.get('/:parkingLotId/slots-public', parkingLotController.getAllParkingSlotsByLotId);
+router.get(
+  '/:parkingLotId/slots-public',
+  parkingLotController.getAllParkingSlotsByLotId
+);
 
 // ========================
 // Nested Route cho Slots (yêu cầu auth nếu middleware được áp dụng ở bên trong route slot)
@@ -32,6 +35,7 @@ router.get(
   authController.restrictTo('owner'),
   parkingLotController.getMyParkingLots
 );
+router.route('/:id').get(parkingLotController.getOneParkingLot);
 
 router.post(
   '/',
@@ -45,6 +49,8 @@ router.patch(
   parkingLotController.softDeleteParkingLot
 );
 
+router.route('/:id/users').get(parkingLotController.getUserBookingInParkingLot);
+
 // ========================
 // Admin quyền toàn bộ
 // ========================
@@ -53,7 +59,6 @@ router.get('/', parkingLotController.getAllParkingLots);
 
 router
   .route('/:id')
-  .get(parkingLotController.getOneParkingLot)
   .patch(
     authController.restrictTo('owner'),
     parkingLotController.updateParkingLot
