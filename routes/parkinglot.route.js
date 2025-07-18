@@ -6,19 +6,18 @@ import parkingSlotRoute from './parkingSlot.route.js';
 const router = express.Router();
 
 // ========================
-// Nested Route cho Slots
-// ========================
-router.use('/:parkingLotId/slots', parkingSlotRoute);
-
-// ========================
-// Route công khai
+// Route công khai (không yêu cầu auth)
 // ========================
 router.get('/:id/public', parkingLotController.getParkingLotById);
 router.get('/city/:city', parkingLotController.getParkingLotsByCity);
-router.get(
-  '/:parkingLotId/slots',
-  parkingLotController.getAllParkingSlotsByLotId
-); // Thêm endpoint này
+
+// ➕ Thêm route công khai mới cho FE gọi danh sách slots
+router.get('/:parkingLotId/slots-public', parkingLotController.getAllParkingSlotsByLotId);
+
+// ========================
+// Nested Route cho Slots (yêu cầu auth nếu middleware được áp dụng ở bên trong route slot)
+// ========================
+router.use('/:parkingLotId/slots', parkingSlotRoute);
 
 // ========================
 // Bảo vệ tất cả các route bên dưới
@@ -31,34 +30,34 @@ router.use(authController.protect);
 router.get(
   '/my-parkinglots',
   authController.restrictTo('owner'),
-  parkingLotController.getMyParkingLots // Lấy danh sách bãi đỗ của chủ sở hữu
+  parkingLotController.getMyParkingLots
 );
 
 router.post(
   '/',
   authController.restrictTo('owner', 'admin'),
-  parkingLotController.createParkingLot // Tạo bãi đỗ mới
+  parkingLotController.createParkingLot
 );
 
 router.patch(
   '/:id/soft-delete',
   authController.restrictTo('owner'),
-  parkingLotController.softDeleteParkingLot // Xóa bãi đỗ (xóa mềm)
+  parkingLotController.softDeleteParkingLot
 );
 
 // ========================
 // Admin quyền toàn bộ
 // ========================
 router.use(authController.restrictTo('admin'));
-router.get('/', parkingLotController.getAllParkingLots); // Lấy tất cả bãi đỗ
+router.get('/', parkingLotController.getAllParkingLots);
 
 router
   .route('/:id')
-  .get(parkingLotController.getOneParkingLot) // Lấy thông tin bãi đỗ theo ID
+  .get(parkingLotController.getOneParkingLot)
   .patch(
     authController.restrictTo('owner'),
-    parkingLotController.updateParkingLot // Cập nhật thông tin bãi đỗ
+    parkingLotController.updateParkingLot
   )
-  .delete(parkingLotController.deleteParkingLot); // Xóa bãi đỗ
+  .delete(parkingLotController.deleteParkingLot);
 
 export default router;
