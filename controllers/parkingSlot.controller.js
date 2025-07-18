@@ -34,3 +34,20 @@ export const deleteParkingSlot = catchAsync(async (req, res, next) => {
 
 // Update 1 slot
 export const updateParkingSlot = Factory.updateOne(ParkingSlot);
+
+// lấy các slot theo ngày
+export const getSlotsByDate = catchAsync(async (req, res, next) => {
+  const { parkingLotId } = req.params;
+  const { date } = req.query;
+
+  const result = await ParkingSlotService.getAvailableSlotsByDate(
+    parkingLotId,
+    date
+  );
+
+  res.status(200).json({
+    status: 'success',
+    results: result.length,
+    data: result,
+  });
+});
