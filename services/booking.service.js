@@ -137,7 +137,7 @@ export const createBooking = async (data) => {
   // Kiểm tra trùng lịch
   const booked = await isSlotBooked(data.parkingSlotId, startTime, endTime);
   if (booked)
-    throw new AppError('Slot has already been booked for this time range', 400);
+    throw new AppError(`Slot đã được đặt trong khoảng thời gian này`, 400);
 
   // Kiểm tra phương thức thanh toán
   const paymentMethod = data.paymentMethod || 'pay-at-parking';

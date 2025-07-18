@@ -81,25 +81,36 @@ export const deleteSlotAndSyncZone = async (slotId) => {
     }
   }
 };
-export const getAvailableSlotsByDate = async (parkingLotId, date) => {
-  // Chỉ lấy slot có trạng thái 'available'
-  const slots = await ParkingSlot.find({
-    parkingLot: parkingLotId,
-    status: 'available',
-  });
 
-  // Tìm các booking còn hiệu lực trong ngày đó
-  const startOfDay = new Date(date + 'T00:00:00.000Z');
-  const endOfDay = new Date(date + 'T23:59:59.999Z');
+// Lấy tất cả slot còn trống trong khoảng thời gian nhất định
+export const getSlotsAvailable = async (startTime, endTime, parkingLotId) => {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new AppError('Thời gian không hợp lệ', 400);
+  }
 
-  const bookings = await Booking.find({
-    parkingLotId,
-    startTime: { $lte: endOfDay },
-    endTime: { $gte: startOfDay },
-  });
+  // 1. Lấy tất cả slot thuộc bãi đỗ
+  const allSlots = await ParkingSlot.find({ parkingLot: parkingLotId });
 
-  const bookedSlotIds = bookings.map((b) => b.parkingSlotId.toString());
+  // 1.1 Lấy ID của tất cả slot
+  const allSlotIds = allSlots.map((slot) => slot._id);
 
-  // Trả về slot có trạng thái 'available' và chưa bị đặt trong ngày đó
-  return slots.filter((slot) => !bookedSlotIds.includes(slot._id.toString()));
+  // 2. Tìm booking giao nhau với khoảng thời gian này
+  const activeBookings = await Booking.find({
+    parkingSlotId: { $in: allSlotIds },
+    startTime: { $lt: end },
+    endTime: { $gt: start },
+    status: { $in: ['pending', 'confirmed'] },
+  }).select('parkingSlotId');
+
+  // Lấy danh sách ID của các slot đã giao nhau với khoảng thời gian query
+  const occupiedSlotIds = activeBookings.map((b) => b.parkingSlotId.toString());
+
+  // 3. Trả lại slot chưa bị giao nhau
+  const availableSlots = allSlots.filter(
+    (slot) => !occupiedSlotIds.includes(slot._id.toString())
+  );
+
+  return availableSlots;
 };

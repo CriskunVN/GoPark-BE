@@ -1,7 +1,11 @@
 import * as BookingController from '../controllers/booking.controller.js';
+import * as authController from '../controllers/auth.controller.js';
 import express from 'express';
 
 const router = express.Router();
+
+// Middleware để bảo vệ các route sau khi đăng nhập
+router.use(authController.protect);
 
 // Route để tạo một booking mới
 router.route('/').get(BookingController.getAllBookings);
