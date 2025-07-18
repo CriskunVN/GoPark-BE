@@ -2,6 +2,7 @@ import ParkingSlot from '../models/parkingSlot.model.js';
 import ParkingLot from '../models/parkinglot.model.js';
 import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
+import Booking from '../models/booking.model.js';
 
 // thêm slot và đồng bộ trong parkingLot
 export const prepareParkingSlotData = async (data) => {
@@ -79,4 +80,26 @@ export const deleteSlotAndSyncZone = async (slotId) => {
       await ParkingLot.findByIdAndUpdate(parkingLot, { zones });
     }
   }
+};
+export const getAvailableSlotsByDate = async (parkingLotId, date) => {
+  // Chỉ lấy slot có trạng thái 'available'
+  const slots = await ParkingSlot.find({
+    parkingLot: parkingLotId,
+    status: 'available',
+  });
+
+  // Tìm các booking còn hiệu lực trong ngày đó
+  const startOfDay = new Date(date + 'T00:00:00.000Z');
+  const endOfDay = new Date(date + 'T23:59:59.999Z');
+
+  const bookings = await Booking.find({
+    parkingLotId,
+    startTime: { $lte: endOfDay },
+    endTime: { $gte: startOfDay },
+  });
+
+  const bookedSlotIds = bookings.map((b) => b.parkingSlotId.toString());
+
+  // Trả về slot có trạng thái 'available' và chưa bị đặt trong ngày đó
+  return slots.filter((slot) => !bookedSlotIds.includes(slot._id.toString()));
 };
