@@ -55,3 +55,47 @@ export const getSlotsAvailableByDate = catchAsync(async (req, res, next) => {
     data: availableSlots,
   });
 });
+
+export const getSlotsBookedByDateForOwner = catchAsync(
+  async (req, res, next) => {
+    const { time } = req.query;
+    const { parkingLotId } = req.params;
+
+    if (!time) {
+      return res.status(400).json({ message: 'Missing date query' });
+    }
+
+    const bookedSlots = await ParkingSlotService.getBookedSlotsForOwner(
+      time,
+      parkingLotId
+    );
+
+    res.status(200).json({
+      status: 'success',
+      results: bookedSlots.length,
+      data: bookedSlots,
+    });
+  }
+);
+
+export const getSlotsAvailableByDateForOwner = catchAsync(
+  async (req, res, next) => {
+    const { time } = req.query;
+    const { parkingLotId } = req.params;
+
+    if (!time) {
+      return res.status(400).json({ message: 'Missing date query' });
+    }
+
+    const availableSlots = await ParkingSlotService.getAvailableSlotsForOwner(
+      time,
+      parkingLotId
+    );
+
+    res.status(200).json({
+      status: 'success',
+      results: availableSlots.length,
+      data: availableSlots,
+    });
+  }
+);
