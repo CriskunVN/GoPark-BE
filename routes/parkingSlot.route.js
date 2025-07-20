@@ -22,4 +22,20 @@ router
   .delete(ParkingSlot.deleteParkingSlot)
   .patch(ParkingSlot.updateParkingSlot);
 
+// Lấy các slot đã đặt theo ngày cho Owner
+router
+  .route('/bookedSlots/:parkingLotId')
+  .get(
+    authController.restrictTo('owner'),
+    ParkingSlot.getSlotsBookedByDateForOwner
+  );
+
+// Lấy các slot trống theo ngày cho Owner
+router
+  .route('/availableSlots/:parkingLotId')
+  .get(
+    authController.restrictTo('owner'),
+    ParkingSlot.getSlotsAvailableByDateForOwner
+  );
+
 export default router;
