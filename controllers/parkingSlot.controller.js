@@ -18,19 +18,25 @@ export const getSlotsAvailableByDate = catchAsync(async (req, res, next) => {
 
   // Lấy tất cả booking trong khoảng thời gian
   const bookings = await Booking.find({
-    parkingSlotId: { $in: slots.map(slot => slot._id) },
-    $or: [
-      { startTime: { $lte: endTime }, endTime: { $gte: startTime } },
-    ],
+    parkingSlotId: { $in: slots.map((slot) => slot._id) },
+    $or: [{ startTime: { $lte: endTime }, endTime: { $gte: startTime } }],
+    status: { $in: ['pending', 'confirmed'] },
   });
 
   // Gắn trạng thái cho slot dựa trên booking
-  const slotsWithStatus = slots.map(slot => {
-    const slotBookings = bookings.filter(booking => booking.parkingSlotId.toString() === slot._id.toString());
+  const slotsWithStatus = slots.map((slot) => {
+    console.log(`Processing slot: ${slot}`);
+    const slotBookings = bookings.filter(
+      (booking) => booking.parkingSlotId.toString() === slot._id.toString()
+    );
     const isBookedOrReserved = slotBookings.length > 0;
     return {
       ...slot.toObject(),
-      status: isBookedOrReserved ? (slot.status === 'booked' ? 'booked' : 'reserved') : 'available',
+      status: isBookedOrReserved
+        ? slot.status === 'booked'
+          ? 'booked'
+          : 'reserved'
+        : 'available',
       bookings: slotBookings, // Gắn thông tin booking vào slot
     };
   });
@@ -55,9 +61,7 @@ export const getSlotBookings = catchAsync(async (req, res, next) => {
 
   const bookings = await Booking.find({
     parkingSlotId: slotId,
-    $or: [
-      { startTime: { $lte: endTime }, endTime: { $gte: startTime } },
-    ],
+    $or: [{ startTime: { $lte: endTime }, endTime: { $gte: startTime } }],
   }).populate('userId', 'name email'); // Lấy thông tin user nếu cần
 
   res.status(200).json({
@@ -78,6 +82,7 @@ export const createParkingSlot = catchAsync(async (req, res, next) => {
   });
 });
 export const getParkingSlot = Factory.getOne(ParkingSlot);
+
 export const deleteParkingSlot = catchAsync(async (req, res, next) => {
   await ParkingSlotService.deleteSlotAndSyncZone(req.params.id);
   res.status(204).json({
@@ -86,29 +91,40 @@ export const deleteParkingSlot = catchAsync(async (req, res, next) => {
   });
 });
 export const updateParkingSlot = Factory.updateOne(ParkingSlot);
-export const getSlotsBookedByDateForOwner = catchAsync(async (req, res, next) => {
-  const { time } = req.query;
-  const { parkingLotId } = req.params;
-  if (!time) {
-    return res.status(400).json({ message: 'Missing date query' });
+
+export const getSlotsBookedByDateForOwner = catchAsync(
+  async (req, res, next) => {
+    const { time } = req.query;
+    const { parkingLotId } = req.params;
+    if (!time) {
+      return res.status(400).json({ message: 'Missing date query' });
+    }
+    const bookedSlots = await ParkingSlotService.getBookedSlotsForOwner(
+      time,
+      parkingLotId
+    );
+    res.status(200).json({
+      status: 'success',
+      results: bookedSlots.length,
+      data: bookedSlots,
+    });
   }
-  const bookedSlots = await ParkingSlotService.getBookedSlotsForOwner(time, parkingLotId);
-  res.status(200).json({
-    status: 'success',
-    results: bookedSlots.length,
-    data: bookedSlots,
-  });
-});
-export const getSlotsAvailableByDateForOwner = catchAsync(async (req, res, next) => {
-  const { time } = req.query;
-  const { parkingLotId } = req.params;
-  if (!time) {
-    return res.status(400).json({ message: 'Missing date query' });
+);
+export const getSlotsAvailableByDateForOwner = catchAsync(
+  async (req, res, next) => {
+    const { time } = req.query;
+    const { parkingLotId } = req.params;
+    if (!time) {
+      return res.status(400).json({ message: 'Missing date query' });
+    }
+    const availableSlots = await ParkingSlotService.getAvailableSlotsForOwner(
+      time,
+      parkingLotId
+    );
+    res.status(200).json({
+      status: 'success',
+      results: availableSlots.length,
+      data: availableSlots,
+    });
   }
-  const availableSlots = await ParkingSlotService.getAvailableSlotsForOwner(time, parkingLotId);
-  res.status(200).json({
-    status: 'success',
-    results: availableSlots.length,
-    data: availableSlots,
-  });
-});
+);
