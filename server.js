@@ -10,6 +10,10 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: `${__dirname}/config.env` });
 import app from './app.js';
 
+// Cron job: Update booking status to 'booked' when startTime <= now
+import './utils/cron/bookingStatusUpdater.js';
+import './utils/cron/parkingSlotCleaner.js';
+
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.log(err.name, err.message);
@@ -33,6 +37,10 @@ const port = process.env.PORT;
 const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+
+
+
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {

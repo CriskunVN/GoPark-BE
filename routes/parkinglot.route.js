@@ -2,40 +2,67 @@ import express from 'express';
 import * as parkingLotController from '../controllers/parkinglot.controller.js';
 import * as authController from '../controllers/auth.controller.js';
 import parkingSlotRoute from './parkingSlot.route.js';
+
 const router = express.Router();
 
-// router.use('/:slotID', parkingSlotRoute);
+// ========================
+// Route công khai (không yêu cầu auth)
+// ========================
+router.get('/:id/public', parkingLotController.getParkingLotById);
+router.get('/city/:city', parkingLotController.getParkingLotsByCity);
 
-// Sử dụng cho tất cả các route
-router.use(
-  authController.protect,
-  authController.restrictTo('admin', 'parking_owner')
+// ➕ Thêm route công khai mới cho FE gọi danh sách slots
+router.get(
+  '/:parkingLotId/slots-public',
+  parkingLotController.getAllParkingSlotsByLotId
 );
 
-// Route để lấy tất cả bãi đỗ xe hoặc tạo bãi đỗ xe mới
-router
-  .route('/')
-  .get(parkingLotController.getAllParkingLots)
-  .post(parkingLotController.createParkingLot);
+// ========================
+// Nested Route cho Slots (yêu cầu auth nếu middleware được áp dụng ở bên trong route slot)
+// ========================
+router.use('/:parkingLotId/slots', parkingSlotRoute);
 
-// Route để lấy, cập nhật hoặc xóa bãi đỗ xe theo ID
+// ========================
+// Bảo vệ tất cả các route bên dưới
+// ========================
+router.use(authController.protect);
+
+// ========================
+// Route cho Parking Owner
+// ========================
+router.get(
+  '/my-parkinglots',
+  authController.restrictTo('owner'),
+  parkingLotController.getMyParkingLots
+);
+router.route('/:id').get(parkingLotController.getOneParkingLot);
+
+router.post(
+  '/',
+  authController.restrictTo('owner', 'admin'),
+  parkingLotController.createParkingLot
+);
+
+router.patch(
+  '/:id/soft-delete',
+  authController.restrictTo('owner'),
+  parkingLotController.softDeleteParkingLot
+);
+
+router.route('/:id/users').get(parkingLotController.getUserBookingInParkingLot);
+
+// ========================
+// Admin quyền toàn bộ
+// ========================
+router.use(authController.restrictTo('admin'));
+router.get('/', parkingLotController.getAllParkingLots);
+
 router
   .route('/:id')
-  .get(parkingLotController.getParkingLot)
-  .patch(parkingLotController.updateParkingLot)
-  .delete(
-    authController.restrictTo('admin'), // only admin
-    parkingLotController.deleteParkingLot
-  );
-
-router
-  .route('/:id/soft-delete')
-  .patch(parkingLotController.softDeleteParkingLot);
-
-// // Route để tìm kiếm bãi đỗ xe theo tên
-// router.route('/search').get(parkingLotController.searchParkingLots);
-
-// // Route để lấy bãi đỗ xe gần vị trí hiện tại
-// router.route('/nearby').get(parkingLotController.getNearbyParkingLots);
+  .patch(
+    authController.restrictTo('owner'),
+    parkingLotController.updateParkingLot
+  )
+  .delete(parkingLotController.deleteParkingLot);
 
 export default router;

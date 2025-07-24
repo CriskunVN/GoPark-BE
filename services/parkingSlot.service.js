@@ -2,6 +2,7 @@ import ParkingSlot from '../models/parkingSlot.model.js';
 import ParkingLot from '../models/parkinglot.model.js';
 import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
+import Booking from '../models/booking.model.js';
 
 // thêm slot và đồng bộ trong parkingLot
 export const prepareParkingSlotData = async (data) => {
@@ -79,4 +80,99 @@ export const deleteSlotAndSyncZone = async (slotId) => {
       await ParkingLot.findByIdAndUpdate(parkingLot, { zones });
     }
   }
+};
+
+// Lấy tất cả slot còn trống trong khoảng thời gian nhất định
+export const getSlotsAvailable = async (startTime, endTime, parkingLotId) => {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new AppError('Thời gian không hợp lệ', 400);
+  }
+
+  // 1. Lấy tất cả slot thuộc bãi đỗ
+  const allSlots = await ParkingSlot.find({ parkingLot: parkingLotId });
+
+  // 1.1 Lấy ID của tất cả slot
+  const allSlotIds = allSlots.map((slot) => slot._id);
+
+  // 2. Tìm booking giao nhau với khoảng thời gian này
+  const activeBookings = await Booking.find({
+    parkingSlotId: { $in: allSlotIds },
+    startTime: { $lt: end },
+    endTime: { $gt: start },
+    status: { $in: ['pending', 'confirmed'] },
+  }).select('parkingSlotId');
+
+  // Lấy danh sách ID của các slot đã giao nhau với khoảng thời gian query
+  const occupiedSlotIds = activeBookings.map((b) => b.parkingSlotId.toString());
+
+  // 3. Trả lại slot chưa bị giao nhau
+  const availableSlots = allSlots.filter(
+    (slot) => !occupiedSlotIds.includes(slot._id.toString())
+  );
+
+  return availableSlots;
+};
+
+export const getBookedSlotsForOwner = async (time, parkingLotId) => {
+  const timeCheck = new Date(time);
+  if (isNaN(timeCheck.getTime())) {
+    throw new AppError('Thời gian không hợp lệ', 400);
+  }
+
+  // 1. Lấy tất cả slot thuộc bãi đỗ
+  const allSlots = await ParkingSlot.find({ parkingLot: parkingLotId });
+
+  // 1.1 Lấy ID của tất cả slot
+  const allSlotIds = allSlots.map((slot) => slot._id);
+
+  // 2. Tìm booking giao nhau với khoảng thời gian này
+  const activeBookings = await Booking.find({
+    parkingSlotId: { $in: allSlotIds },
+    startTime: { $lt: timeCheck },
+    endTime: { $gt: timeCheck },
+    status: { $in: ['pending', 'confirmed'] },
+  }).select('parkingSlotId');
+
+  // Lấy danh sách ID của các slot đã giao nhau với khoảng thời gian query
+  const occupiedSlotIds = activeBookings.map((b) => b.parkingSlotId.toString());
+
+  // 3. Trả lại slot chưa bị giao nhau
+  const bookedSlots = allSlots.filter((slot) =>
+    occupiedSlotIds.includes(slot._id.toString())
+  );
+
+  return bookedSlots;
+};
+
+export const getAvailableSlotsForOwner = async (time, parkingLotId) => {
+  const timeCheck = new Date(time);
+  if (isNaN(timeCheck.getTime())) {
+    throw new AppError('Thời gian không hợp lệ', 400);
+  }
+
+  // 1. Lấy tất cả slot thuộc bãi đỗ
+  const allSlots = await ParkingSlot.find({ parkingLot: parkingLotId });
+
+  // 1.1 Lấy ID của tất cả slot
+  const allSlotIds = allSlots.map((slot) => slot._id);
+
+  // 2. Tìm booking giao nhau với khoảng thời gian này
+  const activeBookings = await Booking.find({
+    parkingSlotId: { $in: allSlotIds },
+    startTime: { $lt: timeCheck },
+    endTime: { $gt: timeCheck },
+    status: { $in: ['pending', 'confirmed'] },
+  }).select('parkingSlotId');
+
+  // Lấy danh sách ID của các slot đã giao nhau với khoảng thời gian query
+  const occupiedSlotIds = activeBookings.map((b) => b.parkingSlotId.toString());
+
+  // 3. Trả lại slot chưa bị giao nhau
+  const availableSlots = allSlots.filter(
+    (slot) => !occupiedSlotIds.includes(slot._id.toString())
+  );
+
+  return availableSlots;
 };

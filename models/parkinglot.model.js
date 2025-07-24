@@ -35,12 +35,6 @@ const parkingLotSchema = new mongoose.Schema(
         count: { type: Number, required: true }, // số slot
       },
     ],
-    pricePerHour: {
-      type: Number,
-      required: true,
-      default: 0, // Giá tiền mỗi giờ
-    },
-
     isActive: {
       type: Boolean,
       default: true, // Trạng thái hoạt động của bãi đỗ
@@ -55,11 +49,16 @@ const parkingLotSchema = new mongoose.Schema(
       type: [String],
       default: '',
     },
+    allowedPaymentMethods: {
+      type: [String],
+      enum: ['prepaid', 'pay-at-parking' ], // Các phương thức thanh toán được hỗ trợ
+      default: ['prepaid', 'pay-at-parking'], // Mặc định là cả hai phương thức
+    },
   },
   { timestamps: true } // sinh thêm trường updatedAt và createdAt
 );
 
-parkingLotSchema.index({ localtion: '2dsphere' }); // Tạo chỉ mục 2dsphere cho trường localtion để hỗ trợ truy vấn không gian
+parkingLotSchema.index({ location: '2dsphere' }); // Tạo chỉ mục 2dsphere cho trường localtion để hỗ trợ truy vấn không gian
 parkingLotSchema.index({ name: 'text' }); // Tạo chỉ mục văn bản cho trường name để hỗ trợ tìm kiếm
 
 const ParkingLot = mongoose.model('ParkingLot', parkingLotSchema);

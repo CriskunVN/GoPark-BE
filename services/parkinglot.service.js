@@ -1,6 +1,8 @@
 import ParkingLot from '../models/parkinglot.model.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
+import Booking from '../models/booking.model.js';
 import AppError from '../utils/appError.js';
+import mongoose from 'mongoose';
 
 export const createParkingLotWithSlots = async (body) => {
   const { name, zones, location } = body;
@@ -29,6 +31,8 @@ export const createParkingLotWithSlots = async (body) => {
   // Tạo bãi đỗ xe mới
   const newLot = await ParkingLot.create(body);
 
+  console.log('✅ Created parking lot:', newLot);
+
   // Tạo các slot dựa trên zones
   let slotsToCreate = [];
 
@@ -48,13 +52,13 @@ export const createParkingLotWithSlots = async (body) => {
   const createdSlots = await ParkingSlot.insertMany(slotsToCreate);
 
   return {
-    parkingLot: newLot,
-    slots: createdSlots,
+    newLot,
   };
 };
 
-export const getParkingLotWithPineline = async () => {
+export const getParkingLotByIdWithStats = async (id) => {
   const doc = await ParkingLot.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(id) } },
     {
       $lookup: {
         from: 'parkingslots',
@@ -77,12 +81,29 @@ export const getParkingLotWithPineline = async () => {
         },
       },
     },
-    // {
-    //   $project: {
-    //     slots: 0, // ẩn danh sách slot
-    //   },
-    // },
+    // { $project: { slots: 0 } },
   ]);
+  return doc[0] || null;
+};
 
-  return doc;
+export const getUserBookingInParkingLot = async (parkingLotId) => {
+  // 1. Lấy tất cả slot thuộc bãi đỗ này
+  const slots = await ParkingSlot.find({ parkingLot: parkingLotId }).select(
+    '_id'
+  );
+  const slotIds = slots.map((slot) => slot._id);
+
+  // 2. Lấy tất cả booking trong các slot này
+  const bookings = await Booking.find({
+    parkingSlotId: { $in: slotIds },
+  });
+
+  if (!bookings || bookings.length === 0) {
+    throw new AppError('Không tìm thấy booking nào trong bãi đỗ này', 404);
+  }
+  // lấy user trong các booking để trả về
+  const userIds = bookings.map((booking) => booking.userId);
+  const users = await mongoose.model('User').find({ _id: { $in: userIds } });
+
+  return users;
 };

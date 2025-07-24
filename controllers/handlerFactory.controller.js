@@ -34,7 +34,7 @@ export const getOne = (Model) =>
       doc = await Model.findById(req.params.id);
     } else {
       // tương tự như sub-query để lấy các thông tin của bãi xe và số lượng trống không cần phải tham chiếu
-      doc = await ParkingLotService.getParkingLotWithPineline();
+      doc = await ParkingLotService.getParkingLotByIdWithStats(req.params.id);
     }
 
     if (!doc) {
