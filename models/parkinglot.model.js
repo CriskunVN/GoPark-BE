@@ -39,6 +39,11 @@ const parkingLotSchema = new mongoose.Schema(
       type: Boolean,
       default: true, // Trạng thái hoạt động của bãi đỗ
     },
+    pricePerHour: {
+      type: Number,
+      default: 15000, // Giá mặc định 15,000 VND/giờ
+      min: 0,
+    },
     // Avatar
     avtImage: {
       type: String,
