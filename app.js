@@ -18,6 +18,9 @@ import vnpayRouter from './routes/vnpay.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+// Admin routes
+import adminRouter from './routes/admin.route.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -51,6 +54,7 @@ app.use('/api/v1/bookings', bookingRouter);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/v1/tickets', ticketRouter);
 app.use('/api/v1/vnpay', vnpayRouter);
+app.use('/api/v1/admin', adminRouter);
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
