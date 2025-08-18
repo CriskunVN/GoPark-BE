@@ -44,7 +44,7 @@ app.use(express.json()); // Parse JSON request body
 app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 
 // 3. ROUTES
-app.use(`/api/v1/users`, userRouter);
+app.use(`/api/v1/users`, userRouter); // đăng nhập
 app.use(`/api/v1/users_new`, userNewRouter); // New user routes
 app.use(`/api/v1/parkinglots`, parkinglotRouter);
 app.use('/api/v1/search', searchRoutes);
