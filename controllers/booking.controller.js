@@ -51,7 +51,51 @@ export const createBookingOnline = catchAsync(async (req, res, next) => {
 
 
 // Lấy tất cả bookings
-export const getAllBookings = Factory.getAll(Booking);
+export const getAllBookings = catchAsync(async (req, res, next) => {
+  const bookings = await Booking.find()
+    .populate({
+      path: 'userId',
+      select: 'userName email phoneNumber'
+    })
+    .populate({
+      path: 'parkingSlotId',
+      select: 'slotNumber zone',
+      populate: {
+        path: 'parkingLot',
+        select: 'name address image'
+      }
+    })
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    status: 'success',
+    results: bookings.length,
+    data: bookings
+  });
+});
+
+// Lấy bookings của user hiện tại
+export const getMyBookings = catchAsync(async (req, res, next) => {
+  const bookings = await Booking.find({ userId: req.user.id })
+    .populate({
+      path: 'parkingSlotId',
+      select: 'slotNumber zone',
+      populate: {
+        path: 'parkingLot',
+        select: 'name address image'
+      }
+    })
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    status: 'success',
+    results: bookings.length,
+    data: bookings
+  });
+});
+
+// Keep the existing factory export as backup
+export const getAllBookingsFactory = Factory.getAll(Booking);
 
 // Lấy thông tin một booking theo ID
 export const getBookingById = catchAsync(async (req, res, next) => {

@@ -8,10 +8,11 @@ const router = express.Router();
 // ========================
 // Route công khai (không yêu cầu auth)
 // ========================
+router.get('/public/all', parkingLotController.getAllParkingLots);
 router.get('/:id/public', parkingLotController.getParkingLotById);
 router.get('/city/:city', parkingLotController.getParkingLotsByCity);
 
-// ➕ Thêm route công khai mới cho FE gọi danh sách slots
+//  Thêm route công khai mới cho FE gọi danh sách slots
 router.get(
   '/:parkingLotId/slots-public',
   parkingLotController.getAllParkingSlotsByLotId

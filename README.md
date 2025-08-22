@@ -1,18 +1,24 @@
-# GoPark Backend - Express API
+# GoPark Backend – Smart Parking API
 
-This is the **backend API** for the GoPark project, built with **Node.js**, **Express**, and **MongoDB**.
+This is the **backend API** for the GoPark project, built with **Node.js**, **Express**, and **MongoDB**.  
+GoPark is a smart parking management platform supporting booking, payment, AI-powered chatbot, and automatic license plate recognition.
 
-## Features
+---
 
-- RESTful API for user authentication and management
-- JWT-based authentication
-- Role-based access control (admin, user, etc.)
-- Password reset via email (nodemailer)
-- Query/filter/sort/pagination for resources
-- Secure HTTP headers with Helmet
-- CORS enabled for frontend integration
+## ✨ Key Features
 
-## Getting Started
+- **User management:** Registration, login, role-based access (admin, owner, guest)
+- **Flexible booking:** Book by hour, day, month, or as a guest
+- **Multiple payment methods:** Pay at parking, online payment, VNPay integration
+- **Parking lot & slot management:** Real-time status, statistics, search, and filtering
+- **AI Chatbot:** Automated customer support, FAQ, and booking guidance (OpenAI/ChatGPT or Dialogflow integration)
+- **License plate recognition:** AI-powered license plate analysis for automatic check-in/out (easy to extend with Python microservice)
+- **Security:** JWT, Helmet, CORS, access control
+- **RESTful API:** Standardized, easy to integrate with frontend/mobile apps
+
+---
+
+## 🚀 Getting Started
 
 ### 1. Clone the repository
 
@@ -29,18 +35,6 @@ npm install
 
 ### 3. Configure environment variables
 
-Create a file named `.env` or `config.env` in the `backend` folder with the following content:
-
-```
-PORT=5000
-DATABASE=<your-mongodb-connection-string>
-DATABASE_PASSWORD=<your-db-password>
-JWT_SECRET=<your-jwt-secret>
-JWT_EXPIRES_IN=90d
-EMAIL_USERNAME=<your-email>
-EMAIL_PASSWORD=<your-email-password>
-```
-
 > Replace the values with your actual credentials.
 
 ### 4. Run the development server
@@ -51,35 +45,50 @@ npm run dev
 
 The server will start on [http://localhost:5000](http://localhost:5000) (or the port you set).
 
-## API Endpoints
+---
 
-- `POST   /api/v1/users/signup` - Register a new user
-- `POST   /api/v1/users/login` - Login
-- `POST   /api/v1/users/forgotPassword` - Request password reset
-- `PATCH  /api/v1/users/resetPassword/:token` - Reset password
-- `PATCH  /api/v1/users/updateMyPassword` - Update password (logged in)
-- `GET    /api/v1/users/` - Get all users (admin only)
-- `GET    /api/v1/users/:id` - Get user by ID (admin only)
-- `PATCH  /api/v1/users/:id` - Update user by ID (admin only)
-- `DELETE /api/v1/users/:id` - Delete user by ID (admin only)
+## 📚 Main API Endpoints
 
-## Project Structure
+- `POST   /api/v1/users/signup` – Register a new user
+- `POST   /api/v1/users/login` – Login
+- `POST   /api/v1/bookings/bookingOnline` – Online booking
+- `POST   /api/v1/bookings/bookingGuest` – Guest booking
+- `POST   /api/v1/tickets/:ticketId/checkin` – Ticket check-in
+- `POST   /api/v1/tickets/:ticketId/checkout` – Ticket check-out
+- `POST   /api/chatbot` – AI chatbot support
+- `POST   /api/v1/vehicles/recognize-plate` – License plate recognition (AI)
+
+---
+
+## 🗂️ Project Structure
 
 ```
 backend/
 ├── controllers/
 ├── models/
 ├── routes/
+├── services/
 ├── utils/
 ├── app.js
 ├── server.js
 └── config.env
 ```
 
+---
+
+## 🧠 AI Integration (Extension Ideas)
+
+- **AI Chatbot:** Integrate OpenAI GPT or Dialogflow for automated customer support.
+- **License Plate Recognition:** Connect to a Python microservice (Flask/FastAPI) using EasyOCR, YOLO, or OpenALPR.
+
+---
+
 ## Scripts
 
-- `npm run dev` - Start server with nodemon (development)
-- `npm start` - Start server (production)
+- `npm run dev` – Start server with nodemon (development)
+- `npm start` – Start server (production)
+
+---
 
 ## License
 
@@ -87,4 +96,4 @@ MIT
 
 ---
 
-**GoPark Backend** - Developed with ❤️ using Express & MongoDB.
+**GoPark Backend** – Smart parking platform, ready for the AI era 🚀
