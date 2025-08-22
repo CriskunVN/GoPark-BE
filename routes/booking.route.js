@@ -4,8 +4,14 @@ import express from 'express';
 
 const router = express.Router();
 
+// Public route for admin dashboard (for development/testing)
+router.route('/admin/all').get(BookingController.getAllBookings);
+
 // Middleware để bảo vệ các route sau khi đăng nhập
 router.use(authController.protect);
+
+// Route để lấy bookings của user hiện tại
+router.route('/my-bookings').get(BookingController.getMyBookings);
 
 // Route để tạo một booking mới
 router.route('/').get(BookingController.getAllBookings);

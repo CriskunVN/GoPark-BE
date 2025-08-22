@@ -28,6 +28,7 @@
     "morgan": "^1.10.0",
     "ndb": "^1.1.5",
     "node-cron": "^4.2.0",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.3",
     "populate": "^5.0.1",
     "qrcode": "^1.5.4",

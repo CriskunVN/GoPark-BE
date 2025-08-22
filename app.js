@@ -18,6 +18,9 @@ import vnpayRouter from './routes/vnpay.route.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+// Admin routes
+import adminRouter from './routes/admin.route.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -27,7 +30,7 @@ const app = express();
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://go-park-fe.vercel.app'],
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://go-park-fe.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
     preflightContinue: false,
@@ -41,7 +44,7 @@ app.use(express.json()); // Parse JSON request body
 app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 
 // 3. ROUTES
-app.use(`/api/v1/users`, userRouter);
+app.use(`/api/v1/users`, userRouter); // đăng nhập
 app.use(`/api/v1/users_new`, userNewRouter); // New user routes
 app.use(`/api/v1/parkinglots`, parkinglotRouter);
 app.use('/api/v1/search', searchRoutes);
@@ -51,6 +54,7 @@ app.use('/api/v1/bookings', bookingRouter);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/v1/tickets', ticketRouter);
 app.use('/api/v1/vnpay', vnpayRouter);
+app.use('/api/v1/admin', adminRouter);
 
 // 4. ERROR HANDLER
 app.use((err, req, res, next) => {
