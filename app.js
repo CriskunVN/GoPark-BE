@@ -30,7 +30,11 @@ const app = express();
 // Cấu hình CORS để cho phép frontend truy cập vào backend
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://go-park-fe.vercel.app'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://go-park-fe.vercel.app',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
     preflightContinue: false,
@@ -46,17 +50,17 @@ app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 // 3. ROUTES
 app.use(`/api/v1/users`, userRouter); // đăng nhập
 app.use(`/api/v1/users_new`, userNewRouter); // New user routes
-app.use(`/api/v1/parkinglots`, parkinglotRouter);
-app.use('/api/v1/search', searchRoutes);
-app.use(`/api/v1/parking-slots`, parkingSlotRouter);
-app.use('/api/v1/vehicles', vehicleRoutes);
-app.use('/api/v1/bookings', bookingRouter);
-app.use('/api/chatbot', chatbotRoutes);
-app.use('/api/v1/tickets', ticketRouter);
-app.use('/api/v1/vnpay', vnpayRouter);
-app.use('/api/v1/admin', adminRouter);
+app.use(`/api/v1/parkinglots`, parkinglotRouter); // route bãi đỗ xe
+app.use('/api/v1/search', searchRoutes); // route tìm kiếm
+app.use(`/api/v1/parking-slots`, parkingSlotRouter); // route chỗ đỗ xe
+app.use('/api/v1/vehicles', vehicleRoutes); // route xe
+app.use('/api/v1/bookings', bookingRouter); // route đặt chỗ
+app.use('/api/chatbot', chatbotRoutes); // route chatbot
+app.use('/api/v1/tickets', ticketRouter); //route vé xe
+app.use('/api/v1/vnpay', vnpayRouter); // route thanh toán VNPay
+app.use('/api/v1/admin', adminRouter); // route admin
 
-// 4. ERROR HANDLER
+// 4. ERROR HANDLER (Middle xử lý lỗi)
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
