@@ -95,7 +95,6 @@ export const updateParkingLot = catchAsync(async (req, res, next) => {
 export const deleteParkingLot = catchAsync(async (req, res, next) => {
   const deletedLot = await ParkingLot.findOneAndDelete({
     _id: req.params.id,
-    parkingOwner: req.user.id,
   });
 
   if (!deletedLot) {
