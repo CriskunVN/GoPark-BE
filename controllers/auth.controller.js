@@ -138,7 +138,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3. Gửi reset token qua email
-  const resetURL = `${req.protocol}://localhost:3000/account/reset/password?token=${resetToken}`;
+  const resetURL = `${process.env.URL_FE}/account/reset/password?token=${resetToken}`;
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.
                     If you didn't forget your password, please ignore this email!`;
@@ -248,4 +248,3 @@ const createSendToken = (user, statusCode, res) => {
     },
   });
 };
-
