@@ -31,7 +31,11 @@ export const signup = catchAsync(async (req, res, next) => {
   if (existingUser) {
     return next(new AppError('User already exists with this email', 409));
   }
-
+  if (password < 8) {
+    return next(
+      new AppError('Password must be at least 8 characters long', 400)
+    );
+  }
   // Tạo khách hàng mới
   const user = await User.create({
     userName,
