@@ -1,0 +1,13 @@
+export const createBookingForGuest: (req: any, res: any, next: any) => void;
+export const createBookingOnline: (req: any, res: any, next: any) => void;
+export const getAllBookings: (req: any, res: any, next: any) => void;
+export const getMyBookings: (req: any, res: any, next: any) => void;
+export const getAllBookingsFactory: (req: any, res: any, next: any) => void;
+export const getBookingById: (req: any, res: any, next: any) => void;
+export const cancelBooking: (req: any, res: any, next: any) => void;
+export const checkinBooking: (req: any, res: any, next: any) => void;
+export const checkoutBooking: (req: any, res: any, next: any) => void;
+export const updateBooking: (req: any, res: any, next: any) => void;
+export const deleteBooking: (req: any, res: any, next: any) => void;
+export const payAtParking: (req: any, res: any, next: any) => void;
+//# sourceMappingURL=booking.controller.d.ts.map
