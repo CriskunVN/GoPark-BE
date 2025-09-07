@@ -1,3 +1,13 @@
+// ============================================================================
+// AppError: Custom error class dùng để tạo lỗi có kiểm soát trong ứng dụng
+// - Kế thừa từ class Error gốc của JavaScript
+// - Cho phép truyền vào message và statusCode (mã lỗi HTTP)
+// - Thêm thuộc tính status ('fail' cho lỗi 4xx, 'error' cho lỗi 5xx)
+// - Đánh dấu lỗi là 'operational' để phân biệt với lỗi lập trình
+// - Lưu lại stack trace để dễ dàng debug
+// => Sử dụng để ném lỗi trong service/controller và xử lý tập trung ở middleware lỗi
+// ============================================================================
+
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message); // Gọi constructor của class Error gốc, truyền vào message

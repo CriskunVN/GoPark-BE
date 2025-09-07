@@ -49,7 +49,7 @@ export const createParkingLotWithSlots = async (body) => {
     }
   });
 
-  const createdSlots = await ParkingSlot.insertMany(slotsToCreate);
+  await ParkingSlot.insertMany(slotsToCreate);
 
   return {
     newLot,

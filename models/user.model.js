@@ -20,13 +20,13 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true, minlength: 8, select: false },
     passwordConfirm: {
       type: String,
-      required: [true, 'A user must have a passwordConfirm'],
+      required: [true, 'Bạn cần xác nhận lại mật khẩu'],
       validate: {
-        // This only works on CREATE and SAVE!!!
+        // chỉ làm việc trên CREATE và SAVE!!!
         validator: function (el) {
           return el === this.password;
         },
-        message: 'Password are not the same!',
+        message: 'Mật khẩu xác nhận không khớp với mật khẩu!',
       },
     },
 
@@ -35,14 +35,12 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'admin', 'parking_owner'],
       default: 'user',
     },
-    // profilePicture: { type: String, default: '' }, // hình đại diện người dùng
+    profilePicture: { type: String, default: '' }, // hình đại diện người dùng
     phoneNumber: { type: String, default: '' },
-    isActive: { type: Boolean, default: true, select: false },
-    passwordChangeAt: { type: Date, default: Date.now },
-    // the password reset token of the user
-    passwordResetToken: { type: String, select: false },
-    // the password reset expires date of the user
-    passwordResetExpires: { type: Date, select: false },
+    isActive: { type: Boolean, default: true, select: false }, // xác nhận người dùng có đang hoạt động hay không
+    passwordChangeAt: { type: Date, default: Date.now }, // thời gian thay đổi mật khẩu gần nhất
+    passwordResetToken: { type: String, select: false }, // token dùng để reset mật khẩu
+    passwordResetExpires: { type: Date, select: false }, // thời gian hết hạn của token reset mật khẩu
   },
   { timestamps: true } // sinh thêm trường updatedAt và createdAt
 );

@@ -1,4 +1,11 @@
-// this class is used to build query features for Mongoose
+// ============================================================================
+// APIFeatures: Lớp tiện ích xây dựng các tính năng truy vấn nâng cao cho Mongoose
+// - Hỗ trợ lọc (filter), sắp xếp (sort), giới hạn trường (limit fields), phân trang (pagination)
+// - Nhận vào query của Mongoose và queryString từ request (req.query)
+// - Giúp API linh hoạt, dễ dàng mở rộng các tính năng tìm kiếm, lọc, phân trang cho dữ liệu lớn
+// - Ví dụ sử dụng: new APIFeatures(Model.find(), req.query).filter().sort().limitFields().pagination()
+// ============================================================================
+
 class APIFeatures {
   constructor(query, queryString) {
     this.query = query;

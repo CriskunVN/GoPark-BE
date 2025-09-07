@@ -1,3 +1,4 @@
+
 import User from '../models/user.model.js';
 import Booking from '../models/booking.model.js';
 import ParkingLot from '../models/parkingLot.model.js';
@@ -188,3 +189,4 @@ export async function askGeminiAI(message, userId = null) {
     return 'Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại sau.';
   }
 }
+

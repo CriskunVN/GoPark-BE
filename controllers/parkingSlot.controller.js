@@ -73,6 +73,9 @@ export const getSlotBookings = catchAsync(async (req, res, next) => {
 
 // Các hàm khác giữ nguyên
 export const getAllParkingSlots = Factory.getAll(ParkingSlot);
+export const updateParkingSlot = Factory.updateOne(ParkingSlot);
+export const getParkingSlot = Factory.getOne(ParkingSlot);
+
 export const createParkingSlot = catchAsync(async (req, res, next) => {
   const prepared = await ParkingSlotService.prepareParkingSlotData(req.body);
   const doc = await ParkingSlot.create(prepared);
@@ -81,7 +84,6 @@ export const createParkingSlot = catchAsync(async (req, res, next) => {
     data: { data: doc },
   });
 });
-export const getParkingSlot = Factory.getOne(ParkingSlot);
 
 export const deleteParkingSlot = catchAsync(async (req, res, next) => {
   await ParkingSlotService.deleteSlotAndSyncZone(req.params.id);
@@ -90,7 +92,6 @@ export const deleteParkingSlot = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
-export const updateParkingSlot = Factory.updateOne(ParkingSlot);
 
 export const getSlotsBookedByDateForOwner = catchAsync(
   async (req, res, next) => {

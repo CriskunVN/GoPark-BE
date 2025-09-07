@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const chatHistorySchema = new mongoose.Schema({
@@ -37,3 +38,4 @@ const chatHistorySchema = new mongoose.Schema({
 chatHistorySchema.index({ userId: 1, createdAt: -1 });
 
 export default mongoose.model("ChatHistory", chatHistorySchema);
+
