@@ -1,13 +1,14 @@
-import User from "../models/user.model.js";
-import Booking from "../models/booking.model.js";
-import ParkingLot from "../models/parkingLot.model.js";
-import fetch from "node-fetch";
-import dotenv from "dotenv";
+import User from '../models/user.model.js';
+import Booking from '../models/booking.model.js';
+import ParkingLot from '../models/parkingLot.model.js';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
 
-dotenv.config({ path: "./config.env" });
+dotenv.config({ path: './config.env' });
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+const GEMINI_URL =
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // Prompt cơ bản cho tất cả user
 const BASE_PROMPT = `
@@ -25,7 +26,7 @@ export async function getUserInfo(userId) {
       return {
         role: 'guest',
         name: 'Khách vãng lai',
-        contextInfo: 'Chỉ có thể xem thông tin cơ bản về bãi xe'
+        contextInfo: 'Chỉ có thể xem thông tin cơ bản về bãi xe',
       };
     }
 
@@ -33,9 +34,9 @@ export async function getUserInfo(userId) {
     const user = await User.findById(userId);
     if (!user) {
       return {
-        role: 'guest', 
+        role: 'guest',
         name: 'User không tồn tại',
-        contextInfo: 'Vui lòng đăng nhập để có trải nghiệm tốt hơn'
+        contextInfo: 'Vui lòng đăng nhập để có trải nghiệm tốt hơn',
       };
     }
 
@@ -47,17 +48,20 @@ export async function getUserInfo(userId) {
         const bookingCount = await Booking.countDocuments({ userId });
         contextInfo = `Khách hàng có ${bookingCount} booking. Có thể hỏi về lịch sử đặt chỗ, tìm bãi xe.`;
         break;
-        
+
       case 'parking_owner':
         // Lấy số bãi xe của owner
-        const lotCount = await ParkingLot.countDocuments({ parkingOwner: userId });
+        const lotCount = await ParkingLot.countDocuments({
+          parkingOwner: userId,
+        });
         contextInfo = `Chủ bãi xe quản lý ${lotCount} bãi. Có thể hỏi về thống kê, doanh thu.`;
         break;
-        
+
       case 'admin':
-        contextInfo = 'Quản trị viên có quyền truy cập tất cả thông tin hệ thống.';
+        contextInfo =
+          'Quản trị viên có quyền truy cập tất cả thông tin hệ thống.';
         break;
-        
+
       default:
         contextInfo = 'User với quyền hạn cơ bản.';
     }
@@ -66,15 +70,14 @@ export async function getUserInfo(userId) {
       role: user.role,
       name: user.userName,
       email: user.email,
-      contextInfo
+      contextInfo,
     };
-
   } catch (error) {
-    console.error("Lỗi lấy thông tin user:", error);
+    console.error('Lỗi lấy thông tin user:', error);
     return {
       role: 'guest',
-      name: 'Lỗi hệ thống', 
-      contextInfo: 'Không thể xác định thông tin người dùng'
+      name: 'Lỗi hệ thống',
+      contextInfo: 'Không thể xác định thông tin người dùng',
     };
   }
 }
@@ -93,7 +96,7 @@ THÔNG TIN: ${userInfo.contextInfo}
 BẠN CÓ THỂ: Giúp tìm bãi xe, hướng dẫn đặt chỗ, giải đáp về booking cá nhân.
 KHÔNG ĐƯỢC: Tiết lộ thông tin người khác, dữ liệu doanh thu hệ thống.`;
       break;
-      
+
     case 'parking_owner':
       personalizedPrompt += `
       
@@ -102,7 +105,7 @@ THÔNG TIN: ${userInfo.contextInfo}
 BẠN CÓ THỂ: Hỗ trợ quản lý bãi xe, thống kê booking, tư vấn tối ưu hóa.
 KHÔNG ĐƯỢC: Xem dữ liệu bãi xe của chủ khác.`;
       break;
-      
+
     case 'admin':
       personalizedPrompt += `
       
@@ -111,7 +114,7 @@ THÔNG TIN: ${userInfo.contextInfo}
 BẠN CÓ THỂ: Cung cấp mọi thống kê, quản lý user, xử lý khiếu nại.
 QUYỀN HẠN: Toàn quyền truy cập dữ liệu.`;
       break;
-      
+
     default: // guest
       personalizedPrompt += `
       
@@ -126,42 +129,47 @@ KHUYẾN NGHỊ: Đề xuất đăng nhập để có trải nghiệm tốt hơn
 // Hàm gọi Gemini AI chính
 export async function askGeminiAI(message, userId = null) {
   try {
-    console.log("Bắt đầu xử lý tin nhắn:", { message: message.substring(0, 50), userId });
+    console.log('Bắt đầu xử lý tin nhắn:', {
+      message: message.substring(0, 50),
+      userId,
+    });
 
-    // Bước 1: Lấy thông tin user 
+    // Bước 1: Lấy thông tin user
     const userInfo = await getUserInfo(userId);
-    console.log("Thông tin user:", userInfo);
+    console.log('Thông tin user:', userInfo);
 
     // Bước 2: Tạo prompt có cá nhân hóa
     const personalizedPrompt = createPersonalizedPrompt(userInfo, message);
 
     // Bước 3: Gọi Gemini API
     const requestBody = {
-      contents: [{
-        parts: [
-          { text: personalizedPrompt }, // System prompt với context
-          { text: `Câu hỏi: ${message}` } // User message
-        ]
-      }],
+      contents: [
+        {
+          parts: [
+            { text: personalizedPrompt }, // System prompt với context
+            { text: `Câu hỏi: ${message}` }, // User message
+          ],
+        },
+      ],
       generationConfig: {
         temperature: 0.7, // Độ sáng tạo vừa phải
-        maxOutputTokens: 1000 // Giới hạn độ dài phản hồi
-      }
+        maxOutputTokens: 1000, // Giới hạn độ dài phản hồi
+      },
     };
 
     const response = await fetch(GEMINI_URL, {
-      method: "POST", 
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-goog-api-key": GEMINI_API_KEY
+        'Content-Type': 'application/json',
+        'X-goog-api-key': GEMINI_API_KEY,
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
     });
 
     // Bước 4: Xử lý phản hồi
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lỗi Gemini API:", response.status, errorText);
+      console.error('Lỗi Gemini API:', response.status, errorText);
       throw new Error(`Gemini API Error: ${response.status}`);
     }
 
@@ -169,15 +177,14 @@ export async function askGeminiAI(message, userId = null) {
     const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!aiReply) {
-      console.error("Không có phản hồi từ AI:", data);
-      return "Xin lỗi, tôi không thể trả lời câu hỏi này. Vui lòng thử lại.";
+      console.error('Không có phản hồi từ AI:', data);
+      return 'Xin lỗi, tôi không thể trả lời câu hỏi này. Vui lòng thử lại.';
     }
 
-    console.log("AI phản hồi thành công cho user:", userInfo.name);
+    console.log('AI phản hồi thành công cho user:', userInfo.name);
     return aiReply;
-
   } catch (error) {
-    console.error("Lỗi askGeminiAI:", error);
-    return "Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại sau.";
+    console.error('Lỗi askGeminiAI:', error);
+    return 'Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại sau.';
   }
 }
