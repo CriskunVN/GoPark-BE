@@ -29,25 +29,37 @@ export const signup = catchAsync(async (req, res, next) => {
   // Kiểm tra nếu tài khoản đã tồn tại
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return next(new AppError('User already exists with this email', 409));
+    return next(new AppError('Người dùng đã tồn tại với email này', 409));
   }
-  if (password < 8) {
-    return next(
-      new AppError('Password must be at least 8 characters long', 400)
-    );
+  if (password.length < 8) {
+    return next(new AppError('Mật khẩu phải có ít nhất 8 ký tự', 400));
   }
-  // Tạo khách hàng mới
-  const user = await User.create({
-    userName,
-    email,
-    password,
-    passwordConfirm,
-    profilePicture,
-    phoneNumber,
-  });
+  try {
+    // Tạo khách hàng mới
+    const user = await User.create({
+      userName,
+      email,
+      password,
+      passwordConfirm,
+      profilePicture,
+      phoneNumber,
+    });
 
-  // Tạo token và set cookie
-  createSendToken(user, 201, res);
+    // Tạo token và set cookie
+    createSendToken(user, 201, res);
+  } catch (err) {
+    // Custom lại message cho lỗi passwordConfirm
+    if (
+      err.name === 'ValidationError' &&
+      err.errors &&
+      err.errors.passwordConfirm
+    ) {
+      return next(
+        new AppError('Mật khẩu xác nhận không khớp với mật khẩu!', 400)
+      );
+    }
+    return next(err);
+  }
 });
 
 // Hàm đăng nhập người dùng
@@ -55,7 +67,7 @@ export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   // kiểm tra nếu email và password được cung cấp
   if (!email || !password) {
-    return next(new AppError('Please provide email and password!', 400));
+    return next(new AppError('Vui lòng cung cấp email và mật khẩu!', 400));
   }
   // kiểm tra xem người dùng có tồn tại trong cơ sở dữ liệu hay không
   const user = await User.findOne({ email }).select('+password');
@@ -63,7 +75,7 @@ export const login = catchAsync(async (req, res, next) => {
   // correctPassword là một phương thức trong mô hình người dùng để so sánh mật khẩu đã nhập với mật khẩu đã mã hóa trong cơ sở dữ liệu
   // nếu mật khẩu không đúng, trả về lỗi
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError('Incorrect email or password', 401));
+    return next(new AppError('Email hoặc mật khẩu không đúng', 401));
   }
 
   // send token to client
@@ -84,7 +96,10 @@ export const protect = catchAsync(async (req, res, next) => {
   }
   if (!token) {
     return next(
-      new AppError('You are not logged in! Please log in to get access.', 401)
+      new AppError(
+        'Bạn chưa đăng nhập! Vui lòng đăng nhập để có quyền truy cập.',
+        401
+      )
     );
   }
   // 2. Xác thực token
@@ -96,7 +111,7 @@ export const protect = catchAsync(async (req, res, next) => {
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
     return next(
-      new AppError('The user belonging to this token does no longer exist', 401)
+      new AppError('Người dùng thuộc về token này không còn tồn tại', 401)
     );
   }
 
@@ -106,7 +121,10 @@ export const protect = catchAsync(async (req, res, next) => {
   // decoded.iat là thời gian tạo token được lưu trong payload của token
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
-      new AppError('User recently changed password! Please log in again.', 401)
+      new AppError(
+        'Người dùng đã thay đổi mật khẩu gần đây! Vui lòng đăng nhập lại.',
+        401
+      )
     );
   }
 
@@ -121,7 +139,7 @@ export const restrictTo = (...roles) => {
     // roles ['admin', 'user']. if role='parking_owner' no have permission
     if (!roles.includes(req.user.role)) {
       return next(
-        new AppError('You do not have permission to perform this action', 403)
+        new AppError('Bạn không có quyền thực hiện hành động này', 403)
       );
     }
     next();
@@ -135,7 +153,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   // 1. Lấy user dựa trên email được cung cấp trong request body
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError('There is no user with this email address', 404));
+    return next(new AppError('Không có người dùng nào với email này', 404));
   }
   // 2. Tạo random reset token để đặt lại mật khẩu
   const resetToken = user.createPasswordResetToken();
@@ -144,8 +162,8 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   // 3. Gửi reset token qua email
   const resetURL = `${process.env.URL_FE}/account/reset/password?token=${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.
-                    If you didn't forget your password, please ignore this email!`;
+  const message = `Quên mật khẩu? Gửi yêu cầu PATCH với mật khẩu mới và mật khẩu xác thực đến: ${resetURL}.
+                    Nếu bạn không quên mật khẩu, vui lòng bỏ qua email này!`;
 
   try {
     await sendEmail({
@@ -194,18 +212,33 @@ export const resetPassword = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
+  if (req.body.password.length < 8) {
+    return next(new AppError('Mật khẩu phải có ít nhất 8 ký tự', 400));
+  }
   // không lỗi thì sẽ tiếp tục cập nhật mật khẩu
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
-  await user.save();
+  try {
+    await user.save();
 
-  // 3. cập nhật thời gian thay đổi mật khẩu
-  // pre save middleware trong mô hình người dùng sẽ tự động cập nhật thời gian thay đổi mật khẩu
+    // 3. cập nhật thời gian thay đổi mật khẩu
+    // pre save middleware trong mô hình người dùng sẽ tự động cập nhật thời gian thay đổi mật khẩu
 
-  // 4. Log the user in, send JWT
-  createSendToken(user, 200, res);
+    // 4. Log the user in, send JWT
+    createSendToken(user, 200, res);
+  } catch (err) {
+    if (
+      err.name === 'ValidationError' &&
+      err.errors &&
+      err.errors.passwordConfirm
+    ) {
+      return next(
+        new AppError('Mật khẩu xác nhận không khớp với mật khẩu!', 400)
+      );
+    }
+  }
 });
 
 // Hàm này được sử dụng để cập nhật mật khẩu của người dùng đã đăng nhập
