@@ -20,13 +20,13 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true, minlength: 8, select: false },
     passwordConfirm: {
       type: String,
-      required: [true, 'A user must have a passwordConfirm'],
+      required: [true, 'Bạn cần xác nhận lại mật khẩu'],
       validate: {
         // chỉ làm việc trên CREATE và SAVE!!!
         validator: function (el) {
           return el === this.password;
         },
-        message: 'Password are not the same!',
+        message: 'Mật khẩu xác nhận không khớp với mật khẩu!',
       },
     },
 
