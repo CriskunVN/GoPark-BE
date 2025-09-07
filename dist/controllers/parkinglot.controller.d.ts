@@ -1,0 +1,12 @@
+export const getMyParkingLots: (req: any, res: any, next: any) => void;
+export const createParkingLot: (req: any, res: any, next: any) => void;
+export const getParkingLotById: (req: any, res: any, next: any) => void;
+export const updateParkingLot: (req: any, res: any, next: any) => void;
+export const deleteParkingLot: (req: any, res: any, next: any) => void;
+export const softDeleteParkingLot: (req: any, res: any, next: any) => void;
+export const getParkingLotsByCity: (req: any, res: any, next: any) => void;
+export const getAllParkingSlotsByLotId: (req: any, res: any, next: any) => void;
+export const getAllParkingLots: (req: any, res: any, next: any) => void;
+export const getOneParkingLot: (req: any, res: any, next: any) => void;
+export const getUserBookingInParkingLot: (req: any, res: any, next: any) => void;
+//# sourceMappingURL=parkinglot.controller.d.ts.map

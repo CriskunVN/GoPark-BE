@@ -1,0 +1,10 @@
+export const getSlotsAvailableByDate: (req: any, res: any, next: any) => void;
+export const getSlotBookings: (req: any, res: any, next: any) => void;
+export const getAllParkingSlots: (req: any, res: any, next: any) => void;
+export const updateParkingSlot: (req: any, res: any, next: any) => void;
+export const getParkingSlot: (req: any, res: any, next: any) => void;
+export const createParkingSlot: (req: any, res: any, next: any) => void;
+export const deleteParkingSlot: (req: any, res: any, next: any) => void;
+export const getSlotsBookedByDateForOwner: (req: any, res: any, next: any) => void;
+export const getSlotsAvailableByDateForOwner: (req: any, res: any, next: any) => void;
+//# sourceMappingURL=parkingSlot.controller.d.ts.map

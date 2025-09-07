@@ -1,0 +1,10 @@
+export const createTicket: (req: any, res: any, next: any) => void;
+export const getAllTickets: (req: any, res: any, next: any) => void;
+export const getTicketById: (req: any, res: any, next: any) => void;
+export const updateTicketById: (req: any, res: any, next: any) => void;
+export const deleteTicketById: (req: any, res: any, next: any) => void;
+export const getTicketsByStatus: (req: any, res: any, next: any) => void;
+export const getTicketsByUserId: (req: any, res: any, next: any) => void;
+export const checkinTicket: (req: any, res: any, next: any) => void;
+export const checkoutTicket: (req: any, res: any, next: any) => void;
+//# sourceMappingURL=ticket.controller.d.ts.map
