@@ -49,17 +49,20 @@ app.use(express.json()); // Parse JSON request body
 app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 
 // 3. ROUTES
-app.use(`/api/v1/users`, userRouter); // đăng nhập
-app.use(`/api/v1/users_new`, userNewRouter); // New user routes
-app.use(`/api/v1/parkinglots`, parkinglotRouter); // route bãi đỗ xe
-app.use('/api/v1/search', searchRoutes); // route tìm kiếm
-app.use(`/api/v1/parking-slots`, parkingSlotRouter); // route chỗ đỗ xe
-app.use('/api/v1/vehicles', vehicleRoutes); // route xe
-app.use('/api/v1/bookings', bookingRouter); // route đặt chỗ
-app.use('/api/chatbot', chatbotRoutes); // route chatbot
-app.use('/api/v1/tickets', ticketRouter); //route vé xe
-app.use('/api/v1/vnpay', vnpayRouter); // route thanh toán VNPay
-app.use('/api/v1/admin', adminRouter); // route admin
+
+const apiPrefix = process.env.API_PREFIX || '/api/v1';
+
+app.use(`${apiPrefix}/users`, userRouter); // đăng nhập
+app.use(`${apiPrefix}/users_new`, userNewRouter); // New user routes
+app.use(`${apiPrefix}/parkinglots`, parkinglotRouter); // route bãi đỗ xe
+app.use(`${apiPrefix}/search`, searchRoutes); // route tìm kiếm
+app.use(`${apiPrefix}/parking-slots`, parkingSlotRouter); // route chỗ đỗ xe
+app.use(`${apiPrefix}/vehicles`, vehicleRoutes); // route xe
+app.use(`${apiPrefix}/bookings`, bookingRouter); // route đặt chỗ
+app.use(`${apiPrefix}/chatbot`, chatbotRoutes); // route chatbot
+app.use(`${apiPrefix}/tickets`, ticketRouter); //route vé xe
+app.use(`${apiPrefix}/vnpay`, vnpayRouter); // route thanh toán VNPay
+app.use(`${apiPrefix}/admin`, adminRouter); // route admin
 
 // 4. ERROR HANDLER (Middle xử lý lỗi)
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
