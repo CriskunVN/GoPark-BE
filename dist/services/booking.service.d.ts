@@ -2,7 +2,7 @@ export function createBookingForGuest(data: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -18,7 +18,7 @@ export function createBookingForGuest(data: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -39,7 +39,7 @@ export function createBooking(data: any): Promise<mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -55,7 +55,7 @@ export function createBooking(data: any): Promise<mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -80,7 +80,7 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
     } & {
-        status: "paid" | "unpaid" | "failed";
+        status: "failed" | "paid" | "unpaid";
         userId: mongoose.Types.ObjectId;
         paymentMethod: "bank" | "cash" | "e-wallet";
         bookingId: mongoose.Types.ObjectId;
@@ -92,7 +92,7 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
     } & {
-        status: "paid" | "unpaid" | "failed";
+        status: "failed" | "paid" | "unpaid";
         userId: mongoose.Types.ObjectId;
         paymentMethod: "bank" | "cash" | "e-wallet";
         bookingId: mongoose.Types.ObjectId;
@@ -114,7 +114,7 @@ export function getBookingById(id: any): Promise<mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -130,7 +130,7 @@ export function getBookingById(id: any): Promise<mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -151,7 +151,7 @@ export function cancelBooking(id: any): Promise<(mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -167,7 +167,7 @@ export function cancelBooking(id: any): Promise<(mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -188,7 +188,7 @@ export function checkInBooking(id: any): Promise<(mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -204,7 +204,7 @@ export function checkInBooking(id: any): Promise<(mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -225,7 +225,7 @@ export function checkOutBooking(id: any): Promise<(mongoose.Document<unknown, {}
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -241,7 +241,7 @@ export function checkOutBooking(id: any): Promise<(mongoose.Document<unknown, {}
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -262,7 +262,7 @@ export function checkOutBookingForGuest(id: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -278,7 +278,7 @@ export function checkOutBookingForGuest(id: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;

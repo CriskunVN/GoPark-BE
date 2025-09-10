@@ -48,6 +48,7 @@ const port = process.env.PORT;
 // Start the server
 server = app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    console.log('REDIS_HOST:', process.env.REDIS_HOST);
 });
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
