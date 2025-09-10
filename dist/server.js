@@ -3,9 +3,10 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/config.env` });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import app from './app.js';
 // Cron job: Update booking status to 'booked' when startTime <= now
 import './utils/cron/bookingStatusUpdater.js';
