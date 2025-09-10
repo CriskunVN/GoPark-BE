@@ -1,27 +1,15 @@
-import express from "express";
-import { askGeminiAI } from "../services/chatbot.service.js";
-import ChatHistory from "../models/chatHistory.model.js";
+import express from 'express';
+import { aiChat, getChatHistory, deleteChatHistory, healthCheck, getChatStats, } from '../controllers/chatbot.controller.js';
 const router = express.Router();
-router.post("/ai-chat", async (req, res) => {
-    try {
-        const { message, userId } = req.body;
-        if (!message)
-            return res.status(400).json({ error: "Message is required" });
-        // Gọi AI
-        const aiReply = await askGeminiAI(message);
-        // Lưu lịch sử chat
-        await ChatHistory.create({
-            userId: userId || null,
-            message,
-            aiReply,
-            createdAt: new Date()
-        });
-        res.json({ reply: aiReply });
-    }
-    catch (err) {
-        console.error("AI chat error:", err.stack || err);
-        res.status(500).json({ error: err.message || "Server error" });
-    }
-});
+// Route chính cho chat với AI (public - không cần auth)
+router.post('/ai-chat', aiChat);
+// Route health check (public)
+router.get('/health', healthCheck);
+// Route lấy lịch sử chat theo userId (public nhưng cần userId)
+router.get('/chat-history/:userId', getChatHistory);
+// Route xóa lịch sử chat (public nhưng cần userId)
+router.delete('/chat-history/:userId', deleteChatHistory);
+// Route thống kê chat (có thể cần auth cho admin)
+router.get('/stats', getChatStats);
 export default router;
 //# sourceMappingURL=chatbot.routes.js.map

@@ -66,6 +66,6 @@ const parkingLotSchema = new mongoose.Schema(
 parkingLotSchema.index({ location: '2dsphere' }); // Tạo chỉ mục 2dsphere cho trường localtion để hỗ trợ truy vấn không gian
 parkingLotSchema.index({ name: 'text' }); // Tạo chỉ mục văn bản cho trường name để hỗ trợ tìm kiếm
 
-const ParkingLot = mongoose.model('ParkingLot', parkingLotSchema);
+const ParkingLot = mongoose.models.ParkingLot || mongoose.model('ParkingLot', parkingLotSchema);
 
 export default ParkingLot;

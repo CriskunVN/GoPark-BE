@@ -1,5 +1,5 @@
 export default ParkingLot;
-declare const ParkingLot: mongoose.Model<{
+declare const ParkingLot: mongoose.Model<any, {}, {}, {}, any, any> | mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {

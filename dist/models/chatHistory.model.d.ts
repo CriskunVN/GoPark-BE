@@ -1,37 +1,43 @@
 declare const _default: mongoose.Model<{
+    message: string;
     createdAt: NativeDate;
     userId: string;
-    message?: string | null;
-    aiReply?: string | null;
+    aiReply: string;
+    userRole: "user" | "admin" | "parking_owner" | "guest";
 }, {}, {}, {}, mongoose.Document<unknown, {}, {
+    message: string;
     createdAt: NativeDate;
     userId: string;
-    message?: string | null;
-    aiReply?: string | null;
+    aiReply: string;
+    userRole: "user" | "admin" | "parking_owner" | "guest";
 }, {}> & {
+    message: string;
     createdAt: NativeDate;
     userId: string;
-    message?: string | null;
-    aiReply?: string | null;
+    aiReply: string;
+    userRole: "user" | "admin" | "parking_owner" | "guest";
 } & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
 }, mongoose.Schema<any, mongoose.Model<any, any, any, any, any, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, {
+    message: string;
     createdAt: NativeDate;
     userId: string;
-    message?: string | null;
-    aiReply?: string | null;
+    aiReply: string;
+    userRole: "user" | "admin" | "parking_owner" | "guest";
 }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
+    message: string;
     createdAt: NativeDate;
     userId: string;
-    message?: string | null;
-    aiReply?: string | null;
+    aiReply: string;
+    userRole: "user" | "admin" | "parking_owner" | "guest";
 }>, {}> & mongoose.FlatRecord<{
+    message: string;
     createdAt: NativeDate;
     userId: string;
-    message?: string | null;
-    aiReply?: string | null;
+    aiReply: string;
+    userRole: "user" | "admin" | "parking_owner" | "guest";
 }> & {
     _id: mongoose.Types.ObjectId;
 } & {
