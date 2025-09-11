@@ -45,6 +45,7 @@ process.on('unhandledRejection', (err: AppError) => {
 });
 
 if (!process.env.DATABASE) {
+  console.log(process.env.DATABASE);
   throw new AppError('DATABASE environment variable is not defined');
 }
 const DB = process.env.DATABASE.replace(
