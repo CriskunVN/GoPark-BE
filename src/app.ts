@@ -14,7 +14,7 @@ import vehicleRoutes from './routes/vehicle.route.js';
 import bookingRouter from './routes/booking.route.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
 import ticketRouter from './routes/ticket.route.js';
-import ocrRoute from "./routes/ocr.route.js";
+import ocrRoute from './routes/ocr.route.js';
 // Route for VNPay
 import vnpayRouter from './routes/vnpay.route.js';
 import { fileURLToPath } from 'url';
@@ -35,14 +35,13 @@ app.use(
     origin: (origin, callback) => {
       const allowedOrigins = [
         'http://localhost:3000',
-        'http://localhost:3001',
         'https://go-park-fe.vercel.app',
       ];
       // Cho phép cả request không có origin (ví dụ từ Postman)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new AppError('Not allowed by CORS'));
       }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
