@@ -6,10 +6,11 @@ import type { Server } from 'http';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/config.env` });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import app from './app.js';
 
 // Cron job: Update booking status to 'booked' when startTime <= now
@@ -44,6 +45,7 @@ process.on('unhandledRejection', (err: AppError) => {
 });
 
 if (!process.env.DATABASE) {
+  console.log(process.env.DATABASE);
   throw new AppError('DATABASE environment variable is not defined');
 }
 const DB = process.env.DATABASE.replace(
@@ -59,6 +61,7 @@ const port = process.env.PORT;
 // Start the server
 server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  console.log('REDIS_HOST:', process.env.REDIS_HOST);
 });
 
 // Handle unhandled promise rejections

@@ -2,7 +2,7 @@ export function checkInTicket(ticketId: any): Promise<import("mongoose").Documen
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "cancelled" | "active" | "used" | "expired";
+    status: "active" | "pending" | "cancelled" | "used" | "expired";
     userId: import("mongoose").Types.ObjectId;
     parkingSlotId: import("mongoose").Types.ObjectId;
     vehicleNumber: string;
@@ -17,7 +17,7 @@ export function checkInTicket(ticketId: any): Promise<import("mongoose").Documen
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "cancelled" | "active" | "used" | "expired";
+    status: "active" | "pending" | "cancelled" | "used" | "expired";
     userId: import("mongoose").Types.ObjectId;
     parkingSlotId: import("mongoose").Types.ObjectId;
     vehicleNumber: string;
@@ -37,7 +37,7 @@ export function checkOutTicket(ticketId: any): Promise<import("mongoose").Docume
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "cancelled" | "active" | "used" | "expired";
+    status: "active" | "pending" | "cancelled" | "used" | "expired";
     userId: import("mongoose").Types.ObjectId;
     parkingSlotId: import("mongoose").Types.ObjectId;
     vehicleNumber: string;
@@ -52,7 +52,7 @@ export function checkOutTicket(ticketId: any): Promise<import("mongoose").Docume
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "cancelled" | "active" | "used" | "expired";
+    status: "active" | "pending" | "cancelled" | "used" | "expired";
     userId: import("mongoose").Types.ObjectId;
     parkingSlotId: import("mongoose").Types.ObjectId;
     vehicleNumber: string;
@@ -72,7 +72,7 @@ export function createTicket(ticketData: any): Promise<import("mongoose").Docume
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "cancelled" | "active" | "used" | "expired";
+    status: "active" | "pending" | "cancelled" | "used" | "expired";
     userId: import("mongoose").Types.ObjectId;
     parkingSlotId: import("mongoose").Types.ObjectId;
     vehicleNumber: string;
@@ -87,7 +87,7 @@ export function createTicket(ticketData: any): Promise<import("mongoose").Docume
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "cancelled" | "active" | "used" | "expired";
+    status: "active" | "pending" | "cancelled" | "used" | "expired";
     userId: import("mongoose").Types.ObjectId;
     parkingSlotId: import("mongoose").Types.ObjectId;
     vehicleNumber: string;

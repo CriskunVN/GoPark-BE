@@ -14,22 +14,39 @@ const sendEmail = catchAsync(async (option) => {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD,
         },
+        secure: true,
     });
-    // Thay thế biến trong template
-    const html = htmlTemplate
-        .replace('{{userName}}', option.user)
-        .replace('{{resetURL}}', option.resetURL);
     // 2) Define the email options
     const mailOptions = {
         from: 'GoPark <goparkservice@gmail.io> ',
         to: option.email,
         subject: option.subject,
         text: option.message,
-        // Nếu option.html có giá trị thì gửi html, nếu không thì undefined
-        html,
     };
     // 3) Send the email
     await transporter.sendMail(mailOptions);
 });
+export const sendPasswordResetEmail = async (email, token) => {
+    const transporter = nodemailer.createTransport({
+        // Cấu hình SMTP của bạn
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USERNAME,
+            pass: process.env.EMAIL_PASSWORD,
+        },
+    });
+    const resetLink = `${process.env.URL_FE}/account/reset/password?token=${token}`;
+    // Sử dụng template HTML
+    const html = htmlTemplate
+        .replace('{{userName}}', email)
+        .replace('{{resetURL}}', resetLink);
+    await transporter.sendMail({
+        from: '"GoPark" <goparkservice@gmail.com>',
+        to: email,
+        subject: 'Reset your password',
+        html,
+    });
+    console.log(`Password reset email sent to ${email}`);
+};
 export default sendEmail;
 //# sourceMappingURL=email.service.js.map

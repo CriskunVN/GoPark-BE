@@ -3,9 +3,10 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/config.env` });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import app from './app.js';
 // Cron job: Update booking status to 'booked' when startTime <= now
 import './utils/cron/bookingStatusUpdater.js';
@@ -39,6 +40,7 @@ process.on('unhandledRejection', (err) => {
     }
 });
 if (!process.env.DATABASE) {
+    console.log(process.env.DATABASE);
     throw new AppError('DATABASE environment variable is not defined');
 }
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD || ''); // Replace <PASSWORD> with your actual database password
@@ -48,6 +50,7 @@ const port = process.env.PORT;
 // Start the server
 server = app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    console.log('REDIS_HOST:', process.env.REDIS_HOST);
 });
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {

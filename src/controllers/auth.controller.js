@@ -4,8 +4,8 @@ import AppError from '../utils/appError.js';
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import sendEmail from '../services/email.service.js';
-
+import { addPasswordResetJob } from '../queues/passwordReset.queue.js';
+import { limitResetRequest } from '../utils/rateLimit.js';
 // Hàm tạo token JWT
 // Hàm này sẽ tạo một token JWT với id người dùng và bí mật từ biến môi trường
 // Token sẽ hết hạn sau thời gian được định nghĩa trong biến môi trường JWT_EXPIRES_IN
@@ -149,30 +149,23 @@ export const restrictTo = (...roles) => {
 // Hàm này đươc sử dụng để lấy lại mật khẩu của người dùng
 // Nó sẽ gửi một email chứa token để người dùng có thể đặt lại mật khẩu của mình
 // Token này sẽ được lưu trong cơ sở dữ liệu và có thời gian hết hạn
-export const forgotPassword = catchAsync(async (req, res, next) => {
-  // 1. Lấy user dựa trên email được cung cấp trong request body
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) {
-    return next(new AppError('Không có người dùng nào với email này', 404));
-  }
-  // 2. Tạo random reset token để đặt lại mật khẩu
-  const resetToken = user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false });
-
-  // 3. Gửi reset token qua email
-  const resetURL = `${process.env.URL_FE}/account/reset/password?token=${resetToken}`;
-
-  const message = `Quên mật khẩu? Gửi yêu cầu PATCH với mật khẩu mới và mật khẩu xác thực đến: ${resetURL}.
-                    Nếu bạn không quên mật khẩu, vui lòng bỏ qua email này!`;
-
+export const forgotPassword = async (req, res, next) => {
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
-      message,
-      user: user.userName,
-      resetURL, // truyền resetURL vào đây nếu cần
-    });
+    // 1. Lấy user dựa trên email được cung cấp trong request body
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return next(new AppError('Không có người dùng nào với email này', 404));
+    }
+    // 2. Tạo random reset token để đặt lại mật khẩu
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    // 3. Gửi token đến email của người dùng
+    // limit request đặt lại mật khẩu: 3 lần/phút
+    await limitResetRequest(user.email, req.ip, 3, 60); // 3 lần/phút
+    // Sử dụng job queue để gửi email
+
+    await addPasswordResetJob(user.email, resetToken);
 
     res.status(200).json({
       status: 'success',
@@ -188,7 +181,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
       500
     );
   }
-});
+};
 
 // Đây là hàm để đặt lại mật khẩu của người dùng
 export const resetPassword = catchAsync(async (req, res, next) => {

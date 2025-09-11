@@ -3,7 +3,7 @@ declare const Booking: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -19,7 +19,7 @@ declare const Booking: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -35,7 +35,7 @@ declare const Booking: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -57,7 +57,7 @@ declare const Booking: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -73,7 +73,7 @@ declare const Booking: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
@@ -89,7 +89,7 @@ declare const Booking: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "pending" | "confirmed" | "cancelled" | "completed";
+    status: "completed" | "pending" | "confirmed" | "cancelled";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
