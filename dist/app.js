@@ -61,7 +61,11 @@ app.use(`${apiPrefix}/chatbot`, chatbotRoutes); // route chatbot
 app.use(`${apiPrefix}/tickets`, ticketRouter); //route vé xe
 app.use(`${apiPrefix}/vnpay`, vnpayRouter); // route thanh toán VNPay
 app.use(`${apiPrefix}/admin`, adminRouter); // route admin
+<<<<<<< HEAD
 app.use(`${apiPrefix}/ocr`, ocrRoute); //route scan
+=======
+app.use("/ocr", ocrRoute);
+>>>>>>> 9040813bcd80b11f4c63fea0ec8d312696d6158b
 // 4. ERROR HANDLER (Middle xử lý lỗi)
 app.use((err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
