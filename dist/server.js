@@ -8,6 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import app from './app.js';
+// Import worker để xử lý job trong queue
+import './workers/passwordReset.worker.js'; // chạy worker cùng process
 // Cron job: Update booking status to 'booked' when startTime <= now
 import './utils/cron/bookingStatusUpdater.js';
 import './utils/cron/parkingSlotCleaner.js';

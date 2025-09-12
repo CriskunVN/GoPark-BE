@@ -6,8 +6,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "concurrently \"tsc --watch\" \"nodemon dist/server.js\"",
-    "debug": "ndb server.js"
+    "dev:api": "concurrently \"tsc --watch\" \"nodemon dist/server.js\"",
+    "dev": "npm run dev:api",
+    "debug": "ndb dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +38,7 @@
     "populate": "^5.0.1",
     "qrcode": "^1.5.4",
     "qs": "^6.14.0",
+    "resend": "^6.0.3",
     "sharp": "^0.32.6",
     "tesseract.js": "^4.1.1",
     "validator": "^13.15.15"

@@ -2,7 +2,7 @@ export function createInvoice(invoiceData: any): Promise<import("mongoose").Docu
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: import("mongoose").Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: import("mongoose").Types.ObjectId;
@@ -14,7 +14,7 @@ export function createInvoice(invoiceData: any): Promise<import("mongoose").Docu
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: import("mongoose").Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: import("mongoose").Types.ObjectId;

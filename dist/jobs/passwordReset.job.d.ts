@@ -1,3 +1,3 @@
 import { Job } from 'bullmq';
-export declare const processPasswordResetJob: (job: Job) => Promise<void>;
+export declare function processPasswordResetJob(job: Job): Promise<boolean>;
 //# sourceMappingURL=passwordReset.job.d.ts.map

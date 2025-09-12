@@ -1,185 +1,410 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi" dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Password Reset | GoPark</title>
+    <!--[if mso]>
+      <style>
+        *,
+        a {
+          font-family: Arial, sans-serif !important;
+        }
+      </style>
+    <![endif]-->
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
-      body {
-        background-color: #f8fafc;
-        margin: 0;
-        padding: 0;
-        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont,
-          sans-serif;
-        color: #1a1a1a;
-        line-height: 1.6;
+      /* Mobile tweaks */
+      @media (max-width: 600px) {
+        .container {
+          width: 100% !important;
+        }
+        .px-40 {
+          padding-left: 20px !important;
+          padding-right: 20px !important;
+        }
+        .py-40 {
+          padding-top: 24px !important;
+          padding-bottom: 24px !important;
+        }
+        .btn {
+          display: block !important;
+          width: 100% !important;
+        }
       }
-
-      .email-wrapper {
-        max-width: 600px;
-        margin: 40px auto;
-        background: #ffffff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e5e7eb;
-      }
-
-      .header {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-        padding: 24px 40px;
-        color: white;
-      }
-
-      .logo {
-        height: 32px;
-      }
-
-      .content {
-        padding: 40px;
-      }
-
-      h1 {
-        font-size: 24px;
-        font-weight: 700;
-        color: #111827;
-        margin: 0 0 24px 0;
-      }
-
-      p {
-        font-size: 15px;
-        color: #4b5563;
-        margin-bottom: 24px;
-      }
-
-      .btn-primary {
-        display: inline-block;
-        padding: 16px 32px;
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-        color: white !important;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 15px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
-      }
-
-      .divider {
-        height: 1px;
-        background-color: #f3f4f6;
-        margin: 32px 0;
-      }
-
-      .security-note {
-        background-color: #f9fafb;
-        border-radius: 8px;
-        padding: 16px;
-        border-left: 4px solid #2563eb;
-        font-size: 14px;
-        color: #4b5563;
-      }
-
-      .footer {
-        padding: 24px 40px;
-        background-color: #f9fafb;
-        font-size: 12px;
-        color: #9ca3af;
-        text-align: center;
-        border-top: 1px solid #e5e7eb;
-      }
-
-      .user-name {
-        color: #2563eb;
-        font-weight: 600;
-      }
-
-      .expiry-note {
-        color: #dc2626;
-        font-weight: 500;
+      /* Dark mode hint (supported clients) */
+      @media (prefers-color-scheme: dark) {
+        .bg-body {
+          background-color: #0b0f1a !important;
+        }
+        .card {
+          background-color: #111827 !important;
+          border-color: #1f2937 !important;
+        }
+        .text {
+          color: #e5e7eb !important;
+        }
+        .muted {
+          color: #9ca3af !important;
+        }
+        .divider {
+          background-color: #1f2937 !important;
+        }
+        .note {
+          background-color: #0f172a !important;
+          border-left-color: #3b82f6 !important;
+        }
       }
     </style>
   </head>
-  <body>
-    <div class="email-wrapper">
-      <div class="header">
-        <!-- Replace with your actual logo -->
-        <img
-          src="https://via.placeholder.com/150x40/1e40af/ffffff?text=GoPark"
-          alt="GoPark Enterprise"
-          class="logo"
-        />
-      </div>
-
-      <div class="content">
-        <h1>Password Reset Request</h1>
-
-        <p>Dear <span class="user-name">{{userName}}</span>,</p>
-
-        <p>
-          We've received a request to reset the password for your GoPark
-          Enterprise account. To proceed with resetting your password, please
-          click the button below:
-        </p>
-
-        <div style="text-align: center; margin: 32px 0">
-          <a href="{{resetURL}}" class="btn-primary">Reset Password</a>
-        </div>
-
-        <p class="expiry-note">
-          This password reset link will expire in 10 minutes for security
-          reasons.
-        </p>
-
-        <div class="divider"></div>
-
-        <div class="security-note">
-          <strong>Security Tip:</strong> If you didn't initiate this request,
-          please contact our security team immediately at
-          <a
-            href="mailto:security@gopark.com"
-            style="color: #2563eb; text-decoration: none"
-            >security@gopark.com</a
-          >. Never share your password with anyone.
-        </div>
-
-        <p>For your security, we recommend:</p>
-        <ul style="padding-left: 20px; color: #4b5563; font-size: 15px">
-          <li style="margin-bottom: 8px">Creating a strong, unique password</li>
-          <li style="margin-bottom: 8px">Enabling two-factor authentication</li>
-          <li>Regularly updating your password</li>
-        </ul>
-      </div>
-
-      <div class="footer">
-        <p>© 2025 GoPark Enterprise. All rights reserved.</p>
-        <p>123 Corporate Boulevard, San Francisco, CA 94107</p>
-        <p>
-          <a
-            href="#"
-            style="color: #9ca3af; text-decoration: none; margin: 0 8px"
-            >Privacy Policy</a
-          >
-          |
-          <a
-            href="#"
-            style="color: #9ca3af; text-decoration: none; margin: 0 8px"
-            >Terms of Service</a
-          >
-          |
-          <a
-            href="#"
-            style="color: #9ca3af; text-decoration: none; margin: 0 8px"
-            >Contact Us</a
-          >
-        </p>
-      </div>
+  <body class="bg-body" style="margin: 0; padding: 0; background: #f3f4f6">
+    <!-- Preheader (ẩn nhưng hiển thị trong inbox preview) -->
+    <div style="display: none; max-height: 0; overflow: hidden; opacity: 0">
+      Yêu cầu đặt lại mật khẩu cho tài khoản GoPark của bạn. Link sẽ hết hạn sau
+      10 phút.
     </div>
+
+    <table
+      role="presentation"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      width="100%"
+      style="background: #f3f4f6"
+    >
+      <tr>
+        <td align="center" style="padding: 32px 16px">
+          <!-- Card -->
+          <table
+            role="presentation"
+            class="container"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            width="600"
+            style="
+              width: 600px;
+              max-width: 600px;
+              background: #ffffff;
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              overflow: hidden;
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+                  padding: 20px 24px;
+                "
+              >
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                >
+                  <tr>
+                    <td valign="middle" style="vertical-align: middle">
+                      <img
+                        src="https://njwclzubcmeehcnpgjoj.supabase.co/storage/v1/object/public/images/logo.png"
+                        alt="GoPark Team"
+                        width="120"
+                        height="32"
+                        style="
+                          display: block;
+                          height: 32px;
+                          width: auto;
+                          border: 0;
+                          outline: none;
+                          text-decoration: none;
+                        "
+                      />
+                    </td>
+                    <td
+                      align="right"
+                      valign="middle"
+                      style="vertical-align: middle"
+                    >
+                      <span
+                        style="
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-size: 16px;
+                          font-weight: 700;
+                          color: #ffffff;
+                        "
+                      >
+                        GoPark Team
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td class="px-40 py-40" style="padding: 40px">
+                <h1
+                  style="
+                    margin: 0 0 16px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 22px;
+                    line-height: 1.3;
+                    color: #111827;
+                  "
+                >
+                  Password Reset Request
+                </h1>
+
+                <p
+                  class="text"
+                  style="
+                    margin: 0 0 16px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 15px;
+                    line-height: 1.6;
+                    color: #4b5563;
+                  "
+                >
+                  Xin chào <strong style="color: #2563eb">{{userName}}</strong>,
+                </p>
+
+                <p
+                  class="text"
+                  style="
+                    margin: 0 0 24px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 15px;
+                    line-height: 1.6;
+                    color: #4b5563;
+                  "
+                >
+                  Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản
+                  GoPark của bạn. Vui lòng nhấn nút bên dưới để tiếp tục:
+                </p>
+
+                <!-- Button (bulletproof + VML for Outlook) -->
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  align="center"
+                  style="margin: 0 auto 24px auto"
+                >
+                  <tr>
+                    <td align="center">
+                      <!--[if mso]>
+                        <v:roundrect
+                          xmlns:v="urn:schemas-microsoft-com:vml"
+                          xmlns:w="urn:schemas-microsoft-com:office:word"
+                          href="{{resetURL}}"
+                          style="
+                            height: 48px;
+                            v-text-anchor: middle;
+                            width: 240px;
+                          "
+                          arcsize="10%"
+                          fillcolor="#2563eb"
+                          stroked="f"
+                        >
+                          <w:anchorlock />
+                          <center
+                            style="
+                              color: #ffffff;
+                              font-family: Arial, Helvetica, sans-serif;
+                              font-size: 15px;
+                              font-weight: 700;
+                            "
+                          >
+                            Reset Password
+                          </center>
+                        </v:roundrect>
+                      <![endif]-->
+                      <!--[if !mso]><!-- -->
+                      <a
+                        class="btn"
+                        href="{{resetURL}}"
+                        style="
+                          display: inline-block;
+                          padding: 14px 28px;
+                          background: linear-gradient(
+                            135deg,
+                            #2563eb 0%,
+                            #1e40af 100%
+                          );
+                          color: #ffffff;
+                          text-decoration: none;
+                          border-radius: 8px;
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-weight: 700;
+                          font-size: 15px;
+                          line-height: 1;
+                        "
+                      >
+                        Reset Password
+                      </a>
+                      <!--<![endif]-->
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  class="text"
+                  style="
+                    margin: 0 0 16px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 14px;
+                    line-height: 1.6;
+                  "
+                >
+                  <span class="expiry" style="color: #dc2626; font-weight: 600"
+                    >Lưu ý:</span
+                  >
+                  Liên kết đặt lại mật khẩu sẽ
+                  <strong>hết hạn sau 10 phút</strong> vì lý do bảo mật.
+                </p>
+
+                <!-- Divider -->
+                <div
+                  class="divider"
+                  style="height: 1px; background: #f3f4f6; margin: 24px 0"
+                ></div>
+
+                <!-- Security Note -->
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  class="note"
+                  style="
+                    background: #f9fafb;
+                    border-left: 4px solid #2563eb;
+                    border-radius: 6px;
+                  "
+                >
+                  <tr>
+                    <td style="padding: 14px 16px">
+                      <p
+                        class="text"
+                        style="
+                          margin: 0;
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-size: 14px;
+                          color: #4b5563;
+                        "
+                      >
+                        <strong>Mẹo bảo mật:</strong> Nếu bạn không yêu cầu thao
+                        tác này, vui lòng liên hệ đội ngũ bảo mật tại
+                        <a
+                          href="mailto:security@gopark.com"
+                          style="color: #2563eb; text-decoration: none"
+                          >security@gopark.com</a
+                        >. Không chia sẻ mật khẩu cho bất kỳ ai.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Tips -->
+                <p
+                  class="text"
+                  style="
+                    margin: 16px 0 8px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 15px;
+                    color: #4b5563;
+                  "
+                >
+                  Khuyến nghị:
+                </p>
+                <ul
+                  style="
+                    margin: 0;
+                    padding: 0 0 0 18px;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 15px;
+                    color: #4b5563;
+                    line-height: 1.6;
+                  "
+                >
+                  <li style="margin: 0 0 8px 0">
+                    Tạo mật khẩu mạnh và duy nhất
+                  </li>
+                  <li style="margin: 0 0 8px 0">Bật xác thực hai lớp (2FA)</li>
+                  <li style="margin: 0">Thay đổi mật khẩu định kỳ</li>
+                </ul>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background: #f9fafb;
+                  border-top: 1px solid #e5e7eb;
+                  padding: 18px 24px;
+                  text-align: center;
+                "
+              >
+                <p
+                  class="muted"
+                  style="
+                    margin: 0 0 6px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12px;
+                    color: #9ca3af;
+                  "
+                >
+                  © 2025 GoPark Enterprise. All rights reserved.
+                </p>
+                <p
+                  class="muted"
+                  style="
+                    margin: 0 0 10px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12px;
+                    color: #9ca3af;
+                  "
+                >
+                  123 Corporate Boulevard, San Francisco, CA 94107
+                </p>
+                <p
+                  style="
+                    margin: 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12px;
+                  "
+                >
+                  <a
+                    href="{{privacyURL}}"
+                    style="color: #9ca3af; text-decoration: none; margin: 0 6px"
+                    >Privacy Policy</a
+                  >
+                  |
+                  <a
+                    href="{{termsURL}}"
+                    style="color: #9ca3af; text-decoration: none; margin: 0 6px"
+                    >Terms of Service</a
+                  >
+                  |
+                  <a
+                    href="{{contactURL}}"
+                    style="color: #9ca3af; text-decoration: none; margin: 0 6px"
+                    >Contact Us</a
+                  >
+                </p>
+              </td>
+            </tr>
+          </table>
+          <!-- /Card -->
+        </td>
+      </tr>
+    </table>
   </body>
 </html>

@@ -3,7 +3,7 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "active" | "pending" | "cancelled" | "used" | "expired";
+    status: "pending" | "cancelled" | "active" | "used" | "expired";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
@@ -18,7 +18,7 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "active" | "pending" | "cancelled" | "used" | "expired";
+    status: "pending" | "cancelled" | "active" | "used" | "expired";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
@@ -33,7 +33,7 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "active" | "pending" | "cancelled" | "used" | "expired";
+    status: "pending" | "cancelled" | "active" | "used" | "expired";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
@@ -54,7 +54,7 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "active" | "pending" | "cancelled" | "used" | "expired";
+    status: "pending" | "cancelled" | "active" | "used" | "expired";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
@@ -69,7 +69,7 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "active" | "pending" | "cancelled" | "used" | "expired";
+    status: "pending" | "cancelled" | "active" | "used" | "expired";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
@@ -84,7 +84,7 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "active" | "pending" | "cancelled" | "used" | "expired";
+    status: "pending" | "cancelled" | "active" | "used" | "expired";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
