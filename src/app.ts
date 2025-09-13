@@ -36,7 +36,7 @@ app.use(
       const allowedOrigins = [
         'http://localhost:3000',
         'https://gopark.id.vn',
-        // 'https://go-park-fe.vercel.app',
+        'https://go-park-fe.vercel.app',
       ];
       // Cho phép cả request không có origin (ví dụ từ Postman)
       if (!origin || allowedOrigins.includes(origin)) {
