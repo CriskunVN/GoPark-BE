@@ -64,7 +64,6 @@ const port = process.env.PORT;
 // Start the server
 server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-  console.log('Check CORS');
 });
 
 // Handle unhandled promise rejections

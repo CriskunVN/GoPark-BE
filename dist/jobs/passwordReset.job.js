@@ -3,7 +3,6 @@ import { Job } from 'bullmq';
 import { sendPasswordResetEmail } from '../services/email.service.js';
 // Hàm xử lý job gửi email đặt lại mật khẩu
 export async function processPasswordResetJob(job) {
-    console.log(`🔔 Bắt đầu xử lý job gửi email reset mật khẩu: ${job.id}`);
     try {
         // ...xử lý gửi email...
         const { email, token } = job.data;

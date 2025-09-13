@@ -13,7 +13,7 @@ processPasswordResetJob, // Hàm xử lý job
 });
 // Log sự kiện
 passwordResetWorker
-    .on('ready', () => console.log('[WORKER] ready'))
+    // .on('ready', () => console.log('[WORKER] ready'))
     .on('active', (job) => console.log('[WORKER] active', job.id))
     .on('completed', (job) => console.log('[WORKER] done', job.id))
     .on('failed', (job, err) => console.log('[WORKER] failed', job?.id, err))
