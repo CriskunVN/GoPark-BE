@@ -27,11 +27,14 @@ const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
 //   await resend.emails.send(mailOptions);
 // });
 export const sendPasswordResetEmail = async (email, token) => {
-    const resetLink = `${process.env.URL_FE}/account/reset/password?token=${token}`;
+    const resetLink = `${process.env.URL_FE_NEW}/account/reset/password?token=${token}`;
     // Sử dụng template HTML
     const html = htmlTemplate
         .replace('{{userName}}', email)
-        .replace('{{resetURL}}', resetLink);
+        .replace(/{{resetURL}}/g, resetLink)
+        .replace('{{privacyURL}}', 'https://gopark.id.vn/privacy')
+        .replace('{{termsURL}}', 'https://gopark.id.vn/terms')
+        .replace('{{contactURL}}', 'https://gopark.id.vn/contact');
     try {
         await resend.emails.send({
             from: `GoPark Team <${process.env.FROM_EMAIL}>`,
@@ -39,7 +42,6 @@ export const sendPasswordResetEmail = async (email, token) => {
             subject: 'Reset your password',
             html,
         });
-        console.log(`Password reset email sent to ${email}`);
     }
     catch (err) {
         console.error('Send mail error:', err);

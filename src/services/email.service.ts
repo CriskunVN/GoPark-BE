@@ -40,12 +40,15 @@ const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
 // });
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetLink = `${process.env.URL_FE}/account/reset/password?token=${token}`;
+  const resetLink = `${process.env.URL_FE_NEW}/account/reset/password?token=${token}`;
 
   // Sử dụng template HTML
   const html = htmlTemplate
     .replace('{{userName}}', email)
-    .replace('{{resetURL}}', resetLink);
+    .replace(/{{resetURL}}/g, resetLink)
+    .replace('{{privacyURL}}', 'https://gopark.id.vn/privacy')
+    .replace('{{termsURL}}', 'https://gopark.id.vn/terms')
+    .replace('{{contactURL}}', 'https://gopark.id.vn/contact');
 
   try {
     await resend.emails.send({
@@ -54,7 +57,6 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
       subject: 'Reset your password',
       html,
     });
-    console.log(`Password reset email sent to ${email}`);
   } catch (err: any) {
     console.error('Send mail error:', err);
     throw err; // Để job chuyển sang failed
