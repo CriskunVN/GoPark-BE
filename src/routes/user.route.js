@@ -8,6 +8,7 @@ import {
   forgotPassword,
   resetPassword,
   updatePassword,
+  refreshToken,
 } from '../controllers/auth.controller.js';
 
 import * as userController from '../controllers/user.controller.js';
@@ -17,6 +18,7 @@ const router = express.Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
+router.post('/refresh-token', refreshToken);
 router.patch('/resetPassword/:token', resetPassword);
 
 // Middleware: bảo vệ các route dưới

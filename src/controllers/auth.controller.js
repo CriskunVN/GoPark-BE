@@ -9,9 +9,15 @@ import { limitResetRequest } from '../utils/rateLimit.js';
 // Hàm tạo token JWT
 // Hàm này sẽ tạo một token JWT với id người dùng và bí mật từ biến môi trường
 // Token sẽ hết hạn sau thời gian được định nghĩa trong biến môi trường JWT_EXPIRES_IN
-const signToken = (id) => {
+const signAccessToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+  });
+};
+
+const signRefreshToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   });
 };
 
@@ -79,7 +85,7 @@ export const login = catchAsync(async (req, res, next) => {
   }
 
   // send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, res, req.body.rememberMe);
 });
 
 // Đây là hàm bảo vệ các route yêu cầu người dùng đã đăng nhập
@@ -253,28 +259,55 @@ export const updatePassword = catchAsync(async (req, res, next) => {
 });
 
 // function để tạo và gửi token JWT cho client
-const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
-  // create cookie
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-  };
-  // check run at environment proc or dev
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+const createSendToken = (user, statusCode, res, rememberMe = false) => {
+  const accessToken = signAccessToken(user._id);
+  const refreshToken = signRefreshToken(user._id);
 
-  res.cookie('jwt', token, cookieOptions);
-
-  // remove password in response to client
+  // Lưu refreshToken vào cookie httpOnly (hoặc DB nếu muốn)
+  if (rememberMe === true) {
+    const cookieOptions = {
+      expires: new Date(
+        Date.now() +
+          (process.env.JWT_COOKIE_EXPIRES_IN || 7) * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+      sameSite: 'strict',
+    };
+    // check run at environment proc or dev
+    if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+    // set refresh token vào cookie
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+  }
+  // xóa mật khẩu khỏi output
   user.password = undefined;
 
   res.status(statusCode).json({
     status: 'success',
-    token,
+    token: accessToken,
     data: {
       user,
     },
   });
 };
+
+export const refreshToken = catchAsync(async (req, res, next) => {
+  const token = req.cookies.refreshToken || req.body.refreshToken;
+  if (!token) {
+    return next(new AppError('No refresh token provided', 401));
+  }
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  } catch (err) {
+    return next(new AppError('Invalid or expired refresh token', 401));
+  }
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    return next(new AppError('User not found', 401));
+  }
+  const accessToken = signAccessToken(user._id);
+  res.status(200).json({
+    status: 'success',
+    token: accessToken,
+  });
+});
