@@ -22,18 +22,29 @@ Hệ thống hỗ trợ đặt chỗ, thanh toán, chatbot AI, nhận diện bi�
 ## 🗂️ Cấu Trúc Dự Án
 
 ```
-src/
-├── controllers/      # Xử lý logic API
-├── models/           # Định nghĩa schema MongoDB
-├── routes/           # Định tuyến API
-├── services/         # Xử lý nghiệp vụ
-├── jobs/             # Định nghĩa các job (cron, queue)
-├── queues/           # Kết nối & quản lý Redis queue
-├── workers/          # Worker xử lý job nền
-├── utils/            # Tiện ích, xử lý lỗi, template
-├── types/            # Định nghĩa type cho TypeScript
-├── app.ts            # Khởi tạo app Express
-├── server.ts         # Khởi động server
+GoPark-BE/                     # Thư mục gốc của backend project
+
+├── src/                       # Chứa toàn bộ source code chính
+│   ├── app.ts                 # Khởi tạo ứng dụng Express (middleware, config...)
+│   ├── server.ts              # Điểm khởi chạy server (listen port, connect DB)
+│   ├── controllers/           # Chứa các controller xử lý request/response
+│   ├── jobs/                  # Định nghĩa các background jobs (tác vụ chạy ngầm)
+│   ├── models/                 # Khai báo schema/model MongoDB bằng Mongoose
+│   ├── queues/                 # Quản lý queue (Redis, BullMQ) để xử lý bất đồng bộ
+│   ├── routes/                 # Khai báo API routes (URL → controller)
+│   ├── services/               # Business logic (xử lý nghiệp vụ, tách khỏi controller)
+│   ├── types/                  # Định nghĩa type/interface TypeScript
+│   ├── utils/                  # Hàm tiện ích dùng chung
+│   │   ├── cron/               # Tác vụ định kỳ (cron job)
+│   │   └── template/           # Template email, nội dung dùng chung
+│   └── workers/                # Worker xử lý các job trong queue (ví dụ: gửi email)
+│
+├── node_modules/               # Thư viện cài bằng npm/yarn
+├── dist/                       # File build từ TypeScript sang JavaScript
+├── package.json                # Thông tin project & dependencies
+├── .env                        # Biến môi trường (DB_URL, SECRET_KEY, PORT...)
+├── README.md                   # Tài liệu hướng dẫn, mô tả dự án
+
 ```
 
 ---
@@ -131,3 +142,4 @@ MIT
 ---
 
 **GoPark Backend** – Nền tảng bãi đỗ xe thông minh, sẵn sàng cho kỷ nguyên AI 🚀
+
