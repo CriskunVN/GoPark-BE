@@ -1,6 +1,7 @@
 import express from 'express';
 import * as adminController from '../controllers/admin.controller.js';
 import * as authController from '../controllers/auth.controller.js';
+import { protect, restrictTo } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -13,8 +14,8 @@ router.get('/test', (req, res) => {
 });
 
 // Protect all routes after this middleware
-router.use(authController.protect);
-router.use(authController.restrictTo('admin'));
+router.use(protect);
+router.use(restrictTo('admin'));
 // Dashboard routes
 router.get('/dashboard/stats', adminController.getDashboardStats);
 router.get('/dashboard/activities', adminController.getRecentActivities);

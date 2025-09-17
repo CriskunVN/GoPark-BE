@@ -1,11 +1,12 @@
 import * as BookingController from '../controllers/booking.controller.js';
 import * as authController from '../controllers/auth.controller.js';
+import { protect, restrictTo } from '../middlewares/auth.middleware.js';
 import express from 'express';
 const router = express.Router();
+// Middleware để bảo vệ các route sau khi đăng nhập
+router.use(protect);
 // Public route for admin dashboard (for development/testing)
 router.route('/admin/all').get(BookingController.getAllBookings);
-// Middleware để bảo vệ các route sau khi đăng nhập
-router.use(authController.protect);
 // Route để lấy bookings của user hiện tại
 router.route('/my-bookings').get(BookingController.getMyBookings);
 // Route để tạo một booking mới

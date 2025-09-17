@@ -7,12 +7,12 @@ import {
   getVehiclesByUserId,
   addVehicleForUser,
 } from '../controllers/vehicle.controller.js';
-import * as authController from '../controllers/auth.controller.js';
+import { protect } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
 // Áp dụng middleware bảo vệ
-router.use(authController.protect);
+router.use(protect);
 
 // Routes cho người dùng hiện tại
 router.get('/my-vehicles', getMyVehicles);
