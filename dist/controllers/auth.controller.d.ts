@@ -1,4 +1,5 @@
 export const signup: (req: any, res: any, next: any) => void;
+export const verifyEmail: (req: any, res: any, next: any) => void;
 export const login: (req: any, res: any, next: any) => void;
 export const protect: (req: any, res: any, next: any) => void;
 export function restrictTo(...roles: any[]): (req: any, res: any, next: any) => any;

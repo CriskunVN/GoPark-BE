@@ -1,10 +1,33 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema, Model } from 'mongoose';
 import { type } from 'os';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
-const userSchema = new mongoose.Schema(
+export interface IUser extends Document {
+  userName: string;
+  email: string;
+  password: string;
+  passwordConfirm?: string | undefined;
+  role: 'user' | 'admin' | 'parking_owner';
+  profilePicture?: string;
+  phoneNumber?: string;
+  isActive?: boolean;
+  passwordChangeAt?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+
+  correctPassword(
+    candidatePassword: string,
+    userPassword: string
+  ): Promise<boolean>;
+  changedPasswordAfter(JWTTimestamp: number): boolean;
+  createPasswordResetToken(): string;
+}
+
+const userSchema = new Schema<IUser>(
   {
     userName: {
       type: String,
@@ -23,7 +46,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Bạn cần xác nhận lại mật khẩu'],
       validate: {
         // chỉ làm việc trên CREATE và SAVE!!!
-        validator: function (el) {
+        validator: function (el: string) {
           return el === this.password;
         },
         message: 'Mật khẩu xác nhận không khớp với mật khẩu!',
@@ -46,7 +69,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // Middleware để hash mật khẩu trước khi lưu vào cơ sở dữ liệu
-userSchema.pre('save', async function (next) {
+userSchema.pre<IUser>('save', async function (next) {
   // Chỉ hash password nếu nó đã được sửa đổi hoặc là mới
   if (!this.isModified('password') && !this.isNew) {
     return next();
@@ -57,32 +80,31 @@ userSchema.pre('save', async function (next) {
 });
 
 // middleware dùng để cập nhật passwordChangeAt
-userSchema.pre('save', function (next) {
+userSchema.pre<IUser>('save', function (next) {
   if (!this.isModified('password') || this.isNew) {
     return next();
   }
   // Cập nhật thời gian thay đổi mật khẩu
   // thời gian này luôn nhỏ hơn thời gian hết hạn của token JWT.
-  this.passwordChangeAt = Date.now() - 1000;
+  this.passwordChangeAt = new Date(Date.now() - 1000);
   next();
 });
 
 // Hàm này sẽ so sánh mật khẩu người dùng nhập vào với mật khẩu đã được mã hóa trong cơ sở dữ liệu
 userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword
-) {
+  candidatePassword: string,
+  userPassword: string
+): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 // hàm này để kiểm tra xem người dùng đã thay đổi mật khẩu sau khi token JWT được tạo hay chưa
 // JWTTimestamp là thời gian tạo token JWT
-userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+userSchema.methods.changedPasswordAfter = function (
+  JWTTimestamp: number
+): boolean {
   if (this.passwordChangeAt) {
-    const changedTimestamp = parseInt(
-      this.passwordChangeAt.getTime() / 1000,
-      10
-    );
+    const changedTimestamp = Math.floor(this.passwordChangeAt.getTime() / 1000);
     return JWTTimestamp < changedTimestamp; // false có nghĩa là người dùng chưa thay đổi mật khẩu sau khi token được tạo
   }
   return false;
@@ -91,7 +113,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 // Tạo token reset mật khẩu
 // Hàm này sẽ tạo một token reset mật khẩu và lưu trữ nó dưới dạng hash trong cơ sở dữ liệu
 // Đồng thời, nó cũng thiết lập thời gian hết hạn cho token này
-userSchema.methods.createPasswordResetToken = function () {
+userSchema.methods.createPasswordResetToken = function (): string {
   // create random token
   const resetToken = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto
@@ -105,6 +127,6 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-const User = mongoose.model('User', userSchema);
+const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
 
 export default User;

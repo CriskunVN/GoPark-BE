@@ -1,6 +1,9 @@
 import { Worker } from 'bullmq';
 import redisConnection from '../queues/redis.js';
-import { processPasswordResetJob } from '../jobs/passwordReset.job.js';
+import {
+  processPasswordResetJob,
+  processVerifyEmailJob,
+} from '../jobs/passwordReset.job.js';
 import 'dotenv/config'; // QUAN TRỌNG: nạp .env cho WORKER process
 
 // Worker lắng nghe queue
@@ -12,6 +15,17 @@ const passwordResetWorker = new Worker(
     concurrency: 10,
     limiter: { max: 60, duration: 60_000 }, // 60 job/phút (tránh vượt quota SMTP)
     prefix: 'bull', // Đảm bảo trùng prefix với queue
+  }
+);
+
+const verifyEmailWorker = new Worker(
+  'verifyEmailQueue',
+  processVerifyEmailJob,
+  {
+    connection: redisConnection,
+    concurrency: 10,
+    limiter: { max: 60, duration: 60_000 },
+    prefix: 'bull',
   }
 );
 
@@ -27,5 +41,6 @@ passwordResetWorker
 // Giữ process sống
 process.on('SIGINT', async () => {
   await passwordResetWorker.close();
+  await verifyEmailWorker.close();
   process.exit(0);
 });

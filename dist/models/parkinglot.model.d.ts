@@ -3,8 +3,8 @@ declare const ParkingLot: mongoose.Model<any, {}, {}, {}, any, any> | mongoose.M
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    name: string;
     isActive: boolean;
+    name: string;
     parkingOwner: mongoose.Types.ObjectId;
     address: string;
     zones: mongoose.Types.DocumentArray<{
@@ -30,8 +30,8 @@ declare const ParkingLot: mongoose.Model<any, {}, {}, {}, any, any> | mongoose.M
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    name: string;
     isActive: boolean;
+    name: string;
     parkingOwner: mongoose.Types.ObjectId;
     address: string;
     zones: mongoose.Types.DocumentArray<{
@@ -57,8 +57,8 @@ declare const ParkingLot: mongoose.Model<any, {}, {}, {}, any, any> | mongoose.M
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    name: string;
     isActive: boolean;
+    name: string;
     parkingOwner: mongoose.Types.ObjectId;
     address: string;
     zones: mongoose.Types.DocumentArray<{
@@ -90,8 +90,8 @@ declare const ParkingLot: mongoose.Model<any, {}, {}, {}, any, any> | mongoose.M
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    name: string;
     isActive: boolean;
+    name: string;
     parkingOwner: mongoose.Types.ObjectId;
     address: string;
     zones: mongoose.Types.DocumentArray<{
@@ -117,8 +117,8 @@ declare const ParkingLot: mongoose.Model<any, {}, {}, {}, any, any> | mongoose.M
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    name: string;
     isActive: boolean;
+    name: string;
     parkingOwner: mongoose.Types.ObjectId;
     address: string;
     zones: mongoose.Types.DocumentArray<{
@@ -144,8 +144,8 @@ declare const ParkingLot: mongoose.Model<any, {}, {}, {}, any, any> | mongoose.M
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    name: string;
     isActive: boolean;
+    name: string;
     parkingOwner: mongoose.Types.ObjectId;
     address: string;
     zones: mongoose.Types.DocumentArray<{
