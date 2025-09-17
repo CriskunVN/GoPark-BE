@@ -4,7 +4,10 @@ import AppError from '../utils/appError.js';
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { addPasswordResetJob } from '../queues/passwordReset.queue.js';
+import {
+  addPasswordResetJob,
+  addVerifyEmailJob,
+} from '../queues/passwordReset.queue.js';
 import { limitResetRequest } from '../utils/rateLimit.js';
 // Hàm tạo token JWT
 // Hàm này sẽ tạo một token JWT với id người dùng và bí mật từ biến môi trường
@@ -50,6 +53,16 @@ export const signup = catchAsync(async (req, res, next) => {
       profilePicture,
       phoneNumber,
     });
+    // Gửi email chào mừng người dùng mới và xác nhận email
+    // await sendWelcomeEmail(user.email, user.userName);
+
+    // Tạo token xác nhận email (có thể dùng JWT hoặc random string)
+    const verifyToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
+
+    // Gửi email xác nhận
+    await addVerifyEmailJob(user.email, verifyToken);
 
     // Tạo token và set cookie
     createSendToken(user, 201, res);
@@ -66,6 +79,25 @@ export const signup = catchAsync(async (req, res, next) => {
     }
     return next(err);
   }
+});
+
+export const verifyEmail = catchAsync(async (req, res, next) => {
+  const { token } = req.query;
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return next(
+      new AppError('Token xác nhận không hợp lệ hoặc đã hết hạn!', 400)
+    );
+  }
+  const user = await User.findById(decoded.id);
+  if (!user) return next(new AppError('Người dùng không tồn tại!', 404));
+  user.isActive = true;
+  await user.save();
+  res
+    .status(200)
+    .json({ status: 'success', message: 'Xác nhận email thành công!' });
 });
 
 // Hàm đăng nhập người dùng

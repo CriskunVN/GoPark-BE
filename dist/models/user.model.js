@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema, Model } from 'mongoose';
 import { type } from 'os';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     userName: {
         type: String,
         required: true,
@@ -57,7 +57,7 @@ userSchema.pre('save', function (next) {
     }
     // Cập nhật thời gian thay đổi mật khẩu
     // thời gian này luôn nhỏ hơn thời gian hết hạn của token JWT.
-    this.passwordChangeAt = Date.now() - 1000;
+    this.passwordChangeAt = new Date(Date.now() - 1000);
     next();
 });
 // Hàm này sẽ so sánh mật khẩu người dùng nhập vào với mật khẩu đã được mã hóa trong cơ sở dữ liệu
@@ -68,7 +68,7 @@ userSchema.methods.correctPassword = async function (candidatePassword, userPass
 // JWTTimestamp là thời gian tạo token JWT
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     if (this.passwordChangeAt) {
-        const changedTimestamp = parseInt(this.passwordChangeAt.getTime() / 1000, 10);
+        const changedTimestamp = Math.floor(this.passwordChangeAt.getTime() / 1000);
         return JWTTimestamp < changedTimestamp; // false có nghĩa là người dùng chưa thay đổi mật khẩu sau khi token được tạo
     }
     return false;

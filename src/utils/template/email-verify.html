@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="vi" dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <title>Verify Email | GoPark</title>
+    <!--[if mso]>
+      <style>
+        * {
+          font-family: Arial, sans-serif !important;
+        }
+      </style>
+    <![endif]-->
+    <style>
+      /* --- Base reset (safe for email) --- */
+      html,
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        width: 100% !important;
+      }
+      * {
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+      }
+      table,
+      td {
+        mso-table-lspace: 0pt !important;
+        mso-table-rspace: 0pt !important;
+      }
+      img {
+        -ms-interpolation-mode: bicubic;
+      }
+      a {
+        text-decoration: none;
+      }
+      a[x-apple-data-detectors] {
+        color: inherit !important;
+        text-decoration: none !important;
+      }
+
+      /* Gmail dark mode override */
+      u + #body .bg-body {
+        background: #f5f7fb !important;
+      }
+
+      /* Layout tokens */
+      .container {
+        width: 600px;
+        max-width: 600px;
+      }
+      .card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .px-40 {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+      .py-40 {
+        padding-top: 40px;
+        padding-bottom: 40px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 15px;
+        line-height: 1;
+        text-align: center;
+        margin: 0 auto;
+      }
+      .text {
+        color: #334155;
+      }
+      .muted {
+        color: #94a3b8;
+      }
+      .divider {
+        height: 1px;
+        background: #eef2f7;
+        margin: 24px 0;
+      }
+      .note {
+        background: #f8fafc;
+        border-left: 4px solid #2563eb;
+        border-radius: 10px;
+      }
+      .header-gradient {
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #111827 40%,
+          #1e40af 100%
+        );
+      }
+
+      /* --- Mobile --- */
+      @media (max-width: 600px) {
+        .container {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+        .px-40 {
+          padding-left: 16px !important;
+          padding-right: 16px !important;
+        }
+        .py-40 {
+          padding-top: 24px !important;
+          padding-bottom: 24px !important;
+        }
+        .btn {
+          display: block !important;
+          width: 90% !important;
+          margin: 0 auto !important;
+          text-align: center !important;
+        }
+        h1 {
+          font-size: 18px !important;
+        }
+        .lead,
+        .text,
+        .muted,
+        ul,
+        li {
+          font-size: 14px !important;
+        }
+        .header-logo {
+          width: 100px !important;
+          height: auto !important;
+        }
+        .header-title {
+          font-size: 14px !important;
+        }
+        .divider {
+          margin: 16px 0 !important;
+        }
+        .note {
+          padding: 12px 10px !important;
+        }
+      }
+
+      /* --- Dark mode hint (supported clients) --- */
+      @media (prefers-color-scheme: dark) {
+        .bg-body {
+          background: #0b1020 !important;
+        }
+        .card {
+          background: #0f172a !important;
+          border-color: #1f2a44 !important;
+        }
+        .text {
+          color: #e5e7eb !important;
+        }
+        .muted {
+          color: #9aa4b2 !important;
+        }
+        .divider {
+          background: #1f2a44 !important;
+        }
+        .note {
+          background: #0b1222 !important;
+          border-left-color: #3b82f6 !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    id="body"
+    class="bg-body"
+    style="margin: 0; padding: 0; background: #f5f7fb"
+  >
+    <!-- Preheader (hidden preview text) -->
+    <div style="display: none; max-height: 0; overflow: hidden; opacity: 0">
+      Xác minh email để kích hoạt tài khoản GoPark. Liên kết (hoặc mã OTP) sẽ
+      hết hạn sau 15 phút.
+    </div>
+
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      style="background: #f5f7fb"
+    >
+      <tr>
+        <td align="center" style="padding: 32px 16px">
+          <!-- Card -->
+          <table
+            role="presentation"
+            class="container card"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+          >
+            <!-- Header -->
+            <tr>
+              <td class="header-gradient" style="padding: 18px 24px">
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                >
+                  <tr>
+                    <td valign="middle">
+                      <img
+                        src="https://njwclzubcmeehcnpgjoj.supabase.co/storage/v1/object/public/images/logo.png"
+                        alt="GoPark"
+                        width="120"
+                        height="32"
+                        class="header-logo"
+                        style="
+                          display: block;
+                          height: 32px;
+                          width: auto;
+                          border: 0;
+                          outline: none;
+                          text-decoration: none;
+                        "
+                      />
+                    </td>
+                    <td valign="middle" align="right">
+                      <span
+                        style="
+                          display: inline-block;
+                          padding: 6px 10px;
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-size: 12px;
+                          font-weight: 700;
+                          letter-spacing: 0.3px;
+                          color: #dbeafe;
+                          background: rgba(30, 64, 175, 0.35);
+                          border: 1px solid rgba(99, 102, 241, 0.35);
+                          border-radius: 999px;
+                          text-transform: uppercase;
+                          line-height: 1;
+                        "
+                      >
+                        Action Required
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="padding-top: 14px">
+                      <div
+                        style="
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-size: 11px;
+                          font-weight: 700;
+                          letter-spacing: 0.6px;
+                          color: #a5b4fc;
+                          text-transform: uppercase;
+                          margin: 0 0 6px 0;
+                        "
+                      >
+                        Security • Verify Email
+                      </div>
+                      <div
+                        style="
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-size: 22px;
+                          font-weight: 800;
+                          line-height: 1.3;
+                          color: #ffffff;
+                          margin: 0 0 4px 0;
+                        "
+                      >
+                        Xác minh email để kích hoạt tài khoản GoPark
+                      </div>
+                      <div
+                        style="
+                          font-family: Arial, Helvetica, sans-serif;
+                          font-size: 14px;
+                          line-height: 1.5;
+                          color: #c7d2fe;
+                          margin: 0;
+                        "
+                      >
+                        • Liên kết hết hạn sau 7 ngày
+                      </div>
+                      <div
+                        style="
+                          height: 1px;
+                          background: linear-gradient(
+                            90deg,
+                            rgba(255, 255, 255, 0.15),
+                            rgba(255, 255, 255, 0.05)
+                          );
+                          margin: 14px 0 0 0;
+                        "
+                      ></div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td class="px-40 py-40">
+                <h1
+                  style="
+                    margin: 0 0 12px 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 22px;
+                    line-height: 1.35;
+                    color: #0f172a;
+                  "
+                >
+                  Xác minh email của bạn
+                </h1>
+
+                <p
+                  class="text"
+                  style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6"
+                >
+                  Xin chào <strong style="color: #1e40af">{{userName}}</strong>,
+                </p>
+
+                <p
+                  class="text"
+                  style="margin: 0 0 30px 0; font-size: 15px; line-height: 1.6"
+                >
+                  Cảm ơn bạn đã đăng ký GoPark. Nhấn nút bên dưới để xác minh
+                  email và kích hoạt tài khoản. Liên kết sẽ
+                  <strong>hết hạn sau 7 ngày</strong>.
+                </p>
+
+                <!-- Button -->
+
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  align="center"
+                  style="margin: 0 auto; text-align: center"
+                >
+                  <tr>
+                    <td align="center">
+                      <a
+                        href="{{verifyURL}}"
+                        style="
+                          display: inline-block;
+                          background: linear-gradient(
+                            135deg,
+                            #2563eb 0%,
+                            #1e40af 100%
+                          );
+                          color: #ffffff;
+                          font-family: Arial, sans-serif;
+                          font-size: 15px;
+                          font-weight: 700;
+                          padding: 14px 28px;
+                          border-radius: 10px;
+                          text-align: center;
+                          margin: 0 auto;
+                        "
+                      >
+                        Xác minh email
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  class="text"
+                  style="
+                    margin: 20px 0 16px 0;
+                    font-size: 14px;
+                    line-height: 1.6;
+                  "
+                >
+                  Nếu nút không hoạt động, sao chép và dán liên kết này vào
+                  trình duyệt:
+                </p>
+                <p
+                  class="text"
+                  style="
+                    margin: 0 0 20px 0;
+                    font-size: 12px;
+                    line-height: 1.6;
+                    word-break: break-all;
+                  "
+                >
+                  <a href="{{verifyURL}}" style="color: #1e40af"
+                    >{{verifyURL}}</a
+                  >
+                </p>
+
+                <div class="divider"></div>
+
+                <!-- Security Note -->
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  class="note"
+                >
+                  <tr>
+                    <td style="padding: 16px 18px">
+                      <p class="text" style="margin: 0; font-size: 14px">
+                        <strong>Không phải bạn?</strong> Nếu bạn không yêu cầu
+                        tạo tài khoản, hãy bỏ qua email này hoặc
+                        <a
+                          href="mailto:security@gopark.com"
+                          style="color: #2563eb"
+                          >liên hệ đội ngũ bảo mật</a
+                        >.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background: #0b1325;
+                  padding: 18px 24px;
+                  border-top: 1px solid #0f1a33;
+                "
+                align="center"
+              >
+                <p class="muted" style="margin: 0 0 6px 0; font-size: 12px">
+                  © 2025 GoPark Enterprise. All rights reserved.
+                </p>
+                <p class="muted" style="margin: 0 0 10px 0; font-size: 12px">
+                  123 Corporate Boulevard, San Francisco, CA 94107
+                </p>
+                <p style="margin: 0; font-size: 12px">
+                  <a href="{{privacyURL}}" style="color: #9fb3d9; margin: 0 6px"
+                    >Privacy</a
+                  >
+                  |
+                  <a href="{{termsURL}}" style="color: #9fb3d9; margin: 0 6px"
+                    >Terms</a
+                  >
+                  |
+                  <a href="{{contactURL}}" style="color: #9fb3d9; margin: 0 6px"
+                    >Contact</a
+                  >
+                </p>
+              </td>
+            </tr>
+          </table>
+          <!-- /Card -->
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
