@@ -13,10 +13,8 @@ import vehicleRoutes from './routes/vehicle.route.js';
 import bookingRouter from './routes/booking.route.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
 import ticketRouter from './routes/ticket.route.js';
-
 import ocrRoute from "./routes/ocr.route.js";
 import uploadRouter from "./routes/upload.route.js";
-
 // Route for VNPay
 import vnpayRouter from './routes/vnpay.route.js';
 import { fileURLToPath } from 'url';
@@ -32,9 +30,7 @@ app.use(cors({
     origin: (origin, callback) => {
         const allowedOrigins = [
             'http://localhost:3000',
-
             'https://gopark.id.vn',
-
             'https://go-park-fe.vercel.app',
         ];
         // Cho phép cả request không có origin (ví dụ từ Postman)
@@ -66,10 +62,8 @@ app.use(`${apiPrefix}/chatbot`, chatbotRoutes); // route chatbot
 app.use(`${apiPrefix}/tickets`, ticketRouter); //route vé xe
 app.use(`${apiPrefix}/vnpay`, vnpayRouter); // route thanh toán VNPay
 app.use(`${apiPrefix}/admin`, adminRouter); // route admin
-
-app.use(`${apiPrefix}/ocr`, ocrRoute);
 app.use(`${apiPrefix}/upload`, uploadRouter); // route upload anh
-
+app.use(`${apiPrefix}/ocr`, ocrRoute); //route scan
 // 4. ERROR HANDLER (Middle xử lý lỗi)
 app.use((err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
