@@ -2,12 +2,8 @@ import User from '../models/user.model.js';
 // [GET] /api/v1/users/me
 export const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select(
-      '-password -passwordConfirm'
-    );
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+    const user = await User.findById(req.user.id).select('-password -passwordConfirm');
+    if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: 'Lỗi server' });
@@ -76,27 +72,25 @@ export const getUser = async (req, res) => {
   }
 };
 
-// Cập nhật hàm updateUser
+// [PUT] /api/v1/users/:id
 export const updateUser = async (req, res) => {
   try {
-    const { userName, email, phoneNumber } = req.body;
-
+    console.log(1)
+    const { userName, email, phoneNumber, avatar } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { userName, email, phoneNumber },
+      {
+        userName,
+        email,
+        phoneNumber,
+        profilePicture: avatar, // ✅ lưu avatar
+      },
       { new: true, runValidators: true }
     ).select('-password -passwordConfirm -__v -role');
-
-    if (!updatedUser) {
-      return res.status(404).json({ error: 'Không tìm thấy user' });
-    }
-
-    res.json({
-      id: updatedUser._id,
-      userName: updatedUser.userName,
-      email: updatedUser.email,
-      phoneNumber: updatedUser.phoneNumber,
-    });
+console.log(2)
+    if (!updatedUser) return res.status(404).json({ error: 'Không tìm thấy user' });
+console.log(3)
+    res.json(updatedUser);
   } catch (err) {
     if (err.code === 11000) {
       return res.status(400).json({ error: 'Email đã tồn tại' });
