@@ -15,7 +15,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+
+    "@supabase/supabase-js": "^2.57.4",
+
     "@types/jsonwebtoken": "^9.0.10",
+
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "bullmq": "^5.58.5",
@@ -26,6 +30,7 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "formdata-node": "^6.0.3",
     "helmet": "^8.1.0",
     "ioredis": "^5.7.0",
     "jsonwebtoken": "^9.0.2",
@@ -39,9 +44,11 @@
     "populate": "^5.0.1",
     "qrcode": "^1.5.4",
     "qs": "^6.14.0",
+    "sharp": "^0.34.3",
+    "tesseract.js": "^4.1.4",
+
     "resend": "^6.0.3",
-    "sharp": "^0.32.6",
-    "tesseract.js": "^4.1.1",
+
     "validator": "^13.15.15"
   },
   "devDependencies": {
