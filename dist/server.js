@@ -8,6 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import app from './app.js';
+// Import worker để xử lý job trong queue
+import './workers/passwordReset.worker.js'; // chạy worker cùng process
 // Cron job: Update booking status to 'booked' when startTime <= now
 import './utils/cron/bookingStatusUpdater.js';
 import './utils/cron/parkingSlotCleaner.js';
@@ -50,7 +52,6 @@ const port = process.env.PORT;
 // Start the server
 server = app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    console.log('REDIS_HOST:', process.env.REDIS_HOST);
 });
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {

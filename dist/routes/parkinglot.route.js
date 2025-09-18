@@ -1,6 +1,6 @@
 import express from 'express';
 import * as parkingLotController from '../controllers/parkinglot.controller.js';
-import * as authController from '../controllers/auth.controller.js';
+import { protect, restrictTo } from '../middlewares/auth.middleware.js';
 import parkingSlotRoute from './parkingSlot.route.js';
 const router = express.Router();
 // ========================
@@ -18,23 +18,23 @@ router.use('/:parkingLotId/slots', parkingSlotRoute);
 // ========================
 // Bảo vệ tất cả các route bên dưới
 // ========================
-router.use(authController.protect);
+router.use(protect);
 // ========================
 // Route cho Parking Owner
 // ========================
-router.get('/my-parkinglots', authController.restrictTo('owner'), parkingLotController.getMyParkingLots);
+router.get('/my-parkinglots', restrictTo('owner'), parkingLotController.getMyParkingLots);
 router.route('/:id').get(parkingLotController.getOneParkingLot);
-router.post('/', authController.restrictTo('owner', 'admin'), parkingLotController.createParkingLot);
-router.patch('/:id/soft-delete', authController.restrictTo('owner'), parkingLotController.softDeleteParkingLot);
+router.post('/', restrictTo('owner', 'admin'), parkingLotController.createParkingLot);
+router.patch('/:id/soft-delete', restrictTo('owner'), parkingLotController.softDeleteParkingLot);
 router.route('/:id/users').get(parkingLotController.getUserBookingInParkingLot);
 // ========================
 // Admin quyền toàn bộ
 // ========================
-router.use(authController.restrictTo('admin'));
+router.use(restrictTo('admin'));
 router.get('/', parkingLotController.getAllParkingLots);
 router
     .route('/:id')
-    .patch(authController.restrictTo('owner'), parkingLotController.updateParkingLot)
+    .patch(restrictTo('owner'), parkingLotController.updateParkingLot)
     .delete(parkingLotController.deleteParkingLot);
 export default router;
 //# sourceMappingURL=parkinglot.route.js.map

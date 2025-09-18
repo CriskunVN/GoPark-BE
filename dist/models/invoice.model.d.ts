@@ -3,7 +3,7 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
@@ -15,7 +15,7 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
@@ -27,7 +27,7 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
@@ -45,7 +45,7 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
@@ -57,7 +57,7 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
@@ -69,7 +69,7 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "failed" | "paid" | "unpaid";
+    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;

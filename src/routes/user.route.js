@@ -3,12 +3,13 @@ import express from 'express';
 import {
   signup,
   login,
-  protect,
-  restrictTo,
   forgotPassword,
   resetPassword,
   updatePassword,
+  refreshToken,
+  verifyEmail,
 } from '../controllers/auth.controller.js';
+import { protect, restrictTo } from '../middlewares/auth.middleware.js';
 
 import * as userController from '../controllers/user.controller.js';
 
@@ -17,8 +18,9 @@ const router = express.Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
+router.post('/refresh-token', refreshToken);
 router.patch('/resetPassword/:token', resetPassword);
-
+router.get('/verify-email', verifyEmail);
 // Middleware: bảo vệ các route dưới
 router.use(protect);
 

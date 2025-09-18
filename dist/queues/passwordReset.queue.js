@@ -1,21 +1,31 @@
-import { Queue, Worker, Job } from 'bullmq';
+import { Queue } from 'bullmq';
 import redisConnection from './redis.js';
-import { processPasswordResetJob } from '../jobs/passwordReset.job.js';
-// (A) Queue: chỉ giữ options chung
-const passwordResetQueue = new Queue('passwordResetQueue', {
+// (A) Queue: tạo queue
+export const passwordResetQueue = new Queue('passwordResetQueue', {
     connection: redisConnection, // Kết nối đến Redis
+    prefix: 'bull',
 });
-// (B) Helper: dedupe theo “cửa sổ thời gian” bằng Redis SET NX + jobId cố định
-const addPasswordResetJob = async (email, token) => {
-    await passwordResetQueue.add('sendPasswordResetEmail', { email, token });
-};
-// (C) Worker: rate-limit tốc độ xử lý để né quota SMTP (ví dụ 30 mail/phút)
-const passwordResetWorker = new Worker('passwordResetQueue', // Tên queue cần lắng nghe
-processPasswordResetJob, // Hàm xử lý từng job lấy ra từ queue
-{
+export const verifyEmailQueue = new Queue('verifyEmailQueue', {
     connection: redisConnection,
-    concurrency: 5, // Số job xử lý 5 job cùng lúc
-    limiter: { max: 30, duration: 60000 }, // <= rate-limit ở tầng CONSUME ( )
+    prefix: 'bull',
 });
-export { passwordResetQueue, addPasswordResetJob };
+// (B) Helper: hàm thêm job vào queue
+export const addPasswordResetJob = async (email, token) => {
+    console.log('Add job gửi email reset mật khẩu vào queue', email);
+    await passwordResetQueue.add('sendPasswordResetEmail', { email, token }, {
+        jobId: `${email}-${Date.now()}`, // jobId luôn khác nhau
+        removeOnComplete: true,
+        removeOnFail: true,
+        attempts: 3, // Thử lại tối đa 3 lần nếu thất bại
+    });
+};
+export const addVerifyEmailJob = async (email, token) => {
+    console.log('Add job gửi email xác nhận vào queue', email);
+    await verifyEmailQueue.add('sendVerifyEmail', { email, token }, {
+        jobId: `verify-${email}-${Date.now()}`, // jobId luôn khác nhau
+        removeOnComplete: true,
+        removeOnFail: true,
+        attempts: 3, // Thử lại tối đa 3 lần nếu thất bại
+    });
+};
 //# sourceMappingURL=passwordReset.queue.js.map

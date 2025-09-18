@@ -6,15 +6,20 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "concurrently \"tsc --watch\" \"nodemon dist/server.js\"",
-    "debug": "ndb server.js"
+    "dev:api": "concurrently \"tsc --watch\" \"nodemon dist/server.js\"",
+    "dev": "npm run dev:api",
+    "debug": "ndb dist/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+
     "@supabase/supabase-js": "^2.57.4",
+
+    "@types/jsonwebtoken": "^9.0.10",
+
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "bullmq": "^5.58.5",
@@ -41,6 +46,9 @@
     "qs": "^6.14.0",
     "sharp": "^0.34.3",
     "tesseract.js": "^4.1.4",
+
+    "resend": "^6.0.3",
+
     "validator": "^13.15.15"
   },
   "devDependencies": {
