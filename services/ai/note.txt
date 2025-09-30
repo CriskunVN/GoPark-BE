@@ -1,0 +1,18 @@
+User gửi tin nhắn → chatbot.controller.js → 
+→ userService.js (lấy thông tin user) → 
+→ geminiService.js (xử lý thông minh) →
+→ processLocally (kiểm tra yêu cầu thống kê) →
+→ functionCaller.js (gọi function phù hợp) →
+→ statisticsFunctions.js (lấy data từ DB) →
+→ Format response → Trả về user
+
+
+getUserStats(): Lấy thống kê cho user thường (số booking, số xe, chi tiêu)
+
+getOwnerRevenue(): Lấy thống kê doanh thu cho chủ bãi xe
+
+getAdminStats(): Lấy thống kê tổng quan hệ thống cho admin
+
+processLocally(): Phát hiện yêu cầu thống kê và xử lý ngay không cần AI
+
+formatStatsResponse(): Định dạng response đẹp cho từng loại user

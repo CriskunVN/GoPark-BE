@@ -51,7 +51,7 @@ app.use('/api/v1/search', searchRoutes);
 app.use(`/api/v1/parking-slots`, parkingSlotRouter);
 app.use('/api/v1/vehicles', vehicleRoutes);
 app.use('/api/v1/bookings', bookingRouter);
-app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/v1/chatbot', chatbotRoutes);
 app.use('/api/v1/tickets', ticketRouter);
 app.use('/api/v1/vnpay', vnpayRouter);
 app.use('/api/v1/admin', adminRouter);

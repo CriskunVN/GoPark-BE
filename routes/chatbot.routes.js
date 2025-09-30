@@ -4,7 +4,8 @@ import {
   getChatHistory, 
   deleteChatHistory, 
   healthCheck, 
-  getChatStats 
+  getChatStats,
+  getPerformanceMetrics 
 } from "../controllers/chatbot.controller.js";
 
 const router = express.Router();
@@ -14,6 +15,9 @@ router.post("/ai-chat", aiChat);
 
 // Route health check (public)
 router.get("/health", healthCheck);
+
+// Route performance metrics (public - để monitor)
+router.get("/performance", getPerformanceMetrics);
 
 // Route lấy lịch sử chat theo userId (public nhưng cần userId)
 router.get("/chat-history/:userId", getChatHistory);

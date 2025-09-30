@@ -1,190 +1,126 @@
-import User from '../models/user.model.js';
-import Booking from '../models/booking.model.js';
-import ParkingLot from '../models/parkingLot.model.js';
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
+import { getUserInfo } from "./ai/userService.js";
+import { callGeminiAI } from "./ai/geminiService.js";
 
-dotenv.config({ path: './config.env' });
+export { getUserInfo };
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-
-// Prompt cơ bản cho tất cả user
-const BASE_PROMPT = `
-Bạn là trợ lý AI thông minh của GoPark - nền tảng đặt chỗ bãi đỗ xe hàng đầu Việt Nam.
-LUÔN trả lời bằng tiếng Việt, thân thiện và chuyên nghiệp.
-Chỉ trả lời câu hỏi về: đặt chỗ, thanh toán, tìm bãi xe, chính sách, hỗ trợ.
-Trả lời ngắn gọn, rõ ràng, tối đa 4-5 câu.
-`;
-
-// Hàm lấy thông tin user từ database (nếu có userId)
-export async function getUserInfo(userId) {
-  try {
-    // Nếu không có userId hoặc userId là string đơn giản
-    if (!userId || typeof userId !== 'string' || userId.length < 10) {
-      return {
-        role: 'guest',
-        name: 'Khách vãng lai',
-        contextInfo: 'Chỉ có thể xem thông tin cơ bản về bãi xe',
-      };
-    }
-
-    // Thử tìm user trong database
-    const user = await User.findById(userId);
-    if (!user) {
-      return {
-        role: 'guest',
-        name: 'User không tồn tại',
-        contextInfo: 'Vui lòng đăng nhập để có trải nghiệm tốt hơn',
-      };
-    }
-
-    // Tạo context info dựa trên role
-    let contextInfo = '';
-    switch (user.role) {
-      case 'user':
-        // Lấy số booking gần đây của customer
-        const bookingCount = await Booking.countDocuments({ userId });
-        contextInfo = `Khách hàng có ${bookingCount} booking. Có thể hỏi về lịch sử đặt chỗ, tìm bãi xe.`;
-        break;
-
-      case 'parking_owner':
-        // Lấy số bãi xe của owner
-        const lotCount = await ParkingLot.countDocuments({
-          parkingOwner: userId,
-        });
-        contextInfo = `Chủ bãi xe quản lý ${lotCount} bãi. Có thể hỏi về thống kê, doanh thu.`;
-        break;
-
-      case 'admin':
-        contextInfo =
-          'Quản trị viên có quyền truy cập tất cả thông tin hệ thống.';
-        break;
-
-      default:
-        contextInfo = 'User với quyền hạn cơ bản.';
-    }
-
-    return {
-      role: user.role,
-      name: user.userName,
-      email: user.email,
-      contextInfo,
-    };
-  } catch (error) {
-    console.error('Lỗi lấy thông tin user:', error);
-    return {
-      role: 'guest',
-      name: 'Lỗi hệ thống',
-      contextInfo: 'Không thể xác định thông tin người dùng',
-    };
-  }
-}
-
-// Hàm tạo prompt có cá nhân hóa
-function createPersonalizedPrompt(userInfo, message) {
-  let personalizedPrompt = BASE_PROMPT;
-
-  // Thêm thông tin cá nhân hóa dựa trên role
-  switch (userInfo.role) {
-    case 'user':
-      personalizedPrompt += `
-      
-NGƯỜI DÙNG HIỆN TẠI: ${userInfo.name} (Khách hàng)
-THÔNG TIN: ${userInfo.contextInfo}
-BẠN CÓ THỂ: Giúp tìm bãi xe, hướng dẫn đặt chỗ, giải đáp về booking cá nhân.
-KHÔNG ĐƯỢC: Tiết lộ thông tin người khác, dữ liệu doanh thu hệ thống.`;
-      break;
-
-    case 'parking_owner':
-      personalizedPrompt += `
-      
-NGƯỜI DÙNG HIỆN TẠI: ${userInfo.name} (Chủ bãi xe)  
-THÔNG TIN: ${userInfo.contextInfo}
-BẠN CÓ THỂ: Hỗ trợ quản lý bãi xe, thống kê booking, tư vấn tối ưu hóa.
-KHÔNG ĐƯỢC: Xem dữ liệu bãi xe của chủ khác.`;
-      break;
-
-    case 'admin':
-      personalizedPrompt += `
-      
-NGƯỜI DÙNG HIỆN TẠI: ${userInfo.name} (Quản trị viên)
-THÔNG TIN: ${userInfo.contextInfo}  
-BẠN CÓ THỂ: Cung cấp mọi thống kê, quản lý user, xử lý khiếu nại.
-QUYỀN HẠN: Toàn quyền truy cập dữ liệu.`;
-      break;
-
-    default: // guest
-      personalizedPrompt += `
-      
-NGƯỜI DÙNG HIỆN TẠI: Khách vãng lai
-BẠN CÓ THỂ: Cung cấp thông tin cơ bản về bãi xe, hướng dẫn sử dụng.
-KHUYẾN NGHỊ: Đề xuất đăng nhập để có trải nghiệm tốt hơn.`;
-  }
-
-  return personalizedPrompt;
-}
-
-// Hàm gọi Gemini AI chính
 export async function askGeminiAI(message, userId = null) {
   try {
-    console.log('Bắt đầu xử lý tin nhắn:', {
-      message: message.substring(0, 50),
-      userId,
+    console.log('🤖 Processing:', { 
+      message: message, 
+      userId: userId || 'guest' 
     });
 
-    // Bước 1: Lấy thông tin user
     const userInfo = await getUserInfo(userId);
-    console.log('Thông tin user:', userInfo);
-
-    // Bước 2: Tạo prompt có cá nhân hóa
-    const personalizedPrompt = createPersonalizedPrompt(userInfo, message);
-
-    // Bước 3: Gọi Gemini API
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            { text: personalizedPrompt }, // System prompt với context
-            { text: `Câu hỏi: ${message}` }, // User message
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7, // Độ sáng tạo vừa phải
-        maxOutputTokens: 1000, // Giới hạn độ dài phản hồi
-      },
-    };
-
-    const response = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-goog-api-key': GEMINI_API_KEY,
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    // Bước 4: Xử lý phản hồi
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Lỗi Gemini API:', response.status, errorText);
-      throw new Error(`Gemini API Error: ${response.status}`);
+    
+    // Enhanced retry logic với exponential backoff và better error handling
+    let lastError;
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1 second
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const aiResponse = await callGeminiAI(userInfo, message);
+        
+        // Validate response
+        if (!aiResponse || typeof aiResponse !== 'string') {
+          throw new Error('Invalid AI response format');
+        }
+        
+        if (aiResponse.trim().length === 0) {
+          throw new Error('Empty AI response');
+        }
+        
+        console.log('✅ AI responded successfully');
+        return aiResponse;
+        
+      } catch (error) {
+        lastError = error;
+        console.warn(`⚠️ Attempt ${attempt}/${maxRetries} failed:`, {
+          error: error.message,
+          type: error.name,
+          attempt
+        });
+        
+        // Không retry cho một số lỗi cụ thể
+        if (error.message?.includes('Invalid API key') || 
+            error.message?.includes('Authentication') ||
+            error.message?.includes('Permission denied')) {
+          console.error('❌ Authentication error - không retry');
+          break;
+        }
+        
+        // Retry với exponential backoff
+        if (attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt - 1); // 1s, 2s, 4s
+          console.log(`⏳ Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
     }
-
-    const data = await response.json();
-    const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!aiReply) {
-      console.error('Không có phản hồi từ AI:', data);
-      return 'Xin lỗi, tôi không thể trả lời câu hỏi này. Vui lòng thử lại.';
-    }
-
-    console.log('AI phản hồi thành công cho user:', userInfo.name);
-    return aiReply;
+    
+    // Nếu tất cả attempts đều fail
+    throw lastError;
+    
   } catch (error) {
-    console.error('Lỗi askGeminiAI:', error);
-    return 'Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại sau.';
+    console.error('❌ Service Error after all retries:', {
+      error: error.message,
+      type: error.name,
+      userId: userId || 'guest'
+    });
+    
+    // Trả về fallback response thân thiện dựa trên loại lỗi
+    return getFriendlyErrorResponse(error, message);
   }
+}
+
+// Helper function để tạo error response thân thiện
+function getFriendlyErrorResponse(error, originalMessage) {
+  const lowerMessage = originalMessage.toLowerCase();
+  
+  // Phân tích loại lỗi và trả về response phù hợp
+  if (error.message?.includes('rate limit') || error.message?.includes('429')) {
+    return "🕐 Hệ thống đang khá bận lúc này. Vui lòng thử lại sau 1-2 phút nhé! " +
+           "Trong lúc chờ, bạn có thể xem lại lịch sử booking hoặc thông tin xe đã đăng ký.";
+  }
+  
+  if (error.message?.includes('timeout') || error.message?.includes('AbortError')) {
+    return "⏱️ Phản hồi mất nhiều thời gian hơn bình thường. " +
+           "Có thể do câu hỏi phức tạp - hãy thử hỏi ngắn gọn hơn nhé!";
+  }
+  
+  if (error.message?.includes('network') || error.message?.includes('fetch') || 
+      error.message?.includes('ENOTFOUND') || error.message?.includes('ECONNREFUSED')) {
+    return "🌐 Có vấn đề kết nối mạng. Vui lòng kiểm tra internet và thử lại. " +
+           "Nếu vẫn gặp lỗi, có thể server đang bảo trì.";
+  }
+  
+  if (error.message?.includes('Invalid API key') || error.message?.includes('Authentication')) {
+    return "🔐 Có vấn đề với xác thực hệ thống. Vui lòng liên hệ admin để được hỗ trợ.";
+  }
+  
+  if (error.message?.includes('Invalid AI response') || error.message?.includes('Empty AI response')) {
+    return "🤔 Tôi không thể tạo phản hồi phù hợp cho câu hỏi này. " +
+           "Bạn có thể thử hỏi cách khác hoặc cụ thể hơn không?";
+  }
+  
+  // Fallback response dựa trên nội dung tin nhắn
+  if (lowerMessage.includes('đặt') || lowerMessage.includes('booking')) {
+    return "🚗 Hiện tại tôi gặp khó khăn trong việc xử lý đặt chỗ. " +
+           "Bạn có thể thử đặt trực tiếp qua ứng dụng hoặc liên hệ hotline để được hỗ trợ.";
+  }
+  
+  if (lowerMessage.includes('tìm') || lowerMessage.includes('bãi')) {
+    return "🔍 Tôi đang gặp sự cố khi tìm kiếm bãi xe. " +
+           "Bạn có thể xem danh sách bãi xe trong mục 'Khám phá' của ứng dụng.";
+  }
+  
+  if (lowerMessage.includes('lịch sử') || lowerMessage.includes('history')) {
+    return "📋 Không thể truy xuất lịch sử lúc này. " +
+           "Vui lòng kiểm tra mục 'Lịch sử booking' trong tài khoản của bạn.";
+  }
+  
+  // Generic friendly response
+  return "🤖 Xin lỗi, tôi đang gặp một chút khó khăn kỹ thuật. " +
+         "Vui lòng thử lại sau ít phút hoặc liên hệ hỗ trợ nếu cần thiết. " +
+         "Cảm ơn bạn đã kiên nhẫn! 🙏";
 }
