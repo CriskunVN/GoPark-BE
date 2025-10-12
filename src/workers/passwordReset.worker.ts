@@ -3,7 +3,7 @@ import redisConnection from '../queues/redis.js';
 import {
   processPasswordResetJob,
   processVerifyEmailJob,
-} from '../jobs/passwordReset.job.js';
+} from '../jobs/email.job.js';
 import 'dotenv/config'; // QUAN TRỌNG: nạp .env cho WORKER process
 
 // Worker lắng nghe queue

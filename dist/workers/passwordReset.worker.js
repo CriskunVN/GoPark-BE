@@ -1,6 +1,6 @@
 import { Worker } from 'bullmq';
 import redisConnection from '../queues/redis.js';
-import { processPasswordResetJob, processVerifyEmailJob, } from '../jobs/passwordReset.job.js';
+import { processPasswordResetJob, processVerifyEmailJob, } from '../jobs/email.job.js';
 import 'dotenv/config'; // QUAN TRỌNG: nạp .env cho WORKER process
 // Worker lắng nghe queue
 const passwordResetWorker = new Worker('passwordResetQueue', // Tên queue phải trùng với tên queue khi tạo
