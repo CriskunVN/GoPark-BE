@@ -2,7 +2,7 @@ import User from '../models/user.model.js';
 // [GET] /api/v1/users/me
 export const getCurrentUser = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password -passwordConfirm');
+        const user = await User.findById(req.user.id).select('-password -passwordConfirm +isActive');
         if (!user)
             return res.status(404).json({ error: 'User not found' });
         res.json(user);

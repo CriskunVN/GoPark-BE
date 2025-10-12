@@ -29,4 +29,4 @@ export async function processVerifyEmailJob(job) {
 }
 // Note: hàm này chỉ định nghĩa cách xử lý job, không gọi trực tiếp
 // Việc thêm job vào queue được thực hiện ở nơi khác (như trong controller)
-//# sourceMappingURL=passwordReset.job.js.map
+//# sourceMappingURL=email.job.js.map

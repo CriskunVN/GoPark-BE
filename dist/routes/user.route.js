@@ -8,7 +8,7 @@ router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
 router.post('/refresh-token', refreshToken);
 router.patch('/resetPassword/:token', resetPassword);
-router.get('/verify-email', verifyEmail);
+router.patch('/verify-email/:token', verifyEmail);
 // Middleware: bảo vệ các route dưới
 router.use(protect);
 // Route: Lấy thông tin người dùng hiện tại

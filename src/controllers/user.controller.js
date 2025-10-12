@@ -2,7 +2,9 @@ import User from '../models/user.model.js';
 // [GET] /api/v1/users/me
 export const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password -passwordConfirm');
+    const user = await User.findById(req.user.id).select(
+      '-password -passwordConfirm +isActive'
+    );
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (err) {
@@ -75,7 +77,7 @@ export const getUser = async (req, res) => {
 // [PUT] /api/v1/users/:id
 export const updateUser = async (req, res) => {
   try {
-    console.log(1)
+    console.log(1);
     const { userName, email, phoneNumber, avatar } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
@@ -87,9 +89,10 @@ export const updateUser = async (req, res) => {
       },
       { new: true, runValidators: true }
     ).select('-password -passwordConfirm -__v -role');
-console.log(2)
-    if (!updatedUser) return res.status(404).json({ error: 'Không tìm thấy user' });
-console.log(3)
+    console.log(2);
+    if (!updatedUser)
+      return res.status(404).json({ error: 'Không tìm thấy user' });
+    console.log(3);
     res.json(updatedUser);
   } catch (err) {
     if (err.code === 11000) {

@@ -65,7 +65,7 @@ export const sendPasswordResetEmail = async (
     await resend.emails.send({
       from: `GoPark Team <${process.env.FROM_EMAIL}>`,
       to: email,
-      subject: 'Reset your password',
+      subject: 'Thay đổi mật khẩu mới',
       html,
     });
   } catch (err: any) {

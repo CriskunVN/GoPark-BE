@@ -34,7 +34,7 @@ const userSchema = new Schema({
     },
     profilePicture: { type: String, default: '' }, // hình đại diện người dùng
     phoneNumber: { type: String, default: '' },
-    isActive: { type: Boolean, default: true, select: false }, // xác nhận người dùng có đang hoạt động hay không
+    isActive: { type: Boolean, default: false, select: false }, // xác nhận người dùng có đang hoạt động hay không
     passwordChangeAt: { type: Date, default: Date.now }, // thời gian thay đổi mật khẩu gần nhất
     passwordResetToken: { type: String, select: false }, // token dùng để reset mật khẩu
     passwordResetExpires: { type: Date, select: false }, // thời gian hết hạn của token reset mật khẩu

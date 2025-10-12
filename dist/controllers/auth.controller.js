@@ -1,7 +1,6 @@
-import User from '../models/user.model.js';
+import User, {} from '../models/user.model.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
-import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { addPasswordResetJob, addVerifyEmailJob, } from '../queues/passwordReset.queue.js';
@@ -10,13 +9,20 @@ import { limitResetRequest } from '../utils/rateLimit.js';
 // Hàm này sẽ tạo một token JWT với id người dùng và bí mật từ biến môi trường
 // Token sẽ hết hạn sau thời gian được định nghĩa trong biến môi trường JWT_EXPIRES_IN
 const signAccessToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+    const expiresIn = '15m';
+    if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable is not set');
+    }
+    return jwt.sign({ id: id }, process.env.JWT_SECRET, {
+        expiresIn: '15m',
     });
 };
 const signRefreshToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    if (!process.env.JWT_REFRESH_SECRET) {
+        throw new Error('JWT_REFRESH_SECRET environment variable is not set');
+    }
+    return jwt.sign({ id: id }, process.env.JWT_REFRESH_SECRET, {
+        expiresIn: '7d',
     });
 };
 // Hàm đăng ký người dùng mới
@@ -46,6 +52,7 @@ export const signup = catchAsync(async (req, res, next) => {
         const verifyToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: '7d',
         });
+        console.log(`Verify Token: ${verifyToken}`);
         // Gửi email xác nhận
         await addVerifyEmailJob(user.email, verifyToken);
         // Tạo token và set cookie
@@ -62,7 +69,10 @@ export const signup = catchAsync(async (req, res, next) => {
     }
 });
 export const verifyEmail = catchAsync(async (req, res, next) => {
-    const { token } = req.query;
+    const { token } = req.params;
+    if (!token) {
+        return next(new AppError('Token xác nhận không được để trống!', 400));
+    }
     let decoded;
     try {
         decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -74,7 +84,7 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
     if (!user)
         return next(new AppError('Người dùng không tồn tại!', 404));
     user.isActive = true;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
     res
         .status(200)
         .json({ status: 'success', message: 'Xác nhận email thành công!' });
@@ -87,7 +97,7 @@ export const login = catchAsync(async (req, res, next) => {
         return next(new AppError('Vui lòng cung cấp email và mật khẩu!', 400));
     }
     // kiểm tra xem người dùng có tồn tại trong cơ sở dữ liệu hay không
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select('+password +isActive');
     // correctPassword là một phương thức trong mô hình người dùng để so sánh mật khẩu đã nhập với mật khẩu đã mã hóa trong cơ sở dữ liệu
     // nếu mật khẩu không đúng, trả về lỗi
     if (!user || !(await user.correctPassword(password, user.password))) {
@@ -100,9 +110,9 @@ export const login = catchAsync(async (req, res, next) => {
 // Nó sẽ gửi một email chứa token để người dùng có thể đặt lại mật khẩu của mình
 // Token này sẽ được lưu trong cơ sở dữ liệu và có thời gian hết hạn
 export const forgotPassword = async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
     try {
         // 1. Lấy user dựa trên email được cung cấp trong request body
-        const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return next(new AppError('Không có người dùng nào với email này', 404));
         }
@@ -121,10 +131,12 @@ export const forgotPassword = async (req, res, next) => {
     }
     catch (err) {
         // nếu có lỗi xảy ra trong quá trình gửi email, chúng ta sẽ xóa token và thời gian hết hạn khỏi cơ sở dữ liệu
-        user.passwordResetToken = undefined;
-        user.passwordResetExpires = undefined;
-        await user.save({ validateBeforeSave: false });
-        return next(new AppError('There was an error sending the email. Try again later!'), 500);
+        if (user) {
+            user.passwordResetToken = '';
+            user.passwordResetExpires = new Date(0);
+            await user.save({ validateBeforeSave: false });
+        }
+        return next(new AppError('There was an error sending the email. Try again later!', 500));
     }
 };
 // Đây là hàm để đặt lại mật khẩu của người dùng
@@ -153,8 +165,8 @@ export const resetPassword = catchAsync(async (req, res, next) => {
     // không lỗi thì sẽ tiếp tục cập nhật mật khẩu
     user.password = req.body.password;
     user.passwordConfirm = req.body.passwordConfirm;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
+    user.passwordResetToken = '';
+    user.passwordResetExpires = new Date(0);
     try {
         await user.save();
         // 3. cập nhật thời gian thay đổi mật khẩu
@@ -163,16 +175,24 @@ export const resetPassword = catchAsync(async (req, res, next) => {
         createSendToken(user, 200, res);
     }
     catch (err) {
-        if (err.name === 'ValidationError' &&
-            err.errors &&
-            err.errors.passwordConfirm) {
-            return next(new AppError('Mật khẩu xác nhận không khớp với mật khẩu!', 400));
+        {
+            if (err.name === 'ValidationError' &&
+                err.errors &&
+                err.errors.passwordConfirm) {
+                return next(new AppError('Mật khẩu xác nhận không khớp với mật khẩu!', 400));
+            }
         }
     }
 });
 // Hàm này được sử dụng để cập nhật mật khẩu của người dùng đã đăng nhập
 export const updatePassword = catchAsync(async (req, res, next) => {
+    if (!req.user || !req.user.id) {
+        return next(new AppError('Không có thông tin người dùng', 401));
+    }
     const user = await User.findById(req.user.id).select('+password'); // select('+password') để lấy mật khẩu đã mã hóa của người dùng
+    if (!user) {
+        return next(new AppError('Người dùng không tồn tại', 404));
+    }
     // 1. Kiểm tra mật khẩu nhập có đúng với mật khẩu trong DB không
     if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
         return next(new AppError('Your current password is wrong.', 401));
@@ -185,30 +205,35 @@ export const updatePassword = catchAsync(async (req, res, next) => {
     createSendToken(user, 200, res);
 });
 // function để tạo và gửi token JWT cho client
-const createSendToken = (user, statusCode, res, rememberMe = false) => {
-    const accessToken = signAccessToken(user._id);
-    const refreshToken = signRefreshToken(user._id);
-    // Lưu refreshToken vào cookie httpOnly (hoặc DB nếu muốn)
+const createSendToken = async (user, statusCode, res, rememberMe = false) => {
+    const uid = typeof user._id === 'string' ? user._id : user._id;
+    const accessToken = signAccessToken(uid);
+    const refreshToken = signRefreshToken(uid);
     if (rememberMe === true) {
+        const days = Number(process.env.JWT_COOKIE_EXPIRES_IN ?? '7d');
         const cookieOptions = {
-            expires: new Date(Date.now() +
-                (process.env.JWT_COOKIE_EXPIRES_IN || 7) * 24 * 60 * 60 * 1000),
             httpOnly: true,
             sameSite: 'strict',
+            expires: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+            path: '/', // để clear cookie đúng sau này
         };
-        // check run at environment proc or dev
         if (process.env.NODE_ENV === 'production')
             cookieOptions.secure = true;
-        // set refresh token vào cookie
         res.cookie('refreshToken', refreshToken, cookieOptions);
     }
-    // xóa mật khẩu khỏi output
-    user.password = undefined;
-    res.status(statusCode).json({
+    else {
+        // Nếu không rememberMe, đảm bảo xóa cookie cũ (nếu có)
+        res.clearCookie('refreshToken', { path: '/' });
+    }
+    // Trả user không bao gồm password để tránh lỗi TS và lộ thông tin
+    const userPublic = await User.findById(uid)
+        .select('-password -passwordResetToken -passwordResetExpires')
+        .lean();
+    return res.status(statusCode).json({
         status: 'success',
         token: accessToken,
         data: {
-            user,
+            user: userPublic,
         },
     });
 };
@@ -224,7 +249,7 @@ export const refreshToken = catchAsync(async (req, res, next) => {
     catch (err) {
         return next(new AppError('Invalid or expired refresh token', 401));
     }
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).select('+isActive');
     if (!user) {
         return next(new AppError('User not found', 401));
     }
@@ -232,6 +257,9 @@ export const refreshToken = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         token: accessToken,
+        data: {
+            user,
+        },
     });
 });
 //# sourceMappingURL=auth.controller.js.map
