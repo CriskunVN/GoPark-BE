@@ -2,14 +2,14 @@ export function createBookingForGuest(data: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -18,14 +18,14 @@ export function createBookingForGuest(data: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -39,14 +39,14 @@ export function createBooking(data: any): Promise<mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -55,14 +55,14 @@ export function createBooking(data: any): Promise<mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -80,11 +80,11 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
     } & {
-        userId: mongoose.Types.ObjectId;
         status: "paid" | "unpaid" | "failed";
+        userId: mongoose.Types.ObjectId;
         paymentMethod: "bank" | "cash" | "e-wallet";
-        invoiceNumber: string;
         bookingId: mongoose.Types.ObjectId;
+        invoiceNumber: string;
         amount: number;
         transactionId: string;
         paymentDate: NativeDate;
@@ -92,11 +92,11 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
     } & {
-        userId: mongoose.Types.ObjectId;
         status: "paid" | "unpaid" | "failed";
+        userId: mongoose.Types.ObjectId;
         paymentMethod: "bank" | "cash" | "e-wallet";
-        invoiceNumber: string;
         bookingId: mongoose.Types.ObjectId;
+        invoiceNumber: string;
         amount: number;
         transactionId: string;
         paymentDate: NativeDate;
@@ -114,14 +114,14 @@ export function getBookingById(id: any): Promise<mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -130,14 +130,14 @@ export function getBookingById(id: any): Promise<mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -151,14 +151,14 @@ export function cancelBooking(id: any): Promise<(mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -167,14 +167,14 @@ export function cancelBooking(id: any): Promise<(mongoose.Document<unknown, {}, 
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -188,14 +188,14 @@ export function checkInBooking(id: any): Promise<(mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -204,14 +204,14 @@ export function checkInBooking(id: any): Promise<(mongoose.Document<unknown, {},
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -225,14 +225,14 @@ export function checkOutBooking(id: any): Promise<(mongoose.Document<unknown, {}
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -241,14 +241,14 @@ export function checkOutBooking(id: any): Promise<(mongoose.Document<unknown, {}
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -262,14 +262,14 @@ export function checkOutBookingForGuest(id: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
@@ -278,14 +278,14 @@ export function checkOutBookingForGuest(id: any): Promise<mongoose.Document<unkn
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
+    status: "pending" | "confirmed" | "cancelled" | "completed";
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
-    status: "pending" | "confirmed" | "cancelled" | "completed";
     startTime: NativeDate;
     endTime: NativeDate;
     vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
-    paymentMethod: "pay-at-parking" | "prepaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month" | "guest";
     discount: number;
