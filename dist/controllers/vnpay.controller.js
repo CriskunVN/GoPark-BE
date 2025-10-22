@@ -20,10 +20,12 @@ function sortObject(obj) {
     }
     return sorted;
 }
+// Create Payment URL
 export const createPayment = catchAsync(async (req, res) => {
     process.env.TZ = 'Asia/Ho_Chi_Minh';
     const date = new Date();
     const createDate = dayjs(date).format('YYYYMMDDHHmmss');
+    // Lấy địa chỉ IP khách hàng
     const ipAddr = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
@@ -33,10 +35,11 @@ export const createPayment = catchAsync(async (req, res) => {
     const secretKey = process.env.VNP_SECRETKEY;
     const vnpUrl = process.env.VNP_URL;
     const returnUrl = process.env.VNP_RETURN_URL;
+    // Lấy thông tin hóa đơn từ cơ sở dữ liệu
     const invoice = await Invoice.findOne({
         invoiceNumber: req.params.invoiceNumber,
     });
-    const bankCode = req.body.bankCode;
+    const bankCode = ''; //req.body.bankCode;
     console.log('Invoice-Number:', invoice.invoiceNumber);
     let locale = req.body.language;
     if (!locale)
@@ -58,14 +61,20 @@ export const createPayment = catchAsync(async (req, res) => {
     vnp_Params['vnp_ExpireDate'] = dayjs(date)
         .add(15, 'minute')
         .format('YYYYMMDDHHmmss');
-    if (bankCode) {
+    if (bankCode !== null && bankCode !== '') {
         vnp_Params['vnp_BankCode'] = bankCode;
     }
+    //Để tạo chữ ký vnp_SecureHash cần sắp xếp các tham số theo thứ tự tăng dần của key
     vnp_Params = sortObject(vnp_Params);
+    //Tạo chuỗi ký từ các tham số
     const signData = qs.stringify(vnp_Params, { encode: false });
+    // Tạo chữ ký từ chuỗi ký
     const hmac = crypto.createHmac('sha512', secretKey);
+    // Ký chuỗi và chuyển sang dạng hex
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+    // Thêm tham số chữ ký vào dữ liệu trả về
     vnp_Params['vnp_SecureHash'] = signed;
+    // Tạo URL thanh toán
     const finalUrl = vnpUrl + '?' + qs.stringify(vnp_Params, { encode: false });
     // Nếu muốn redirect luôn:
     // res.redirect(finalUrl);

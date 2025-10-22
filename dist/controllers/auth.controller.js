@@ -237,6 +237,7 @@ const createSendToken = async (user, statusCode, res, rememberMe = false) => {
         },
     });
 };
+// Hàm làm mới token JWT sử dụng refresh token
 export const refreshToken = catchAsync(async (req, res, next) => {
     const token = req.cookies.refreshToken || req.body.refreshToken;
     if (!token) {

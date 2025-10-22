@@ -9,32 +9,35 @@ import ParkingSlot from '../models/parkingSlot.model.js';
 
 // Hàm validate dùng chung cho booking
 const validateBookingInput = async (data) => {
-  if (!data.userId) throw new AppError('User ID is required for booking', 400);
-  if (!data.parkingSlotId) throw new AppError('Parking slot is required', 400);
+  if (!data.userId) throw new AppError('User ID là bắt buộc', 400);
+  if (!data.parkingSlotId) throw new AppError('Chỗ đỗ là bắt buộc', 400);
   if (!data.startTime || !data.endTime)
-    throw new AppError('Start time and end time are required', 400);
+    throw new AppError('Thời gian bắt đầu và kết thúc là bắt buộc', 400);
 
   // Kiểm tra định dạng thời gian
   const startTime = new Date(data.startTime);
   const endTime = new Date(data.endTime);
   if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
-    throw new AppError('Invalid start or end time format', 400);
+    throw new AppError('Định dạng thời gian không hợp lệ', 400);
   }
   // Kiểm tra startTime và endTime có hợp lệ
   // Start time phải trước end time và cả hai phải trong tương lai
   if (startTime >= endTime)
-    throw new AppError('Start time must be before end time', 400);
+    throw new AppError('Thời gian bắt đầu phải trước thời gian kết thúc', 400);
   const now = new Date();
   if (startTime < now || endTime <= now) {
-    throw new AppError('Start time and end time must be in the future', 400);
+    throw new AppError(
+      'Thời gian bắt đầu và kết thúc phải trong tương lai',
+      400
+    );
   }
   // Kiểm tra xem user và slot có tồn tại không
   const [user, slot] = await Promise.all([
     mongoose.model('User').findById(data.userId),
     mongoose.model('ParkingSlot').findById(data.parkingSlotId),
   ]);
-  if (!user) throw new AppError('User not found', 400);
-  if (!slot) throw new AppError('Parking slot not found', 404);
+  if (!user) throw new AppError('Không tìm thấy người dùng', 400);
+  if (!slot) throw new AppError('Không tìm thấy chỗ đỗ', 404);
   // Kiểm tra trạng thái slot còn trống không
   // if (slot.status !== 'available') throw new AppError('Parking slot is not available', 400);
 
@@ -43,16 +46,16 @@ const validateBookingInput = async (data) => {
 
 // / Hàm validate dùng chung cho booking khách vãng lai
 const validateBookingGuestInput = async (data) => {
-  if (!data.userId) throw new AppError('User ID is required for booking', 400);
-  if (!data.parkingSlotId) throw new AppError('Parking slot is required', 400);
+  if (!data.userId) throw new AppError('User ID là bắt buộc', 400);
+  if (!data.parkingSlotId) throw new AppError('Chỗ đỗ là bắt buộc', 400);
 
   // Kiểm tra xem user và slot có tồn tại không
   const [user, slot] = await Promise.all([
     mongoose.model('User').findById(data.userId),
     mongoose.model('ParkingSlot').findById(data.parkingSlotId),
   ]);
-  if (!user) throw new AppError('User not found', 400);
-  if (!slot) throw new AppError('Parking slot not found', 404);
+  if (!user) throw new AppError('Không tìm thấy người dùng', 400);
+  if (!slot) throw new AppError('Không tìm thấy chỗ đỗ', 404);
   // Kiểm tra trạng thái slot còn trống không
   // if (slot.status !== 'available') throw new AppError('Parking slot is not available', 400);
 
@@ -146,7 +149,10 @@ export const createBooking = async (data) => {
     paymentMethod
   );
   if (!isAllowed)
-    throw new AppError('Payment method not allowed for this parking lot', 400);
+    throw new AppError(
+      'Phương thức thanh toán không được phép cho bãi đỗ này',
+      400
+    );
 
   await ParkingSlot.findByIdAndUpdate(data.parkingSlotId, {
     status: 'reserved',
@@ -209,7 +215,7 @@ export const handleBookingAfterCreate = async (bookingData) => {
 export const getBookingById = async (id) => {
   const booking = await Booking.findById(id).populate('userId parkingSlotId');
   if (!booking) {
-    throw new AppError('Booking not found', 404);
+    throw new AppError('Không tìm thấy booking', 404);
   }
   return booking;
 };
@@ -232,7 +238,7 @@ export const checkOutBooking = async (id) => {
 // Check out cho booking khách vãng lai
 export const checkOutBookingForGuest = async (id) => {
   const booking = await Booking.findById(id);
-  if (!booking) throw new AppError('Booking not found', 404);
+  if (!booking) throw new AppError('Không tìm thấy booking', 404);
 
   const endTime = new Date();
   const slot = await mongoose

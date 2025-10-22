@@ -28,7 +28,6 @@ export const createBookingForGuest = catchAsync(async (req, res, next) => {
 });
 export const createBookingOnline = catchAsync(async (req, res, next) => {
     try {
-        console.log("🚀 Dữ liệu nhận từ FE:", req.body);
         const bookingData = await bookingService.createBooking(req.body);
         const bookingResult = await bookingService.handleBookingAfterCreate(bookingData);
         res.status(201).json({
@@ -37,7 +36,6 @@ export const createBookingOnline = catchAsync(async (req, res, next) => {
         });
     }
     catch (err) {
-        console.error("❌ Lỗi khi tạo booking:", err);
         res.status(400).json({
             status: 'fail',
             message: err.message,
@@ -49,21 +47,21 @@ export const getAllBookings = catchAsync(async (req, res, next) => {
     const bookings = await Booking.find()
         .populate({
         path: 'userId',
-        select: 'userName email phoneNumber'
+        select: 'userName email phoneNumber',
     })
         .populate({
         path: 'parkingSlotId',
         select: 'slotNumber zone',
         populate: {
             path: 'parkingLot',
-            select: 'name address image'
-        }
+            select: 'name address image',
+        },
     })
         .sort({ createdAt: -1 });
     res.status(200).json({
         status: 'success',
         results: bookings.length,
-        data: bookings
+        data: bookings,
     });
 });
 // Lấy bookings của user hiện tại
@@ -74,14 +72,14 @@ export const getMyBookings = catchAsync(async (req, res, next) => {
         select: 'slotNumber zone',
         populate: {
             path: 'parkingLot',
-            select: 'name address image'
-        }
+            select: 'name address image',
+        },
     })
         .sort({ createdAt: -1 });
     res.status(200).json({
         status: 'success',
         results: bookings.length,
-        data: bookings
+        data: bookings,
     });
 });
 // Keep the existing factory export as backup
