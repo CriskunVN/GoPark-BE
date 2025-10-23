@@ -159,6 +159,7 @@ export const returnPayment = catchAsync(async (req, res) => {
       });
 
       return res.status(200).json({
+        status: 'success',
         RspCode: '00',
         Message: transactionStatusMessage['00'],
         data: {
@@ -172,6 +173,7 @@ export const returnPayment = catchAsync(async (req, res) => {
       });
     } else {
       return res.status(200).json({
+        status: 'fail',
         RspCode: '01',
         Message: transactionStatusMessage['01'],
       });
@@ -179,6 +181,6 @@ export const returnPayment = catchAsync(async (req, res) => {
   } else {
     return res
       .status(200)
-      .json({ RspCode: '97', Message: 'Invalid signature' });
+      .json({ status: 'fail', RspCode: '97', Message: 'Invalid signature' });
   }
 });
