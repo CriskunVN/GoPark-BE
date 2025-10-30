@@ -58,5 +58,5 @@ declare const Vehicle: mongoose.Model<{
 } & {
     __v: number;
 }>>;
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 //# sourceMappingURL=vehicles.model.d.ts.map

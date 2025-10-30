@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const vehicleSchema = new mongoose.Schema(
   {
@@ -13,12 +13,12 @@ const vehicleSchema = new mongoose.Schema(
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     imageVehicle: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   {
@@ -26,5 +26,5 @@ const vehicleSchema = new mongoose.Schema(
   }
 );
 
-const Vehicle = mongoose.model("Vehicle", vehicleSchema);
+const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 export default Vehicle;

@@ -2,6 +2,7 @@ import Booking from '../models/booking.model.js';
 import AppError from '../utils/appError.js';
 import Ticket from '../models/ticket.models.js';
 import * as InvoiceService from './invoice.service.js';
+import * as fee from './fee.service.js';
 import { isPaymentMethodAllowed } from './paymentOption.service.js';
 import mongoose from 'mongoose';
 import ParkingSlot from '../models/parkingSlot.model.js';
@@ -67,32 +68,6 @@ const isSlotBooked = async (slotId, newStartTime, newEndTime) => {
         $or: [{ startTime: { $lt: newEndTime }, endTime: { $gt: newStartTime } }],
     });
 };
-// Tính tiền và áp dụng giảm giá cho booking
-const calculateTotalPrice = (data, slot) => {
-    let price = 0;
-    let discountPercent = 0;
-    const startTime = new Date(data.startTime);
-    const endTime = new Date(data.endTime);
-    if (data.bookingType === 'hours' || data.bookingType === 'guest') {
-        const hours = Math.ceil((endTime - startTime) / (1000 * 60 * 60));
-        price = slot.pricePerHour * hours;
-    }
-    else if (data.bookingType === 'date') {
-        const days = Math.ceil((endTime - startTime) / (1000 * 60 * 60 * 24));
-        price = slot.pricePerHour * days;
-    }
-    else if (data.bookingType === 'month') {
-        price = slot.pricePerHour * 30;
-        discountPercent = 10; // Giảm 10% cho tháng
-    }
-    else if (data.bookingType === 'year') {
-        price = slot.pricePerHour * 365;
-        discountPercent = 20; // Giảm 20% cho năm
-    }
-    // Áp dụng giảm giá
-    price = price * (1 - discountPercent / 100);
-    return { price, discountPercent };
-};
 // Tạo booking cho khách vãng lai
 export const createBookingForGuest = async (data) => {
     const startTime = new Date(); // Thời gian bắt đầu là hiện tại
@@ -117,9 +92,9 @@ export const createBookingForGuest = async (data) => {
         endTime: endTime,
         paymentMethod,
         paymentStatus: 'unpaid',
-        status: 'pending',
+        status: 'check-in',
         vehicleNumber: data.vehicleNumber || '',
-        bookingType: 'guest', // Loại booking cho khách vãng lai
+        bookingType: 'hours', // Loại booking cho khách vãng lai
         discount: 0, // Không có giảm giá cho khách vãng lai
         totalPrice: 0, // Không có giá cho khách vãng lai
     });
@@ -141,7 +116,7 @@ export const createBooking = async (data) => {
         status: 'reserved',
     });
     // Tính toán giá cho booking tháng và năm
-    const { price, discountPercent } = calculateTotalPrice(data, slot);
+    const { price, discountPercent } = fee.calculateTotalPrice(data, slot);
     // Tạo booking
     const booking = await Booking.create({
         userId: data.userId,
@@ -201,11 +176,45 @@ export const cancelBooking = async (id) => {
 };
 // Check-in
 export const checkInBooking = async (id) => {
-    return Booking.findByIdAndUpdate(id, { status: 'confirmed' }, { new: true });
+    return Booking.findByIdAndUpdate(id, { status: 'check-in' }, { new: true });
 };
 // Check-out
 export const checkOutBooking = async (id) => {
-    return Booking.findByIdAndUpdate(id, { status: 'completed' }, { new: true });
+    // Lấy booking
+    const booking = await Booking.findById(id);
+    if (!booking)
+        throw new AppError('Không tìm thấy booking', 404);
+    // check nếu booking đã quá hạn
+    if (booking.status === 'overdue') {
+        // Tính phí phát sinh
+        const now = new Date();
+        // Thời gian kết thúc với 15 phút
+        const endTimeWithGrace = new Date(booking.endTime).getTime() + 15 * 60 * 1000;
+        // Tính số phút quá hạn
+        const overtimeMinutes = Math.ceil((now.getTime() - endTimeWithGrace) / 60000);
+        const overtimeFee = fee.calculateOverdueFee(overtimeMinutes);
+        // Cập nhật booking
+        booking.overDueInfo = {
+            overDueStart: endTimeWithGrace,
+            overDueEnd: now,
+            overDueMinutes: overtimeMinutes,
+            overDueFee: overtimeFee,
+        };
+        await booking.save();
+        // TODO : Lưu lịch sử vào ParkingHistory
+        // await ParkingHistory.create({
+        //   bookingId: booking._id,
+        //   slotId: booking.parkingSlotId,
+        //   userId: booking.userId,
+        //   ownerId: slot.ownerId,
+        //   type: 'checkout',
+        //   timestamp: now,
+        //   durationMinutes: overtimeMinutes,
+        //   fee: booking.totalAmount,
+        //   method: 'manual',
+        // });
+    }
+    return booking;
 };
 // Check out cho booking khách vãng lai
 export const checkOutBookingForGuest = async (id) => {

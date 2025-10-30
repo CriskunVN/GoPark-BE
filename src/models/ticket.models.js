@@ -41,7 +41,7 @@ const ticketSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ['paid', 'unpaid'],
+      enum: [],
       default: 'unpaid', // Trạng thái thanh toán mặc định là 'unpaid'
     },
   },

@@ -7,7 +7,7 @@ declare const Ticket: mongoose.Model<{
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
+    paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
@@ -22,7 +22,7 @@ declare const Ticket: mongoose.Model<{
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
+    paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
@@ -37,7 +37,7 @@ declare const Ticket: mongoose.Model<{
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
+    paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
@@ -58,7 +58,7 @@ declare const Ticket: mongoose.Model<{
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
+    paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
@@ -73,7 +73,7 @@ declare const Ticket: mongoose.Model<{
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
+    paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
@@ -88,7 +88,7 @@ declare const Ticket: mongoose.Model<{
     userId: mongoose.Types.ObjectId;
     parkingSlotId: mongoose.Types.ObjectId;
     vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
+    paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;

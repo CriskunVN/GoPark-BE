@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 const vehicleSchema = new mongoose.Schema({
     licensePlate: {
         type: String,
@@ -11,16 +11,16 @@ const vehicleSchema = new mongoose.Schema({
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
         required: true,
     },
     imageVehicle: {
         type: String,
-        default: "",
+        default: '',
     },
 }, {
     timestamps: true,
 });
-const Vehicle = mongoose.model("Vehicle", vehicleSchema);
+const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 export default Vehicle;
 //# sourceMappingURL=vehicles.model.js.map

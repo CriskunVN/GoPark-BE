@@ -134,7 +134,11 @@ export const checkinBooking = catchAsync(async (bookingId) => {
 // checkout booking
 export const checkoutBooking = catchAsync(async (bookingId) => {
   const booking = await bookingService.checkOutBooking(bookingId);
-  return booking;
+
+  return res.status(200).json({
+    status: 'success',
+    data: { booking },
+  });
 });
 
 // Cập nhật thông tin một booking
@@ -168,41 +172,3 @@ export const payAtParking = catchAsync(async (req, res, next) => {
     data: { booking },
   });
 });
-
-// // Callback sau khi thanh toán thành công
-// export const paymentCallback = catchAsync(async (req, res, next) => {
-//   const booking = await bookingService.getBookingById(req.params.id);
-//   if (!booking) throw new AppError('Booking not found', 404);
-
-//   // Cập nhật trạng thái thanh toán
-//   booking.paymentStatus = 'paid';
-//   await booking.save();
-
-//   // Nếu là thanh toán trước (prepaid), sinh ticket sau khi thanh toán
-//   if (
-//     booking.paymentMethod === 'prepaid' ||
-//     booking.paymentMethod === 'pay-at-parking'
-//   ) {
-//     const ticket = await createTicket({
-//       bookingId: booking._id,
-//       userId: booking.userId,
-//       parkingSlotId: booking.parkingSlotId,
-//       vehicleNumber: booking.vehicleNumber,
-//       ticketType: booking.bookingType,
-//       startTime: booking.startTime,
-//       expiryDate: booking.endTime,
-//       paymentStatus: booking.paymentStatus,
-//     });
-
-//     return res.status(200).json({
-//       status: 'success',
-//       data: { booking, ticket },
-//     });
-//   }
-
-//   // Nếu không cần sinh ticket, chỉ trả về booking
-//   res.status(200).json({
-//     status: 'success',
-//     data: { booking },
-//   });
-// });

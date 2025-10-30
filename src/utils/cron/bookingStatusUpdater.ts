@@ -3,7 +3,7 @@ import Booking from '../../models/booking.model.js';
 import ParkingSlot from '../../models/parkingSlot.model.js';
 
 // CRON
-cron.schedule('*/60 * * * *', async () => {
+cron.schedule('*/2 * * * *', async () => {
   try {
     console.log('[CRON] Running booking status update...');
     const result = await updateSlotStatusToBooked();
@@ -21,13 +21,17 @@ cron.schedule('*/60 * * * *', async () => {
 const updateSlotStatusToBooked = async () => {
   const now = new Date();
   // Tìm các booking có startTime <= hiện tại và status là 'pending'
-  const bookings = await Booking.find({
-    status: { $in: ['pending', 'confirmed'] },
+  const checkinBookings = await Booking.find({
+    status: { $in: ['pending'] },
     startTime: { $lte: now },
   });
 
   let updatedCount = 0;
-  for (const booking of bookings) {
+  for (const booking of checkinBookings) {
+    // Cập nhật status của booking thành 'checked-in'
+    booking.status = 'confirmed';
+    await booking.save();
+
     // Cập nhật status của slot thành 'booked'
     // Nếu parkingSlotId là mảng, lặp qua từng slot
     const slotIds = Array.isArray(booking.parkingSlotId)
@@ -39,8 +43,6 @@ const updateSlotStatusToBooked = async () => {
       });
       if (res) updatedCount++;
     }
-    // Có thể cập nhật luôn status của booking nếu muốn
-    // await Booking.findByIdAndUpdate(booking._id, { status: 'booked' });
   }
   return { updatedCount };
 };

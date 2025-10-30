@@ -3,17 +3,18 @@ import Booking from '../../models/booking.model.js';
 import ParkingSlot from '../../models/parkingSlot.model.js';
 import Ticket from '../../models/ticket.models.js';
 // Chạy mỗi 2 phút
-cron.schedule('*/60 * * * *', async () => {
+cron.schedule('*/2 * * * *', async () => {
     const now = new Date();
-    // Tìm các booking đã hết hạn (endTime < hiện tại) và chưa cancelled
-    const expiredBookings = await Booking.find({
-        endTime: { $lt: now },
-        status: { $nin: ['completed', 'cancelled'] },
+    const timeExp = 15 * 60 * 1000; // Lấy thời gian hiện tại trừ đi 15 phút
+    // Tìm các booking đã hết hạn (endTime + 15p < hiện tại) và có trạng thái 'check-in'
+    const overDueBookings = await Booking.find({
+        endTime: { $lte: now.getTime() - timeExp },
+        status: { $in: ['check-in'] },
     });
     let cleanedCount = 0;
-    for (const booking of expiredBookings) {
-        // Cập nhật trạng thái booking thành completed
-        await Booking.findByIdAndUpdate(booking._id, { status: 'completed' });
+    for (const booking of overDueBookings) {
+        // Cập nhật trạng thái booking thành over-due
+        await Booking.findByIdAndUpdate(booking._id, { status: 'over-due' });
         // Cập nhật trạng thái slot thành 'Trống'
         const slotId = booking.parkingSlotId;
         await ParkingSlot.findByIdAndUpdate(slotId, { status: 'available' });

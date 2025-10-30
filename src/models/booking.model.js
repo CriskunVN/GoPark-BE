@@ -14,7 +14,14 @@ const bookingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'cancelled', 'completed'],
+      enum: [
+        'pending',
+        'confirmed',
+        'cancelled',
+        'completed',
+        'checked-in',
+        'over-due',
+      ],
       default: 'pending',
     },
     startTime: {
@@ -47,8 +54,8 @@ const bookingSchema = new mongoose.Schema(
     },
     bookingType: {
       type: String,
-      enum: ['date', 'hours', 'month', 'guest'], // Loại booking, có thể là theo ngày hoặc theo giờ
-      default: 'guest', // Mặc định là booking theo ngày
+      enum: ['date', 'hours', 'month'], // Loại booking, có thể là theo ngày hoặc theo giờ
+      default: 'hours', // Mặc định là booking theo giờ
     },
     discount: {
       type: Number,
@@ -58,6 +65,12 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: true, // Tổng giá là bắt buộc
       default: 0, // Mặc định là 0 nếu không có giá trị
+    },
+    overDueInfo: {
+      overDueStart: Date,
+      overDueEnd: Date,
+      overDueMinutes: Number,
+      overDueFee: Number,
     },
   },
   { timestamps: true }
