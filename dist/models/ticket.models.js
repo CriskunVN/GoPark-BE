@@ -28,8 +28,8 @@ const ticketSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'active', 'used', 'cancelled', 'expired'],
-        default: 'pending', // Trạng thái mặc định là 'active'
+        enum: ['active', 'used', 'cancelled'],
+        default: 'active', // Trạng thái mặc định là 'active'
     },
     checkInTime: Date,
     checkoutTime: Date,

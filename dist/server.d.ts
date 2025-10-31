@@ -1,4 +1,4 @@
 import './workers/passwordReset.worker.js';
 import './utils/cron/bookingStatusUpdater.js';
-import './utils/cron/parkingSlotCleaner.js';
+import './utils/cron/overDueBookings.js';
 //# sourceMappingURL=server.d.ts.map

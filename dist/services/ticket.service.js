@@ -1,44 +1,61 @@
 import Ticket from '../models/ticket.models.js';
 import AppError from '../utils/appError.js';
-import * as bookingService from './booking.service.js';
-export const checkInTicket = async (ticketId) => {
-    const ticket = await Ticket.findById(ticketId);
-    if (!ticket)
-        throw new AppError('Ticket not found', 404);
-    // nếu vé đặt theo giờ hoặc ngày thì checkin để cập nhật status vé vì
-    if (ticket.ticketType === 'guest') {
-        if (ticket.status !== 'pending')
-            throw new AppError('Ticket has already been checked in', 400);
+import Booking from '../models/booking.model.js';
+import * as fee from '../services/fee.service.js';
+import * as bookingService from '../services/booking.service.js';
+// Check-in
+export const checkInBooking = async (id) => {
+    // Lấy booking và cập nhật trạng thái
+    const booking = await Booking.findByIdAndUpdate(id, { status: 'check-in' }, { new: true });
+    if (!booking)
+        throw new AppError('Không tìm thấy booking', 404);
+    if (booking.paymentStatus !== 'paid') {
+        throw new AppError('Yêu cầu thanh toán trước khi check-in', 400);
     }
-    ticket.status = 'active'; // hoặc 'checked-in'
-    ticket.checkInTime = new Date(); // nếu có trường này
-    // lưu vào db lịch sử  checkin => làm sau
-    await ticket.save();
-    await bookingService.checkInBooking(ticket.bookingId); // Cập nhật trạng thái booking nếu cần
-    return ticket;
+    // Cập nhật ticket checkinTime
+    await Ticket.findOneAndUpdate({ bookingId: booking._id }, { checkInTime: new Date() }, { new: true });
+    return booking;
 };
-export const checkOutTicket = async (ticketId) => {
-    const ticket = await Ticket.findById(ticketId);
-    if (!ticket)
-        throw new AppError('Ticket not found', 404);
-    // Kiểm tra checkout vé khách vãng lai
-    if (ticket.ticketType === 'guest') {
-        if (ticket.status !== 'active') {
-            if (ticket.status !== 'pending') {
-                throw new AppError('Ticket has already been checked out', 400);
-            }
-            throw new AppError('Ticket is not active', 400);
-        }
-        // Cập nhật trạng thái vé khách vãng lai
-        ticket.status = 'used'; // hoặc 'checked-out'
-        // Cập nhật trạng thái booking cho khách vàng lai vì khách
-        await bookingService.checkOutBookingForGuest(ticket.bookingId);
+// Check-out
+export const checkOutBooking = async (id) => {
+    const booking = await bookingService.getBookingById(id);
+    if (!booking)
+        throw new AppError('Không tìm thấy booking', 404);
+    // check nếu booking đã quá hạn
+    if (booking.status === 'over-due') {
+        // Tính phí phát sinh
+        const now = new Date();
+        // Thời gian kết thúc với 15 phút
+        const endTimeWithGrace = new Date(booking.endTime).getTime() + 15 * 60 * 1000;
+        // Tính số phút quá hạn
+        const overtimeMinutes = Math.ceil((now.getTime() - endTimeWithGrace) / 60000);
+        const overtimeFee = fee.calculateOverdueFee(overtimeMinutes);
+        // Cập nhật booking
+        booking.overDueInfo = {
+            overDueStart: endTimeWithGrace,
+            overDueEnd: now,
+            overDueMinutes: overtimeMinutes,
+            overDueFee: overtimeFee,
+        };
+        await booking.save();
+        // Cập nhật ticket checkinTime
+        await Ticket.findOneAndUpdate({ bookingId: booking._id }, {
+            checkoutTime: now,
+        }, { new: true });
+        // TODO : Lưu lịch sử vào ParkingHistory
+        // await ParkingHistory.create({
+        //   bookingId: booking._id,
+        //   slotId: booking.parkingSlotId,
+        //   userId: booking.userId,
+        //   ownerId: slot.ownerId,
+        //   type: 'checkout',
+        //   timestamp: now,
+        //   durationMinutes: overtimeMinutes,
+        //   fee: booking.totalAmount,
+        //   method: 'manual',
+        // });
     }
-    // Cập nhật trạng thái vé và thời gian checkout
-    ticket.checkoutTime = new Date(); // nếu có trường này
-    await ticket.save();
-    // lưu vào db lịch sử checkout => làm sau
-    return ticket;
+    return booking;
 };
 export const createTicket = async (ticketData) => {
     const ticket = await Ticket.create(ticketData);

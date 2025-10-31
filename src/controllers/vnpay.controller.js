@@ -114,8 +114,11 @@ const transactionStatusMessage = {
 };
 
 export const returnPayment = catchAsync(async (req, res) => {
+  // Lấy toàn bộ tham số trả về từ VNPAY
   const vnpParams = { ...req.query };
+  // Lấy giá trị tham số chữ ký
   const secureHash = vnpParams.vnp_SecureHash;
+  // Xóa tham số chữ ký ra khỏi mảng tham số
   delete vnpParams.vnp_SecureHash;
   delete vnpParams.vnp_SecureHashType;
 
@@ -147,7 +150,7 @@ export const returnPayment = catchAsync(async (req, res) => {
         await booking.save();
       }
       // sinh vé
-      await ticketService.createTicket({
+      const ticket = await ticketService.createTicket({
         bookingId: booking._id,
         userId: booking.userId,
         parkingSlotId: booking.parkingSlotId,
@@ -163,6 +166,7 @@ export const returnPayment = catchAsync(async (req, res) => {
         RspCode: '00',
         Message: transactionStatusMessage['00'],
         data: {
+          ticket: ticket,
           invoiceId: invoice._id,
           amount: invoice.amount,
           paymentDate: invoice.paymentDate,

@@ -13,7 +13,7 @@ import './workers/passwordReset.worker.js'; // chạy worker cùng process
 // Cron job: Cập nhật trạng thái booking (checkin)
 import './utils/cron/bookingStatusUpdater.js';
 // Cron job: Dọn dẹp slot đỗ xe (các slot đã hết hạn)
-import './utils/cron/parkingSlotCleaner.js';
+import './utils/cron/overDueBookings.js';
 import AppError from './utils/appError.js';
 let server;
 // Xử  lý các lỗi không được bắt (uncaught exceptions)

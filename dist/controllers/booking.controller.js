@@ -4,6 +4,7 @@ import Booking from '../models/booking.model.js';
 import * as Factory from './handlerFactory.controller.js';
 import * as ticketService from '../services/ticket.service.js';
 import * as invoiceService from '../services/invoice.service.js';
+import Ticket from '../models/ticket.models.js';
 // Tạo booking cho khách vãng lai
 export const createBookingForGuest = catchAsync(async (req, res, next) => {
     const bookingData = await bookingService.createBookingForGuest(req.body);
@@ -102,23 +103,6 @@ export const cancelBooking = catchAsync(async (req, res, next) => {
         data: {
             booking,
         },
-    });
-});
-// checkin booking
-export const checkinBooking = catchAsync(async (bookingId) => {
-    const booking = await bookingService.getBookingById(bookingId);
-    if (booking.paymentStatus !== 'paid') {
-        throw new AppError('Payment required before check-in', 400);
-    }
-    const updateBooking = await bookingService.checkInBooking(bookingId);
-    return updateBooking;
-});
-// checkout booking
-export const checkoutBooking = catchAsync(async (bookingId) => {
-    const booking = await bookingService.checkOutBooking(bookingId);
-    return res.status(200).json({
-        status: 'success',
-        data: { booking },
     });
 });
 // Cập nhật thông tin một booking

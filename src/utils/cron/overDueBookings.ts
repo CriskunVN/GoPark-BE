@@ -28,7 +28,7 @@ cron.schedule('*/2 * * * *', async () => {
     await Ticket.updateOne(
       {
         bookingId: booking._id,
-        $or: [{ status: 'active' }, { status: 'pending' }],
+        status: { $in: ['active'] },
       },
       { status: 'used' }
     );

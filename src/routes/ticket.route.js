@@ -3,13 +3,10 @@ import express from 'express';
 
 const router = express.Router();
 
-// ...existing code...
-
 // Checkin ticket (POST /tickets/:id/checkin)
-router.route('/:ticketId/checkin').post(ticketController.checkinTicket);
+router.route('/:ticketId/checkin').post(ticketController.checkin);
 
 // Checkout ticket (POST /tickets/:id/checkout)
-router.route('/:ticketId/checkout').post(ticketController.checkoutTicket);
+router.route('/:ticketId/checkout').post(ticketController.checkout);
 
-// ...existing code...
 export default router;

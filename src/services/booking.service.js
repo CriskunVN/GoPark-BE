@@ -200,57 +200,6 @@ export const cancelBooking = async (id) => {
   return Booking.findByIdAndUpdate(id, { status: 'cancelled' }, { new: true });
 };
 
-// Check-in
-export const checkInBooking = async (id) => {
-  return Booking.findByIdAndUpdate(id, { status: 'check-in' }, { new: true });
-};
-
-// Check-out
-export const checkOutBooking = async (id) => {
-  // Lấy booking
-  const booking = await Booking.findById(id);
-
-  if (!booking) throw new AppError('Không tìm thấy booking', 404);
-
-  // check nếu booking đã quá hạn
-  if (booking.status === 'overdue') {
-    // Tính phí phát sinh
-    const now = new Date();
-    // Thời gian kết thúc với 15 phút
-    const endTimeWithGrace =
-      new Date(booking.endTime).getTime() + 15 * 60 * 1000;
-    // Tính số phút quá hạn
-    const overtimeMinutes = Math.ceil(
-      (now.getTime() - endTimeWithGrace) / 60000
-    );
-    const overtimeFee = fee.calculateOverdueFee(overtimeMinutes);
-
-    // Cập nhật booking
-    booking.overDueInfo = {
-      overDueStart: endTimeWithGrace,
-      overDueEnd: now,
-      overDueMinutes: overtimeMinutes,
-      overDueFee: overtimeFee,
-    };
-
-    await booking.save();
-
-    // TODO : Lưu lịch sử vào ParkingHistory
-    // await ParkingHistory.create({
-    //   bookingId: booking._id,
-    //   slotId: booking.parkingSlotId,
-    //   userId: booking.userId,
-    //   ownerId: slot.ownerId,
-    //   type: 'checkout',
-    //   timestamp: now,
-    //   durationMinutes: overtimeMinutes,
-    //   fee: booking.totalAmount,
-    //   method: 'manual',
-    // });
-  }
-  return booking;
-};
-
 // Check out cho booking khách vãng lai
 export const checkOutBookingForGuest = async (id) => {
   const booking = await Booking.findById(id);

@@ -39,27 +39,27 @@ export const getTicketsByUserId = catchAsync(async (userId) => {
   return await Ticket.find({ userId });
 });
 
-// Checkin ticket
-export const checkinTicket = catchAsync(async (req, res, next) => {
+// checkin booking
+export const checkin = catchAsync(async (req, res, next) => {
   const { ticketId } = req.params;
-  const ticket = await ticketService.checkInTicket(ticketId);
-  // console.log('Ticket checked in:', ticket);
-  res.status(200).json({
+  const ticket = await Ticket.findById(ticketId);
+
+  const updateBooking = await ticketService.checkInBooking(ticket.bookingId);
+
+  return res.status(200).json({
     status: 'success',
-    data: {
-      ticket,
-    },
+    data: { booking: updateBooking },
   });
 });
 
-// Checkout ticket
-export const checkoutTicket = catchAsync(async (req, res, next) => {
+// checkout booking
+export const checkout = catchAsync(async (req, res, next) => {
   const { ticketId } = req.params;
-  const ticket = await ticketService.checkOutTicket(ticketId);
-  res.status(200).json({
+  const ticket = await Ticket.findById(ticketId);
+  const updateBooking = await ticketService.checkOutBooking(ticket.bookingId);
+
+  return res.status(200).json({
     status: 'success',
-    data: {
-      ticket,
-    },
+    data: { booking: updateBooking },
   });
 });
