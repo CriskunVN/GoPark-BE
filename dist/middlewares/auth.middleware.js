@@ -21,7 +21,7 @@ export const protect = catchAsync(async (req, res, next) => {
     const decoded = await new Promise((resolve, reject) => {
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err)
-                return reject(new AppError('Token không hợp lệ hoặc đã hết hạn', 401));
+                return reject(new AppError('Token không hợp lệ hoặc đã hết hạn', 403));
             resolve(decoded);
         });
     });

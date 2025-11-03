@@ -3,13 +3,12 @@ const bookingSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
     },
     parkingSlotId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ParkingSlot',
-        required: true,
     },
+    // Trạng thái booking
     status: {
         type: String,
         enum: [
@@ -22,6 +21,7 @@ const bookingSchema = new mongoose.Schema({
         ],
         default: 'pending',
     },
+    // Thời gian bắt đầu và kết thúc của booking
     startTime: {
         type: Date,
         default: Date.now(), // Mặc định là thời gian hiện tại nếu không được cung cấp
@@ -31,10 +31,15 @@ const bookingSchema = new mongoose.Schema({
         type: Date,
         required: true, // Ngày kết thúc là bắt buộc
     },
-    vehicleNumber: {
-        type: String,
-        required: true, // Số xe là bắt buộc
-        trim: true, // Loại bỏ khoảng trắng thừa
+    // Thông tin xe
+    vehicleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vehicle',
+    },
+    // thông tin snapshot của xe tại thời điểm booking
+    vehicleSnapshot: {
+        number: { type: String, trim: true, uppercase: true },
+        image: { type: String, default: null },
     },
     paymentStatus: {
         type: String,

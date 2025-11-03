@@ -11,9 +11,8 @@ const ticketSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    parkingSlotId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ParkingSlot',
+    slotNumber: {
+        type: String,
         required: true,
     },
     vehicleNumber: {
@@ -52,7 +51,7 @@ ticketSchema.pre('save', async function (next) {
             ticketId: this._id,
             bookingId: this.bookingId,
             userId: this.userId,
-            parkingSlotId: this.parkingSlotId,
+            slotNumber: this.slotNumber,
             vehicleNumber: this.vehicleNumber,
             startTime: this.startTime,
             status: this.status,
@@ -64,6 +63,12 @@ ticketSchema.pre('save', async function (next) {
     }
     next();
 });
+// Đảm bảo mỗi bookingId chỉ có một ticket duy nhất
+ticketSchema.index({ bookingId: 1 }, { unique: true });
+// Tạo index để tối ưu truy vấn theo userId
+ticketSchema.index({ userId: 1 });
+// Đảm bảo mã QR code là duy nhất nếu nó tồn tại
+ticketSchema.index({ qrCode: 1 }, { unique: true, partialFilterExpression: { qrCode: { $type: 'string' } } });
 const Ticket = mongoose.model('Ticket', ticketSchema);
 export default Ticket;
 //# sourceMappingURL=ticket.models.js.map

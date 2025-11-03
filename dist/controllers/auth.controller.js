@@ -3,28 +3,12 @@ import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { REFRESH_TOKEN_EXPIRES_DAYS } from '../types/typeToken.js';
 import { addPasswordResetJob, addVerifyEmailJob, } from '../queues/passwordReset.queue.js';
 import { limitResetRequest } from '../utils/rateLimit.js';
-// Hàm tạo token JWT
-// Hàm này sẽ tạo một token JWT với id người dùng và bí mật từ biến môi trường
-// Token sẽ hết hạn sau thời gian được định nghĩa trong biến môi trường JWT_EXPIRES_IN
-const signAccessToken = (id) => {
-    const expiresIn = '15m';
-    if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET environment variable is not set');
-    }
-    return jwt.sign({ id: id }, process.env.JWT_SECRET, {
-        expiresIn: '15m',
-    });
-};
-const signRefreshToken = (id) => {
-    if (!process.env.JWT_REFRESH_SECRET) {
-        throw new Error('JWT_REFRESH_SECRET environment variable is not set');
-    }
-    return jwt.sign({ id: id }, process.env.JWT_REFRESH_SECRET, {
-        expiresIn: '7d',
-    });
-};
+// import utils tạo access token và refresh token
+import * as createToken from '../utils/createToken.js';
+import Session from '../models/session.model.js';
 // Hàm đăng ký người dùng mới
 export const signup = catchAsync(async (req, res, next) => {
     const { userName, email, password, passwordConfirm, profilePicture, phoneNumber, } = req.body;
@@ -56,7 +40,11 @@ export const signup = catchAsync(async (req, res, next) => {
         // Gửi email xác nhận
         await addVerifyEmailJob(user.email, verifyToken);
         // Tạo token và set cookie
-        createSendToken(user, 201, res);
+        // createSendToken(user, 201, res);
+        res.status(201).json({
+            status: 'success',
+            message: 'Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.',
+        });
     }
     catch (err) {
         // Custom lại message cho lỗi passwordConfirm
@@ -103,8 +91,33 @@ export const login = catchAsync(async (req, res, next) => {
     if (!user || !(await user.correctPassword(password, user.password))) {
         return next(new AppError('Email hoặc mật khẩu không đúng', 401));
     }
-    // send token to client
-    createSendToken(user, 200, res, req.body.rememberMe);
+    if (!user.isActive) {
+        return next(new AppError('Vui lòng xác nhận email trước khi đăng nhập', 401));
+    }
+    // tạo token và gửi về cho client
+    const { accessToken, refreshToken } = createToken.createTokens(user._id);
+    // lưu refresh token vào cơ sở dữ liệu
+    await Session.create({
+        userId: user._id,
+        refreshToken: refreshToken,
+        expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRES_DAYS),
+    });
+    // Cập nhật refresh token trong cookie
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true, // chống XSS
+        secure: true,
+        sameSite: 'strict', // Chỉ gửi cookie trong cùng một trang web
+        maxAge: REFRESH_TOKEN_EXPIRES_DAYS, // 30 days
+    });
+    // Trả về access token và thông tin người dùng (không bao gồm mật khẩu)
+    user.password = undefined;
+    res.status(200).json({
+        status: 'success',
+        token: accessToken,
+        data: {
+            user,
+        },
+    });
 });
 // Hàm này đươc sử dụng để lấy lại mật khẩu của người dùng
 // Nó sẽ gửi một email chứa token để người dùng có thể đặt lại mật khẩu của mình
@@ -171,8 +184,15 @@ export const resetPassword = catchAsync(async (req, res, next) => {
         await user.save();
         // 3. cập nhật thời gian thay đổi mật khẩu
         // pre save middleware trong mô hình người dùng sẽ tự động cập nhật thời gian thay đổi mật khẩu
-        // 4. Log the user in, send JWT
-        createSendToken(user, 200, res);
+        // 4. Log the user in
+        user.password = undefined;
+        res.status(200).json({
+            status: 'success',
+            message: 'Mật khẩu đã được đặt lại. Vui lòng đăng nhập lại.',
+            data: {
+                user,
+            },
+        });
     }
     catch (err) {
         {
@@ -201,66 +221,42 @@ export const updatePassword = catchAsync(async (req, res, next) => {
     user.password = req.body.password;
     user.passwordConfirm = req.body.passwordConfirm;
     await user.save();
+    user.password = undefined;
     // 3. Log user in, send JWT
-    createSendToken(user, 200, res);
-});
-// function để tạo và gửi token JWT cho client
-const createSendToken = async (user, statusCode, res, rememberMe = false) => {
-    const uid = typeof user._id === 'string' ? user._id : user._id;
-    const accessToken = signAccessToken(uid);
-    const refreshToken = signRefreshToken(uid);
-    if (rememberMe === true) {
-        const days = Number(process.env.JWT_COOKIE_EXPIRES_IN ?? '7d');
-        const cookieOptions = {
-            httpOnly: true,
-            sameSite: 'strict',
-            expires: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
-            path: '/', // để clear cookie đúng sau này
-        };
-        if (process.env.NODE_ENV === 'production')
-            cookieOptions.secure = true;
-        res.cookie('refreshToken', refreshToken, cookieOptions);
-    }
-    else {
-        // Nếu không rememberMe, đảm bảo xóa cookie cũ (nếu có)
-        res.clearCookie('refreshToken', { path: '/' });
-    }
-    // Trả user không bao gồm password để tránh lỗi TS và lộ thông tin
-    const userPublic = await User.findById(uid)
-        .select('-password -passwordResetToken -passwordResetExpires')
-        .lean();
-    return res.status(statusCode).json({
-        status: 'success',
-        token: accessToken,
-        data: {
-            user: userPublic,
-        },
-    });
-};
-// Hàm làm mới token JWT sử dụng refresh token
-export const refreshToken = catchAsync(async (req, res, next) => {
-    const token = req.cookies.refreshToken || req.body.refreshToken;
-    if (!token) {
-        return next(new AppError('No refresh token provided', 401));
-    }
-    let decoded;
-    try {
-        decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    }
-    catch (err) {
-        return next(new AppError('Invalid or expired refresh token', 401));
-    }
-    const user = await User.findById(decoded.id).select('+isActive');
-    if (!user) {
-        return next(new AppError('User not found', 401));
-    }
-    const accessToken = signAccessToken(user._id);
+    // tạo token
+    const accessToken = createToken.createToken(String(user._id));
     res.status(200).json({
         status: 'success',
+        message: 'Mật khẩu đã được cập nhật thành công',
         token: accessToken,
-        data: {
-            user,
-        },
+    });
+});
+export const refreshToken = catchAsync(async (req, res, next) => {
+    // Lấy refresh token từ cookie
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+        return next(new AppError('Refresh token not provided', 403));
+    }
+    // Kiểm tra refresh token trong database
+    const session = await Session.findOne({ refreshToken });
+    if (!session) {
+        return next(new AppError('Invalid refresh token or expired', 403));
+    }
+    // kiểm tra hết hạn chưa
+    const expiresAt = session.expiresAt;
+    if (!expiresAt || expiresAt < new Date()) {
+        return next(new AppError('Refresh token expired', 403));
+    }
+    // Tạo access token mới - lấy userId từ session
+    const userId = session.userId;
+    if (!userId) {
+        return next(new AppError('Associated user not found for session', 403));
+    }
+    const accessToken = createToken.createToken(String(userId));
+    res.status(200).json({
+        status: 'success',
+        message: 'Tạo mới AccessToken thành công',
+        token: accessToken,
     });
 });
 //# sourceMappingURL=auth.controller.js.map

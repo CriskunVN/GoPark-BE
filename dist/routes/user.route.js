@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
-router.post('/refresh-token', refreshToken);
+router.post('/refresh', refreshToken);
 router.patch('/resetPassword/:token', resetPassword);
 router.patch('/verify-email/:token', verifyEmail);
 // Middleware: bảo vệ các route dưới

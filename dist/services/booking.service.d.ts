@@ -1,68 +1,83 @@
-export function createBookingForGuest(data: any): Promise<mongoose.Document<unknown, {}, {
-    createdAt: NativeDate;
-    updatedAt: NativeDate;
-} & {
-    status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    startTime: NativeDate;
-    endTime: NativeDate;
-    vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
-    paymentMethod: "prepaid" | "pay-at-parking";
-    bookingDate: NativeDate;
-    bookingType: "date" | "hours" | "month";
-    discount: number;
-    totalPrice: number;
-    overDueInfo?: {
-        overDueStart?: NativeDate | null;
-        overDueEnd?: NativeDate | null;
-        overDueMinutes?: number | null;
-        overDueFee?: number | null;
-    } | null;
-}, {}> & {
-    createdAt: NativeDate;
-    updatedAt: NativeDate;
-} & {
-    status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    startTime: NativeDate;
-    endTime: NativeDate;
-    vehicleNumber: string;
-    paymentStatus: "paid" | "unpaid";
-    paymentMethod: "prepaid" | "pay-at-parking";
-    bookingDate: NativeDate;
-    bookingType: "date" | "hours" | "month";
-    discount: number;
-    totalPrice: number;
-    overDueInfo?: {
-        overDueStart?: NativeDate | null;
-        overDueEnd?: NativeDate | null;
-        overDueMinutes?: number | null;
-        overDueFee?: number | null;
-    } | null;
-} & {
-    _id: mongoose.Types.ObjectId;
-} & {
-    __v: number;
+export function createBookingForGuest(data: any): Promise<{
+    booking: mongoose.Document<unknown, {}, {
+        createdAt: NativeDate;
+        updatedAt: NativeDate;
+    } & {
+        status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
+        startTime: NativeDate;
+        endTime: NativeDate;
+        paymentStatus: "paid" | "unpaid";
+        paymentMethod: "prepaid" | "pay-at-parking";
+        bookingDate: NativeDate;
+        bookingType: "date" | "hours" | "month";
+        discount: number;
+        totalPrice: number;
+        userId?: mongoose.Types.ObjectId | null;
+        parkingSlotId?: mongoose.Types.ObjectId | null;
+        vehicleId?: mongoose.Types.ObjectId | null;
+        vehicleSnapshot?: {
+            image: string;
+            number?: string | null;
+        } | null;
+        overDueInfo?: {
+            overDueStart?: NativeDate | null;
+            overDueEnd?: NativeDate | null;
+            overDueMinutes?: number | null;
+            overDueFee?: number | null;
+        } | null;
+    }, {}> & {
+        createdAt: NativeDate;
+        updatedAt: NativeDate;
+    } & {
+        status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
+        startTime: NativeDate;
+        endTime: NativeDate;
+        paymentStatus: "paid" | "unpaid";
+        paymentMethod: "prepaid" | "pay-at-parking";
+        bookingDate: NativeDate;
+        bookingType: "date" | "hours" | "month";
+        discount: number;
+        totalPrice: number;
+        userId?: mongoose.Types.ObjectId | null;
+        parkingSlotId?: mongoose.Types.ObjectId | null;
+        vehicleId?: mongoose.Types.ObjectId | null;
+        vehicleSnapshot?: {
+            image: string;
+            number?: string | null;
+        } | null;
+        overDueInfo?: {
+            overDueStart?: NativeDate | null;
+            overDueEnd?: NativeDate | null;
+            overDueMinutes?: number | null;
+            overDueFee?: number | null;
+        } | null;
+    } & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    };
+    ticket: any;
 }>;
 export function createBooking(data: any): Promise<mongoose.Document<unknown, {}, {
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -74,17 +89,21 @@ export function createBooking(data: any): Promise<mongoose.Document<unknown, {},
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -104,8 +123,8 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
     } & {
-        status: "paid" | "unpaid" | "failed";
         userId: mongoose.Types.ObjectId;
+        status: "paid" | "unpaid" | "failed";
         paymentMethod: "bank" | "cash" | "e-wallet";
         bookingId: mongoose.Types.ObjectId;
         invoiceNumber: string;
@@ -116,8 +135,8 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         createdAt: NativeDate;
         updatedAt: NativeDate;
     } & {
-        status: "paid" | "unpaid" | "failed";
         userId: mongoose.Types.ObjectId;
+        status: "paid" | "unpaid" | "failed";
         paymentMethod: "bank" | "cash" | "e-wallet";
         bookingId: mongoose.Types.ObjectId;
         invoiceNumber: string;
@@ -139,17 +158,21 @@ export function getBookingById(id: any): Promise<mongoose.Document<unknown, {}, 
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -161,17 +184,21 @@ export function getBookingById(id: any): Promise<mongoose.Document<unknown, {}, 
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -188,17 +215,21 @@ export function cancelBooking(id: any): Promise<(mongoose.Document<unknown, {}, 
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -210,17 +241,21 @@ export function cancelBooking(id: any): Promise<(mongoose.Document<unknown, {}, 
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -237,17 +272,21 @@ export function checkOutBookingForGuest(id: any): Promise<mongoose.Document<unkn
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -259,17 +298,21 @@ export function checkOutBookingForGuest(id: any): Promise<mongoose.Document<unkn
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -281,5 +324,62 @@ export function checkOutBookingForGuest(id: any): Promise<mongoose.Document<unkn
 } & {
     __v: number;
 }>;
+export function getBookingWithSlot(id: any): Promise<(mongoose.Document<unknown, {}, {
+    createdAt: NativeDate;
+    updatedAt: NativeDate;
+} & {
+    status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
+    startTime: NativeDate;
+    endTime: NativeDate;
+    paymentStatus: "paid" | "unpaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
+    bookingDate: NativeDate;
+    bookingType: "date" | "hours" | "month";
+    discount: number;
+    totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
+    overDueInfo?: {
+        overDueStart?: NativeDate | null;
+        overDueEnd?: NativeDate | null;
+        overDueMinutes?: number | null;
+        overDueFee?: number | null;
+    } | null;
+}, {}> & {
+    createdAt: NativeDate;
+    updatedAt: NativeDate;
+} & {
+    status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
+    startTime: NativeDate;
+    endTime: NativeDate;
+    paymentStatus: "paid" | "unpaid";
+    paymentMethod: "prepaid" | "pay-at-parking";
+    bookingDate: NativeDate;
+    bookingType: "date" | "hours" | "month";
+    discount: number;
+    totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
+    overDueInfo?: {
+        overDueStart?: NativeDate | null;
+        overDueEnd?: NativeDate | null;
+        overDueMinutes?: number | null;
+        overDueFee?: number | null;
+    } | null;
+} & {
+    _id: mongoose.Types.ObjectId;
+} & {
+    __v: number;
+}) | null>;
 import mongoose from 'mongoose';
 //# sourceMappingURL=booking.service.d.ts.map

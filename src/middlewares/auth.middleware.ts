@@ -39,7 +39,7 @@ export const protect = catchAsync(
         ) => {
           if (err)
             return reject(
-              new AppError('Token không hợp lệ hoặc đã hết hạn', 401)
+              new AppError('Token không hợp lệ hoặc đã hết hạn', 403)
             );
           resolve(decoded as jwt.JwtPayload);
         }

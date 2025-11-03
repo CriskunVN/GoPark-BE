@@ -3,8 +3,8 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
+    status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
     invoiceNumber: string;
@@ -15,8 +15,8 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
+    status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
     invoiceNumber: string;
@@ -27,8 +27,8 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
+    status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
     invoiceNumber: string;
@@ -45,8 +45,8 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
+    status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
     invoiceNumber: string;
@@ -57,8 +57,8 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
+    status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
     invoiceNumber: string;
@@ -69,8 +69,8 @@ declare const Invoice: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "paid" | "unpaid" | "failed";
     userId: mongoose.Types.ObjectId;
+    status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
     bookingId: mongoose.Types.ObjectId;
     invoiceNumber: string;

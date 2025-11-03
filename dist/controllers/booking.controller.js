@@ -7,22 +7,11 @@ import * as invoiceService from '../services/invoice.service.js';
 import Ticket from '../models/ticket.models.js';
 // Tạo booking cho khách vãng lai
 export const createBookingForGuest = catchAsync(async (req, res, next) => {
-    const bookingData = await bookingService.createBookingForGuest(req.body);
-    const ticket = await ticketService.createTicket({
-        bookingId: bookingData._id,
-        userId: bookingData.userId,
-        parkingSlotId: bookingData.parkingSlotId,
-        vehicleNumber: bookingData.vehicleNumber,
-        ticketType: 'guest', // Loại vé cho khách vãng lai
-        status: 'active', // Trạng thái vé khi tạo cho khách vãng lai
-        startTime: bookingData.startTime,
-        expiryDate: bookingData.endTime,
-        paymentStatus: bookingData.paymentStatus,
-    });
+    const { booking, ticket } = await bookingService.createBookingForGuest(req.body);
     res.status(201).json({
         status: 'success',
         data: {
-            booking: bookingData,
+            booking: booking,
             ticket: ticket,
         },
     });

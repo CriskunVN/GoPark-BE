@@ -6,6 +6,7 @@ import * as fee from './fee.service.js';
 import { isPaymentMethodAllowed } from './paymentOption.service.js';
 import mongoose from 'mongoose';
 import ParkingSlot from '../models/parkingSlot.model.js';
+import Vehicle from '../models/vehicles.model.js';
 // Hàm validate dùng chung cho booking
 const validateBookingInput = async (data) => {
     if (!data.userId)
@@ -82,23 +83,41 @@ export const createBookingForGuest = async (data) => {
     await mongoose
         .model('ParkingSlot')
         .findByIdAndUpdate(data.parkingSlotId, { status: 'booked' });
-    // Kiểm tra phương thức thanh toán
-    const paymentMethod = 'pay-at-parking';
-    // Tạo booking
+    const { parkingSlotId, vehicleNumber, vehicleImg, bookingType } = data;
+    if (!parkingSlotId || !bookingType || !vehicleNumber) {
+        throw new AppError('Thiếu thông tin bắt buộc để tạo booking cho khách hàng', 400);
+    }
+    // Tạo booking cho khách vãng lai
     const booking = await Booking.create({
-        userId: data.userId,
-        parkingSlotId: data.parkingSlotId,
+        userId: null,
+        parkingSlotId: parkingSlotId,
         startTime: startTime, // Thời gian bắt đầu là hiện tại
         endTime: endTime,
-        paymentMethod,
+        paymentMethod: 'pay-at-parking',
         paymentStatus: 'unpaid',
         status: 'check-in',
-        vehicleNumber: data.vehicleNumber || '',
+        vehicleId: null,
+        vehicleSnapshot: {
+            number: vehicleNumber,
+            image: vehicleImg || null,
+        },
         bookingType: 'hours', // Loại booking cho khách vãng lai
         discount: 0, // Không có giảm giá cho khách vãng lai
         totalPrice: 0, // Không có giá cho khách vãng lai
     });
-    return booking;
+    // Tạo vé cho khách vãng lai
+    const ticket = await ticketService.createTicket({
+        bookingId: booking._id,
+        userId: null,
+        parkingSlotId: parkingSlotId,
+        vehicleNumber: data.vehicleNumber || '',
+        ticketType: 'guest', // Loại vé cho khách vãng lai
+        status: 'active', // Trạng thái vé khi tạo cho khách vãng lai
+        startTime: startTime,
+        expiryDate: endTime,
+        paymentStatus: 'unpaid',
+    });
+    return { booking, ticket };
 };
 export const createBooking = async (data) => {
     // Validate input
@@ -117,29 +136,49 @@ export const createBooking = async (data) => {
     });
     // Tính toán giá cho booking tháng và năm
     const { price, discountPercent } = fee.calculateTotalPrice(data, slot);
+    // lấy thông tin cần thiết từ data
+    const { userId, parkingSlotId, vehicleId, vehicleImage, bookingType } = data;
+    // Lấy thông tin biển số xe từ vehicleId
+    const vehicle = await Vehicle.findById(vehicleId);
+    const vehicleNumber = vehicle.licensePlate;
+    // kiểm tra thông tin có dữ liệu không
+    if (!userId || !parkingSlotId || !bookingType || !vehicleNumber) {
+        throw new AppError('Thiếu thông tin bắt buộc để tạo booking', 400);
+    }
     // Tạo booking
     const booking = await Booking.create({
-        userId: data.userId,
-        parkingSlotId: data.parkingSlotId,
+        userId: userId,
+        parkingSlotId: parkingSlotId,
         startTime,
         endTime,
         paymentMethod,
         status: 'pending',
-        vehicleNumber: data.vehicleNumber || '',
-        bookingType: data.bookingType, // 'hours', 'date', hoặc 'month'
+        vehicleID: vehicleId || null,
+        vehicleSnapshot: {
+            number: vehicleNumber,
+            image: vehicleImage || null,
+        },
+        bookingType: bookingType, // 'hours', 'date', hoặc 'month'
         discount: discountPercent, // Lưu phần trăm giảm giá
         totalPrice: price, // Lưu tổng giá sau giảm
     });
     return booking;
 };
 export const handleBookingAfterCreate = async (bookingData) => {
+    if (!bookingData) {
+        throw new AppError('Dữ liệu booking không hợp lệ', 400);
+    }
     // Nếu khách thanh toán tại bãi, sinh ticket luôn
     if (bookingData.paymentMethod === 'pay-at-parking') {
         const ticket = await createTicket({
             bookingId: bookingData._id,
             userId: bookingData.userId,
             parkingSlotId: bookingData.parkingSlotId,
-            vehicleNumber: bookingData.vehicleNumber,
+            vehicleId: bookingData.vehicleId || null,
+            vehicleSnapshot: {
+                number: bookingData.vehicleSnapshot.number,
+                image: bookingData.vehicleSnapshot.image || null,
+            },
             ticketType: bookingData.bookingType,
             startTime: bookingData.startTime,
             expiryDate: bookingData.endTime,
@@ -198,5 +237,8 @@ export const checkOutBookingForGuest = async (id) => {
         .model('ParkingSlot')
         .findByIdAndUpdate(booking.parkingSlotId, { status: 'available' });
     return booking;
+};
+export const getBookingWithSlot = async (id) => {
+    return Booking.findById(id).populate('parkingSlotId', 'slotNumber');
 };
 //# sourceMappingURL=booking.service.js.map

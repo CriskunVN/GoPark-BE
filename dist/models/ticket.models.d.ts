@@ -3,12 +3,12 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "cancelled" | "active" | "used";
     userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    vehicleNumber: string;
+    slotNumber: string;
+    status: "cancelled" | "active" | "used";
     paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
+    vehicleNumber: string;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
     checkoutTime?: NativeDate | null;
@@ -18,12 +18,12 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "cancelled" | "active" | "used";
     userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    vehicleNumber: string;
+    slotNumber: string;
+    status: "cancelled" | "active" | "used";
     paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
+    vehicleNumber: string;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
     checkoutTime?: NativeDate | null;
@@ -33,12 +33,12 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "cancelled" | "active" | "used";
     userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    vehicleNumber: string;
+    slotNumber: string;
+    status: "cancelled" | "active" | "used";
     paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
+    vehicleNumber: string;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
     checkoutTime?: NativeDate | null;
@@ -54,12 +54,12 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "cancelled" | "active" | "used";
     userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    vehicleNumber: string;
+    slotNumber: string;
+    status: "cancelled" | "active" | "used";
     paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
+    vehicleNumber: string;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
     checkoutTime?: NativeDate | null;
@@ -69,12 +69,12 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "cancelled" | "active" | "used";
     userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    vehicleNumber: string;
+    slotNumber: string;
+    status: "cancelled" | "active" | "used";
     paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
+    vehicleNumber: string;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
     checkoutTime?: NativeDate | null;
@@ -84,12 +84,12 @@ declare const Ticket: mongoose.Model<{
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
-    status: "cancelled" | "active" | "used";
     userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
-    vehicleNumber: string;
+    slotNumber: string;
+    status: "cancelled" | "active" | "used";
     paymentStatus: never;
     bookingId: mongoose.Types.ObjectId;
+    vehicleNumber: string;
     ticketType: "date" | "hours" | "month" | "guest";
     checkInTime?: NativeDate | null;
     checkoutTime?: NativeDate | null;

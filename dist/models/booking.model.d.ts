@@ -4,17 +4,21 @@ declare const Booking: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -26,17 +30,21 @@ declare const Booking: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -48,17 +56,21 @@ declare const Booking: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -76,17 +88,21 @@ declare const Booking: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -98,17 +114,21 @@ declare const Booking: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;
@@ -120,17 +140,21 @@ declare const Booking: mongoose.Model<{
     updatedAt: NativeDate;
 } & {
     status: "pending" | "confirmed" | "cancelled" | "completed" | "checked-in" | "over-due";
-    userId: mongoose.Types.ObjectId;
-    parkingSlotId: mongoose.Types.ObjectId;
     startTime: NativeDate;
     endTime: NativeDate;
-    vehicleNumber: string;
     paymentStatus: "paid" | "unpaid";
     paymentMethod: "prepaid" | "pay-at-parking";
     bookingDate: NativeDate;
     bookingType: "date" | "hours" | "month";
     discount: number;
     totalPrice: number;
+    userId?: mongoose.Types.ObjectId | null;
+    parkingSlotId?: mongoose.Types.ObjectId | null;
+    vehicleId?: mongoose.Types.ObjectId | null;
+    vehicleSnapshot?: {
+        image: string;
+        number?: string | null;
+    } | null;
     overDueInfo?: {
         overDueStart?: NativeDate | null;
         overDueEnd?: NativeDate | null;

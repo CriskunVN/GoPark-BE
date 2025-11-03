@@ -4,6 +4,7 @@ import qs from 'qs';
 import dayjs from 'dayjs';
 import Invoice from '../models/invoice.model.js';
 import Booking from '../models/booking.model.js';
+import * as bookingService from '../services/booking.service.js';
 import * as ticketService from '../services/ticket.service.js';
 
 function sortObject(obj) {
@@ -139,48 +140,80 @@ export const returnPayment = catchAsync(async (req, res) => {
         .json({ RspCode: '02', Message: transactionStatusMessage['02'] });
     }
 
-    if (responseCode === '00') {
-      invoice.status = 'paid';
-      await invoice.save();
+    switch (responseCode) {
+      case '00':
+        invoice.status = 'paid';
+        await invoice.save();
 
-      const booking = await Booking.findById(invoice.bookingId);
-      if (booking) {
-        booking.status = 'confirmed';
-        booking.paymentStatus = 'paid';
-        await booking.save();
-      }
-      // sinh vé
-      const ticket = await ticketService.createTicket({
-        bookingId: booking._id,
-        userId: booking.userId,
-        parkingSlotId: booking.parkingSlotId,
-        vehicleNumber: booking.vehicleNumber,
-        ticketType: booking.bookingType,
-        startTime: booking.startTime,
-        expiryDate: booking.endTime,
-        paymentStatus: 'paid',
-      });
+        const booking = await Booking.findById(invoice.bookingId);
+        if (booking) {
+          booking.status = 'confirmed';
+          booking.paymentStatus = 'paid';
+          await booking.save();
+        }
+        const getBookingWithSlot = await bookingService.getBookingWithSlot(
+          invoice.bookingId
+        );
+        const slotNumber = getBookingWithSlot.parkingSlotId.slotNumber;
+        console.log('Slot Number:', slotNumber);
+        // sinh vé
+        const ticket = await ticketService.createTicket({
+          bookingId: booking._id,
+          userId: booking.userId,
+          slotNumber: slotNumber,
+          vehicleNumber: booking.vehicleSnapshot.number,
+          ticketType: booking.bookingType,
+          startTime: booking.startTime,
+          expiryDate: booking.endTime,
+          paymentStatus: 'paid',
+        });
 
-      return res.status(200).json({
-        status: 'success',
-        RspCode: '00',
-        Message: transactionStatusMessage['00'],
-        data: {
-          ticket: ticket,
-          invoiceId: invoice._id,
-          amount: invoice.amount,
-          paymentDate: invoice.paymentDate,
-          transactionId: invoice.transactionId,
-          paymentMethod: invoice.paymentMethod,
-          invoiceNumber: invoice.invoiceNumber,
-        },
-      });
-    } else {
-      return res.status(200).json({
-        status: 'fail',
-        RspCode: '01',
-        Message: transactionStatusMessage['01'],
-      });
+        return res.status(200).json({
+          status: 'success',
+          RspCode: '00',
+          Message: transactionStatusMessage['00'],
+          data: {
+            ticket: ticket,
+            invoiceId: invoice._id,
+            amount: invoice.amount,
+            paymentDate: invoice.paymentDate,
+            transactionId: invoice.transactionId,
+            paymentMethod: invoice.paymentMethod,
+            invoiceNumber: invoice.invoiceNumber,
+          },
+        });
+      case '01':
+        // xóa hóa đơn nếu thanh toán không thành công
+        await Invoice.findByIdAndDelete(invoice._id);
+
+        // xóa booking liên quan
+        await Booking.findByIdAndDelete(invoice.bookingId);
+
+        return res.status(200).json({
+          status: 'fail',
+          RspCode: '01',
+          Message: transactionStatusMessage['01'],
+        });
+
+      case '02':
+        // xóa hóa đơn nếu thanh toán không thành công
+        await Invoice.findByIdAndDelete(invoice._id);
+
+        // xóa booking liên quan
+        await Booking.findByIdAndDelete(invoice.bookingId);
+
+        return res.status(200).json({
+          status: 'fail',
+          RspCode: '02',
+          Message: transactionStatusMessage['02'],
+        });
+      default:
+        return res.status(200).json({
+          status: 'fail',
+          RspCode: responseCode,
+          Message:
+            transactionStatusMessage[responseCode] || 'Lỗi không xác định',
+        });
     }
   } else {
     return res

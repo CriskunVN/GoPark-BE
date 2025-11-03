@@ -14,10 +14,10 @@ import vehicleRoutes from './routes/vehicle.route.js';
 import bookingRouter from './routes/booking.route.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
 import ticketRouter from './routes/ticket.route.js';
+import cookieParser from 'cookie-parser';
 
-import ocrRoute from "./routes/ocr.route.js";
-import uploadRouter from "./routes/upload.route.js";
-
+import ocrRoute from './routes/ocr.route.js';
+import uploadRouter from './routes/upload.route.js';
 
 // Route for VNPay
 import vnpayRouter from './routes/vnpay.route.js';
@@ -58,6 +58,7 @@ app.use(
 app.use(helmet()); // Bảo mật HTTP headers
 app.use(morgan('dev')); // Ghi log các request
 app.use(express.json()); // Parse JSON request body
+app.use(cookieParser());
 app.use(express.static(`${__dirname}/public`)); // Serve file tĩnh nếu cần
 
 // 3. ROUTES
@@ -75,7 +76,7 @@ app.use(`${apiPrefix}/chatbot`, chatbotRoutes); // route chatbot
 app.use(`${apiPrefix}/tickets`, ticketRouter); //route vé xe
 app.use(`${apiPrefix}/vnpay`, vnpayRouter); // route thanh toán VNPay
 app.use(`${apiPrefix}/admin`, adminRouter); // route admin
-app.use(`${apiPrefix}/upload`, uploadRouter);// route upload anh
+app.use(`${apiPrefix}/upload`, uploadRouter); // route upload anh
 app.use(`${apiPrefix}/ocr`, ocrRoute); //route scan
 
 // 4. ERROR HANDLER (Middle xử lý lỗi)
