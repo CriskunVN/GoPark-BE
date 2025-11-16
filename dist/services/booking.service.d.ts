@@ -126,8 +126,8 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         userId: mongoose.Types.ObjectId;
         status: "paid" | "unpaid" | "failed";
         paymentMethod: "bank" | "cash" | "e-wallet";
-        bookingId: mongoose.Types.ObjectId;
         invoiceNumber: string;
+        bookingId: mongoose.Types.ObjectId;
         amount: number;
         transactionId: string;
         paymentDate: NativeDate;
@@ -138,8 +138,8 @@ export function handleBookingAfterCreate(bookingData: any): Promise<{
         userId: mongoose.Types.ObjectId;
         status: "paid" | "unpaid" | "failed";
         paymentMethod: "bank" | "cash" | "e-wallet";
-        bookingId: mongoose.Types.ObjectId;
         invoiceNumber: string;
+        bookingId: mongoose.Types.ObjectId;
         amount: number;
         transactionId: string;
         paymentDate: NativeDate;

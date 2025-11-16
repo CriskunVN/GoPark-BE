@@ -1,6 +1,5 @@
 import Booking from '../models/booking.model.js';
 import AppError from '../utils/appError.js';
-import Ticket from '../models/ticket.models.js';
 import * as InvoiceService from './invoice.service.js';
 import * as fee from './fee.service.js';
 import { isPaymentMethodAllowed } from './paymentOption.service.js';

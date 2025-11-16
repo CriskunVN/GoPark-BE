@@ -143,20 +143,21 @@ export const returnPayment = catchAsync(async (req, res) => {
                     expiryDate: booking.endTime,
                     paymentStatus: 'paid',
                 });
-                return res.status(200).json({
-                    status: 'success',
-                    RspCode: '00',
-                    Message: transactionStatusMessage['00'],
-                    data: {
-                        ticket: ticket,
-                        invoiceId: invoice._id,
-                        amount: invoice.amount,
-                        paymentDate: invoice.paymentDate,
-                        transactionId: invoice.transactionId,
-                        paymentMethod: invoice.paymentMethod,
-                        invoiceNumber: invoice.invoiceNumber,
-                    },
-                });
+                const FE_SUCCESS_URL = process.env.URL_FE_NEW;
+                const redirectUrl = FE_SUCCESS_URL +
+                    '?invoiceNumber=' +
+                    encodeURIComponent(invoice.invoiceNumber) +
+                    '&amount=' +
+                    encodeURIComponent(invoice.amount) +
+                    '&bookingId=' +
+                    encodeURIComponent(booking._id.toString()) +
+                    '&ticketId=' +
+                    encodeURIComponent(ticket._id.toString()) +
+                    '&slotNumber=' +
+                    encodeURIComponent(slotNumber) +
+                    '&vehicleNumber=' +
+                    encodeURIComponent(booking.vehicleSnapshot.number);
+                return res.redirect(302, redirectUrl);
             case '01':
                 // xóa hóa đơn nếu thanh toán không thành công
                 await Invoice.findByIdAndDelete(invoice._id);

@@ -5,8 +5,8 @@ export function createInvoice(invoiceData: any): Promise<import("mongoose").Docu
     userId: import("mongoose").Types.ObjectId;
     status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
-    bookingId: import("mongoose").Types.ObjectId;
     invoiceNumber: string;
+    bookingId: import("mongoose").Types.ObjectId;
     amount: number;
     transactionId: string;
     paymentDate: NativeDate;
@@ -17,8 +17,8 @@ export function createInvoice(invoiceData: any): Promise<import("mongoose").Docu
     userId: import("mongoose").Types.ObjectId;
     status: "paid" | "unpaid" | "failed";
     paymentMethod: "bank" | "cash" | "e-wallet";
-    bookingId: import("mongoose").Types.ObjectId;
     invoiceNumber: string;
+    bookingId: import("mongoose").Types.ObjectId;
     amount: number;
     transactionId: string;
     paymentDate: NativeDate;
