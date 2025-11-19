@@ -143,7 +143,7 @@ export const returnPayment = catchAsync(async (req, res) => {
                     expiryDate: booking.endTime,
                     paymentStatus: 'paid',
                 });
-                const FE_SUCCESS_URL = process.env.URL_FE_NEW;
+                const FE_SUCCESS_URL = process.env.URL_FE_PAYMENT_SUCCESS;
                 const redirectUrl = FE_SUCCESS_URL +
                     '?invoiceNumber=' +
                     encodeURIComponent(invoice.invoiceNumber) +
@@ -173,17 +173,9 @@ export const returnPayment = catchAsync(async (req, res) => {
                 await Invoice.findByIdAndDelete(invoice._id);
                 // xóa booking liên quan
                 await Booking.findByIdAndDelete(invoice.bookingId);
-                return res.status(200).json({
-                    status: 'fail',
-                    RspCode: '02',
-                    Message: transactionStatusMessage['02'],
-                });
+                return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
             default:
-                return res.status(200).json({
-                    status: 'fail',
-                    RspCode: responseCode,
-                    Message: transactionStatusMessage[responseCode] || 'Lỗi không xác định',
-                });
+                return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
         }
     }
     else {
