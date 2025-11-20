@@ -3,10 +3,13 @@ import express from 'express';
 
 const router = express.Router();
 
-// Checkin ticket (POST /tickets/:id/checkin)
+// Lấy ticket theo ID (GET /tickets/:ticketId)
+router.route('/:ticketId').get(ticketController.getTicketById);
+
+// Checkin ticket (POST /tickets/:ticketId/checkin)
 router.route('/:ticketId/checkin').post(ticketController.checkin);
 
-// Checkout ticket (POST /tickets/:id/checkout)
+// Checkout ticket (POST /tickets/:ticketId/checkout)
 router.route('/:ticketId/checkout').post(ticketController.checkout);
 
 export default router;
