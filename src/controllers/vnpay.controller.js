@@ -168,7 +168,7 @@ export const returnPayment = catchAsync(async (req, res) => {
           paymentStatus: 'paid',
         });
 
-        const FE_SUCCESS_URL = process.env.URL_FE_PAYMENT_SUCCESS_LOCAL;
+        const FE_SUCCESS_URL = process.env.URL_FE_PAYMENT_SUCCESS;
         const redirectUrl =
           FE_SUCCESS_URL +
           '?invoiceNumber=' +
@@ -205,9 +205,9 @@ export const returnPayment = catchAsync(async (req, res) => {
         // xóa booking liên quan
         await Booking.findByIdAndDelete(invoice.bookingId);
 
-        return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED_LOCAL);
+        return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
       default:
-        return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED_LOCAL);
+        return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
     }
   } else {
     return res

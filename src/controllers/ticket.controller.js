@@ -16,58 +16,46 @@ export const createTicket = catchAsync(async (req, res) => {
 });
 
 // Hàm lấy tất cả vé
-export const getAllTickets = catchAsync(async (req, res) => {
-  const tickets = await Ticket.find();
-  res.status(200).json({ status: 'success', data: { tickets } });
+export const getAllTickets = catchAsync(async () => {});
+
+// Hàm cập nhật vé theo ID
+export const updateTicketById = catchAsync(async (ticketId, updateData) => {});
+
+// Hàm xóa vé theo ID
+export const deleteTicketById = catchAsync(async (ticketId) => {});
+
+// Hàm hủy vé theo ID
+
+// Hàm lấy vé theo trạng thái
+export const getTicketsByStatus = catchAsync(async (status) => {
+  return await Ticket.find({ status });
 });
 
-// Hàm lấy vé theo ID
-export const getTicketById = catchAsync(async (req, res) => {
-  const { ticketId } = req.params;
-  const ticket = await Ticket.findById(ticketId);
-
-  if (!ticket) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Ticket not found' });
-  }
-
-  res.status(200).json({ status: 'success', data: { ticket } });
+// Hàm lấy vé theo người dùng
+export const getTicketsByUserId = catchAsync(async (userId) => {
+  return await Ticket.find({ userId });
 });
 
 // checkin booking
-export const checkin = catchAsync(async (req, res) => {
+export const checkin = catchAsync(async (req, res, next) => {
   const { ticketId } = req.params;
   const ticket = await Ticket.findById(ticketId);
 
-  if (!ticket) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Ticket not found' });
-  }
-
   const updateBooking = await ticketService.checkInBooking(ticket.bookingId);
 
-  res.status(200).json({
+  return res.status(200).json({
     status: 'success',
     data: { booking: updateBooking },
   });
 });
 
 // checkout booking
-export const checkout = catchAsync(async (req, res) => {
+export const checkout = catchAsync(async (req, res, next) => {
   const { ticketId } = req.params;
   const ticket = await Ticket.findById(ticketId);
-
-  if (!ticket) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Ticket not found' });
-  }
-
   const updateBooking = await ticketService.checkOutBooking(ticket.bookingId);
 
-  res.status(200).json({
+  return res.status(200).json({
     status: 'success',
     data: { booking: updateBooking },
   });
