@@ -7,6 +7,12 @@ import Booking from '../models/booking.model.js';
 import * as bookingService from '../services/booking.service.js';
 import * as ticketService from '../services/ticket.service.js';
 
+const FE_SUCCESS_URL =
+  process.env.URL_FE_PAYMENT_SUCCESS || 'https://gopark.id.vn/payment/success';
+
+const FE_FAILED_URL =
+  process.env.URL_FE_PAYMENT_FAILED || 'https://gopark.id.vn/payment/fail';
+
 function sortObject(obj) {
   let sorted = {};
   let str = [];
@@ -168,7 +174,6 @@ export const returnPayment = catchAsync(async (req, res) => {
           paymentStatus: 'paid',
         });
 
-        const FE_SUCCESS_URL = process.env.URL_FE_PAYMENT_SUCCESS;
         const redirectUrl =
           FE_SUCCESS_URL +
           '?invoiceNumber=' +
@@ -205,9 +210,9 @@ export const returnPayment = catchAsync(async (req, res) => {
         // xóa booking liên quan
         await Booking.findByIdAndDelete(invoice.bookingId);
 
-        return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
+        return res.redirect(302, FE_FAILED_URL);
       default:
-        return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
+        return res.redirect(302, FE_FAILED_URL);
     }
   } else {
     return res
