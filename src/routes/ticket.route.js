@@ -4,7 +4,7 @@ import express from 'express';
 const router = express.Router();
 
 // Lấy ticket theo ID (GET /tickets/:ticketId)
-router.route('/:ticketId').get(ticketController.getTicketById);
+router.route('/:ticketId').get(ticketController.getTicketsByUserId);
 
 // Checkin ticket (POST /tickets/:ticketId/checkin)
 router.route('/:ticketId/checkin').post(ticketController.checkin);
