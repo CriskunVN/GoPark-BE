@@ -23,6 +23,17 @@ export const deleteTicketById = catchAsync(async (ticketId) => { });
 export const getTicketsByStatus = catchAsync(async (status) => {
     return await Ticket.find({ status });
 });
+// Hàm lấy vé theo ID
+export const getTicketbyId = catchAsync(async (req, res) => {
+    const { ticketId } = req.params;
+    const ticket = await Ticket.findById(ticketId);
+    res.status(200).json({
+        status: 'success',
+        data: {
+            ticket,
+        },
+    });
+});
 // Hàm lấy vé theo người dùng
 export const getTicketsByUserId = catchAsync(async (userId) => {
     return await Ticket.find({ userId });

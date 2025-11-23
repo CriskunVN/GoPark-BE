@@ -6,6 +6,8 @@ import Invoice from '../models/invoice.model.js';
 import Booking from '../models/booking.model.js';
 import * as bookingService from '../services/booking.service.js';
 import * as ticketService from '../services/ticket.service.js';
+const FE_SUCCESS_URL = process.env.URL_FE_PAYMENT_SUCCESS;
+const FE_FAILED_URL = process.env.URL_FE_PAYMENT_FAILED;
 function sortObject(obj) {
     let sorted = {};
     let str = [];
@@ -112,12 +114,14 @@ export const returnPayment = catchAsync(async (req, res) => {
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
     if (secureHash === signed) {
         const invoiceNumber = vnpParams.vnp_TxnRef;
+        const transactionStatus = vnpParams.vnp_TransactionStatus;
         const responseCode = vnpParams.vnp_ResponseCode;
+        console.log('Response Code:', responseCode);
+        console.log('Transaction Status:', transactionStatus);
         const invoice = await Invoice.findOne({ invoiceNumber: invoiceNumber });
         if (!invoice || invoice.status === 'paid') {
-            return res
-                .status(200)
-                .json({ RspCode: '02', Message: transactionStatusMessage['02'] });
+            console.error('Không tìm thấy invoice:', invoiceNumber);
+            return res.redirect(FE_FAILED_URL + '?message=invoice_not_found');
         }
         switch (responseCode) {
             case '00':
@@ -143,7 +147,6 @@ export const returnPayment = catchAsync(async (req, res) => {
                     expiryDate: booking.endTime,
                     paymentStatus: 'paid',
                 });
-                const FE_SUCCESS_URL = process.env.URL_FE_PAYMENT_SUCCESS;
                 const redirectUrl = FE_SUCCESS_URL +
                     '?invoiceNumber=' +
                     encodeURIComponent(invoice.invoiceNumber) +
@@ -158,24 +161,26 @@ export const returnPayment = catchAsync(async (req, res) => {
                     '&vehicleNumber=' +
                     encodeURIComponent(booking.vehicleSnapshot.number);
                 return res.redirect(302, redirectUrl);
-            case '01':
-                // xóa hóa đơn nếu thanh toán không thành công
-                await Invoice.findByIdAndDelete(invoice._id);
-                // xóa booking liên quan
-                await Booking.findByIdAndDelete(invoice.bookingId);
-                return res.status(200).json({
-                    status: 'fail',
-                    RspCode: '01',
-                    Message: transactionStatusMessage['01'],
-                });
-            case '02':
-                // xóa hóa đơn nếu thanh toán không thành công
-                await Invoice.findByIdAndDelete(invoice._id);
-                // xóa booking liên quan
-                await Booking.findByIdAndDelete(invoice.bookingId);
-                return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
             default:
-                return res.redirect(302, process.env.URL_FE_PAYMENT_FAILED);
+                invoice.status = 'failed';
+                await invoice.save();
+                const failedBooking = await Booking.findById(invoice.bookingId);
+                if (failedBooking) {
+                    failedBooking.status = 'cancelled';
+                    await failedBooking.save();
+                    // Trả slot về available
+                    await mongoose
+                        .model('ParkingSlot')
+                        .findByIdAndUpdate(failedBooking.parkingSlotId, {
+                        status: 'available',
+                    });
+                }
+                const message = transactionStatusMessage[responseCode] || 'Giao dịch thất bại';
+                return res.redirect(FE_FAILED_URL +
+                    '?message=' +
+                    encodeURIComponent(message) +
+                    '&code=' +
+                    responseCode);
         }
     }
     else {
