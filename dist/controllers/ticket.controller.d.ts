@@ -7,4 +7,5 @@ export const getTicketbyId: (req: any, res: any, next: any) => void;
 export const getTicketsByUserId: (req: any, res: any, next: any) => void;
 export const checkin: (req: any, res: any, next: any) => void;
 export const checkout: (req: any, res: any, next: any) => void;
+export const getTicketsByParkingLotId: (req: any, res: any, next: any) => void;
 //# sourceMappingURL=ticket.controller.d.ts.map
