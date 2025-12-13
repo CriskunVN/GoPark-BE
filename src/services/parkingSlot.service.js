@@ -56,6 +56,18 @@ export const deleteSlotAndSyncZone = async (slotId) => {
 
   const { parkingLot, zone } = slot;
 
+  const activeBookings = await Booking.find({
+      parkingSlotId: slot._id,
+      status: { $nin: ['cancelled', 'completed'] }, // lấy booking chưa hủy hoặc hoàn thành
+    });
+  
+    if (activeBookings.length > 0) {
+      throw new AppError(
+          `Không thể xóa slot này. Còn ${activeBookings.length} booking đang hoạt động`,
+          400
+        );
+    }
+
   // Xóa slot
   await ParkingSlot.findByIdAndDelete(slotId);
 

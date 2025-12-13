@@ -1,6 +1,7 @@
 // controllers/parkinglot.controller.js
 import ParkingLot from '../models/parkinglot.model.js';
 import ParkingSlot from '../models/parkingSlot.model.js';
+import Booking from '../models/booking.model.js';
 import catchAsync from '../utils/catchAsync.js';
 import * as parkinglotService from '../services/parkinglot.service.js';
 import AppError from '../utils/appError.js';
@@ -87,6 +88,25 @@ export const updateParkingLot = catchAsync(async (req, res, next) => {
 
 // [DELETE] Xóa vĩnh viễn
 export const deleteParkingLot = catchAsync(async (req, res, next) => {
+  // Lấy tất cả slot thuộc bãi đỗ này
+  const slots = await ParkingSlot.find({ parkingLot: req.params.id });
+  const slotIds = slots.map((slot) => slot._id);
+
+  // Kiểm tra xem có booking nào còn hoạt động trong các slot này không
+  const activeBookings = await Booking.find({
+    parkingSlotId: { $in: slotIds },
+    status: { $nin: ['cancelled', 'completed'] }, // Loại bỏ các booking đã hủy hoặc hoàn thành
+  });
+
+  if (activeBookings.length > 0) {
+    return next(
+      new AppError(
+        `Không thể xóa bãi đỗ. Còn ${activeBookings.length} booking đang hoạt động`,
+        400
+      )
+    );
+  }
+
   const deletedLot = await ParkingLot.findOneAndDelete({
     _id: req.params.id,
   });
@@ -94,6 +114,8 @@ export const deleteParkingLot = catchAsync(async (req, res, next) => {
   if (!deletedLot) {
     return next(new AppError('Không tìm thấy bãi đỗ xe của bạn', 404));
   }
+
+
 
   // Xóa tất cả slot thuộc bãi đỗ
   await ParkingSlot.deleteMany({ parkingLot: req.params.id });

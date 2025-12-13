@@ -1,1 +1,1 @@
-{"version":3,"file":"parkinglot.controller.d.ts","sourceRoot":"","sources":["../../src/controllers/parkinglot.controller.js"],"names":[],"mappings":"AAQA,uEAQG;AAGH,uEAwBG;AAGH,wEAeG;AAGH,uEAqBG;AAGH,uEAiBG;AAGH,2EAgBG;AAGH,2EAWG;AAGH,gFAaG;AAGH,wEAQG;AAGH,uEAWG;AAGH,iFAiBG"}
+{"version":3,"file":"parkinglot.controller.d.ts","sourceRoot":"","sources":["../../src/controllers/parkinglot.controller.js"],"names":[],"mappings":"AASA,uEAQG;AAGH,uEAwBG;AAGH,wEAeG;AAGH,uEAqBG;AAGH,uEAsCG;AAGH,2EAgBG;AAGH,2EAWG;AAGH,gFAaG;AAGH,wEAQG;AAGH,uEAWG;AAGH,iFAiBG"}
