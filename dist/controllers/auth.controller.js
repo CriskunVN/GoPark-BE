@@ -106,7 +106,7 @@ export const login = catchAsync(async (req, res, next) => {
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true, // chống XSS
         secure: true,
-        sameSite: 'strict', // Chỉ gửi cookie trong cùng một trang web
+        sameSite: 'none', // Chỉ gửi cookie trong cùng một trang web
         maxAge: REFRESH_TOKEN_EXPIRES_DAYS, // 30 days
     });
     // Trả về access token và thông tin người dùng (không bao gồm mật khẩu)
