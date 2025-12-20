@@ -1,15 +1,17 @@
-import User from '../models/user.model.js';
-import Booking from '../models/booking.model.js';
-import ParkingLot from '../models/parkinglot.model.js';
-import ParkingSlot from '../models/parkingSlot.model.js';
-import Vehicle from '../models/vehicles.model.js';
-import ChatHistory from '../models/chatHistory.model.js';
+import User from '../../models/user.model.js';
+import Booking from '../../models/booking.model.js';
+import ParkingLot from '../../models/parkinglot.model.js';
+import ParkingSlot from '../../models/parkingSlot.model.js';
+import Vehicle from '../../models/vehicles.model.js';
+import ChatHistory from '../../models/chatHistory.model.js';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
+import { handleFindParking, handleMyBookings, handleMyVehicles, handlePriceInfo, handleContactInfo, } from './intelligentHandler.service.js';
+import { findMatchingPattern } from './fallbackResponses.service.js';
 dotenv.config({ path: './config.env' });
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=";
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=';
 // ==================== IN-MEMORY SESSION STORE ====================
 // Đơn giản: lưu session trong RAM (có thể chuyển sang Redis sau)
 const chatSessions = new Map(); // Map<sessionId, sessionData>
@@ -51,22 +53,22 @@ HÃY trả lời câu hỏi sau đây bằng tiếng Việt, ngắn gọn, thân
             body: JSON.stringify({
                 contents: [
                     {
-                        role: "user",
-                        parts: [{ text: prompt }]
-                    }
+                        role: 'user',
+                        parts: [{ text: prompt }],
+                    },
                 ],
                 generationConfig: {
                     temperature: 0.7,
                     maxOutputTokens: 200,
                     topP: 0.8,
-                    topK: 40
+                    topK: 40,
                 },
                 safetySettings: [
                     {
-                        category: "HARM_CATEGORY_HARASSMENT",
-                        threshold: "BLOCK_ONLY_HIGH"
-                    }
-                ]
+                        category: 'HARM_CATEGORY_HARASSMENT',
+                        threshold: 'BLOCK_ONLY_HIGH',
+                    },
+                ],
             }),
         });
         // ========== XỬ LÝ RESPONSE ==========
@@ -84,7 +86,7 @@ HÃY trả lời câu hỏi sau đây bằng tiếng Việt, ngắn gọn, thân
                     status: response.status,
                     message: errorJson.error?.message,
                     statusText: errorJson.error?.status,
-                    details: errorJson.error?.details
+                    details: errorJson.error?.details,
                 });
             }
             catch (e) {
@@ -93,7 +95,8 @@ HÃY trả lời câu hỏi sau đây bằng tiếng Việt, ngắn gọn, thân
             // Phân loại lỗi
             if (response.status === 400) {
                 const errorMsg = errorDetails.toLowerCase();
-                if (errorMsg.includes('api key not valid') || errorMsg.includes('invalid api key')) {
+                if (errorMsg.includes('api key not valid') ||
+                    errorMsg.includes('invalid api key')) {
                     console.error('❌ API KEY KHÔNG HỢP LỆ!');
                     console.error('❌ Hãy kiểm tra:');
                     console.error('   1. API key có đúng không?');
@@ -116,7 +119,7 @@ HÃY trả lời câu hỏi sau đây bằng tiếng Việt, ngắn gọn, thân
         }
         console.log('🔧 [DEBUG] Response structure:', {
             hasCandidates: !!data.candidates,
-            candidatesCount: data.candidates?.length || 0
+            candidatesCount: data.candidates?.length || 0,
         });
         // Lấy text response
         const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -130,21 +133,20 @@ HÃY trả lời câu hỏi sau đây bằng tiếng Việt, ngắn gọn, thân
     catch (error) {
         console.error('❌ [DEBUG] Gemini process error:', {
             message: error.message,
-            stack: error.stack
+            stack: error.stack,
         });
         // Fallback
         return getSmartFallback(message, session);
     }
 }
 function getSmartFallback(message, session) {
-    const messageLower = message.toLowerCase();
-    if (messageLower.includes('chào') || messageLower.includes('hello')) {
-        return 'Xin chào! Tôi là trợ lý GoPark. Hiện AI đang gặp sự cố, nhưng tôi vẫn có thể giúp bạn tìm bãi xe hoặc đặt chỗ!';
-    }
-    if (messageLower.includes('tìm bãi') || messageLower.includes('bãi xe')) {
-        return 'Để tìm bãi xe, vui lòng cho tôi biết khu vực (ví dụ: Hà Nội, Quận 1) hoặc sử dụng vị trí hiện tại của bạn.';
-    }
-    return 'Hiện AI đang gặp sự cố tạm thời. Bạn có thể hỏi về: tìm bãi xe, đặt chỗ, thanh toán, hoặc liên hệ hotline 1800-1234.';
+    // Dùng intelligent fallback system
+    const userInfo = {
+        userId: session.userId,
+        role: session.type,
+        name: session.userName || 'bạn',
+    };
+    return findMatchingPattern(message, userInfo);
 }
 // ==================== SESSION MANAGEMENT ====================
 export function createOrGetSession(sessionId, userId = null) {
@@ -230,6 +232,27 @@ export async function detectIntent(message, sessionContext = null) {
     }
     // Intent với priority
     const intents = [
+        {
+            name: 'find_parking',
+            patterns: [
+                'tìm bãi',
+                'tìm chỗ đỗ',
+                'bãi gần',
+                'còn chỗ không',
+                'parking',
+                'bãi xe',
+                'đỗ xe',
+                'chỗ trống',
+                'bãi đỗ',
+                'chỗ đậu',
+            ],
+            priority: 10,
+        },
+        {
+            name: 'my_vehicles',
+            patterns: ['xe của tôi', 'my vehicle', 'danh sách xe', 'xe đã lưu'],
+            priority: 8,
+        },
         {
             name: 'book_slot',
             patterns: [
@@ -359,6 +382,21 @@ export async function detectIntent(message, sessionContext = null) {
             ],
             priority: 3,
         },
+        {
+            name: 'find_nearby_parking',
+            patterns: ['gần đây', 'quanh đây', 'gần tôi', 'nearby', 'quanh tôi', 'quanh khu vực'],
+            priority: 9,
+        },
+        {
+            name: 'find_cheap_parking',
+            patterns: ['rẻ nhất', 'giá rẻ', 'giá tốt', 'lọc giá rẻ', 'bãi rẻ', 'giá thấp'],
+            priority: 8,
+        },
+        {
+            name: 'find_parking_with_features',
+            patterns: ['có camera', 'có bảo vệ', '24/7', 'che mưa', 'có mái che', 'an toàn'],
+            priority: 7,
+        }
     ];
     // Tìm intent với priority cao nhất
     let detectedIntent = null;
@@ -615,26 +653,57 @@ export async function processMessage(message, sessionId, userId = null) {
         let response;
         switch (intent) {
             case 'find_parking':
-                response = await handleFindParkingWithContext(message, session);
+                response = await handleFindParking(message, session);
                 break;
             case 'book_slot':
                 response = await handleBookSlotWithContext(message, session);
                 break;
             case 'my_bookings':
-                response = await handleBookingHistoryWithContext(session);
+                if (!session.userId) {
+                    response = responseTemplates.requireLogin();
+                }
+                else {
+                    response = await handleMyBookings(session.userId);
+                }
+                break;
+            case 'my_vehicles':
+                if (!session.userId) {
+                    response = responseTemplates.requireLogin();
+                }
+                else {
+                    response = await handleMyVehicles(session.userId);
+                }
                 break;
             case 'payment':
                 response = await handlePaymentWithContext(message, session);
+                break;
+            case 'find_cheap_parking': // THÊM CASE NÀY
+                response = await handleFindCheapParking(message, session);
+                break;
+            case 'price':
+                response = handlePriceInfo();
                 break;
             case 'help':
                 response = responseTemplates.text(`🚗 **Hướng dẫn sử dụng GoPark**\n\n1. Tìm bãi xe\n2. Chọn chỗ & giờ\n3. Thanh toán\n4. Check-in QR\n\nBạn cần hướng dẫn chi tiết phần nào?`);
                 break;
             case 'contact':
-                response = responseTemplates.text(`📞 **Liên hệ hỗ trợ**\n\n• Hotline: 1800-1234\n• Email: support@gopark.vn\n• Giờ làm việc: 8:00-22:00`);
+                response = handleContactInfo();
                 break;
             default:
-                // Dùng Gemini cho câu hỏi chung (có context)
-                response = await askGeminiAIWithContext(message, session);
+                // Thử fallback trước, nếu không được mới dùng AI
+                const fallbackResponse = findMatchingPattern(message, {
+                    userId: session.userId,
+                    role: session.type,
+                    name: session.userName,
+                });
+                if (fallbackResponse.type !== 'text' ||
+                    !fallbackResponse.content.includes('chưa hiểu')) {
+                    response = fallbackResponse;
+                }
+                else {
+                    // Dùng Gemini cho câu hỏi phức tạp
+                    response = await askGeminiAIWithContext(message, session);
+                }
         }
         // 6. Chuẩn bị và trả về response
         return prepareResponse(response, 'business_logic', intent, session);
